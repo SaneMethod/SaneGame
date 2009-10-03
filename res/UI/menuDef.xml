@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Menu System "kmenu.dtd">
 <Menu systemName="saneDef">
+<!-- Font Declarations -->
 	<Item name="interfaceFont" type="font" location="res/UI/Chapparel_00.png" fontLocation="res/UI/Chapparel.fnt" />
+	<Item name="dataFont" type="font" location="res/UI/BrushFont_00.png" fontLocation="res/UI/BrushFont.fnt" />
+	<Item name="standardFont" type="font" location="res/UI/Standard_00.png" fontLocation="res/UI/Standard.fnt" />
+	<Item name="scaryFont" type="font" location="res/UI/Cenobyte_00.png" fontLocation="res/UI/Cenobyte.fnt" />
+	<Item name="kingdomFont" type="font" location="res/UI/Kingdom_00.png" fontLocation="res/UI/Kingdom.fnt" />
+	<Item name="elvenFont" type="font" location="res/UI/Elven_00.png" fontLocation="res/UI/Elven.fnt" />
 </Menu>
