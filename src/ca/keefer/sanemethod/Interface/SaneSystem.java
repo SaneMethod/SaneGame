@@ -19,6 +19,17 @@ import ca.keefer.sanemethod.Tools.MenuItemsXMLPullParser;
  *
  */
 public class SaneSystem {
+	
+	/*
+	 * Defined Resources:
+	 * -Fonts-
+	 * interfaceFont
+	 * dataFont
+	 * standardFont
+	 * scaryFont
+	 * kingdomFont
+	 * elvenFont
+	 */
 
 	// Hashtable for the fonts
 	Hashtable<String,AngelCodeFont> systemFonts; 
@@ -34,7 +45,7 @@ public class SaneSystem {
 		systemFonts = new Hashtable<String,AngelCodeFont>();
 		systemImages = new Hashtable<String,Image>();
 		// Load xml file as input stream, and pass it and all hashtables to the parser
-		MenuItemsXMLPullParser parseThis = new MenuItemsXMLPullParser(
+		new MenuItemsXMLPullParser(
 				ResourceLoader.getResourceAsStream("res/UI/menuDef.xml"),systemImages,systemFonts);
 	}
 	

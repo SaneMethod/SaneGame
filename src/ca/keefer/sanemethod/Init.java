@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.util.Log;
 
 /**
  * This class instantiates an override of the StateBasedGame class, and initializes the various
@@ -31,6 +32,7 @@ public class Init extends StateBasedGame {
 			//Set console output to verbose to help diagnose problems
 			thisGameContainer.setVerbose(true);
 			
+			
 			// Add states to this game container
 			this.addState(new MainMenuState(Constants.MAINMENUSTATE));
 			this.addState(new IntroState(Constants.INTROSTATE));
@@ -40,9 +42,7 @@ public class Init extends StateBasedGame {
 			
 			
 		}catch (SlickException e){
-			JOptionPane.showMessageDialog(null, "Error in Init:"+e.getMessage(), 
-					"Slick Exception", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
+			Log.error("Error in Init:"+e.getMessage());
 			System.exit(-1);
 		}
 		
@@ -60,8 +60,6 @@ public class Init extends StateBasedGame {
 	// Call the init routines of the various states of the game
 	public void initStatesList(GameContainer container) throws SlickException {
 		// Init these states - call in order of expected display
-		this.getState(Constants.INTROSTATE).init(thisGameContainer, this);
-		this.getState(Constants.MAINMENUSTATE).init(thisGameContainer, this);
 		
 	}
 	
