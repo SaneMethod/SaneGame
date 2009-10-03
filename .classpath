@@ -13,5 +13,10 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Documents and Settings/Christopher Keefer/My Documents/lwjgl-2.1.0/native/windows"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Christopher Keefer/My Documents/xpp3-1.1.4c/xpp3-1.1.4c.jar" sourcepath="C:/Documents and Settings/Christopher Keefer/My Documents/xpp3-1.1.4c/src/java">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Documents and Settings/Christopher Keefer/My Documents/xpp3-1.1.4c/doc/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
