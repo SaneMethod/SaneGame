@@ -20,6 +20,8 @@ public class IntroState extends BasicGameState {
 	
 	// Class Variables
 	int stateID = -1;
+	StateBasedGame thisGame;
+	GameContainer thisContainer;
 	
 	SaneSystem systemTest;
 	
@@ -42,6 +44,11 @@ public class IntroState extends BasicGameState {
 			throws SlickException {
 		// TODO Auto-generated method stub
 		systemTest = new SaneSystem();
+		
+		// System reference variables
+		// Useful fo rmaking alterations to setup when outside of the supplying methods
+		thisGame=game;
+		thisContainer=container;
 	}
 
 	@Override
