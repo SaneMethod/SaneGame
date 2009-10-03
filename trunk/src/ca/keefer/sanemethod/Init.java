@@ -31,8 +31,11 @@ public class Init extends StateBasedGame {
 			//Set console output to verbose to help diagnose problems
 			thisGameContainer.setVerbose(true);
 			
-			//Init Game States
-			initStatesList(thisGameContainer);
+			// Add states to this game container
+			this.addState(new MainMenuState(Constants.MAINMENUSTATE));
+			this.addState(new IntroState(Constants.INTROSTATE));
+			
+			// Enter first game state and begin render/update loop
 			this.enterState(Constants.INTROSTATE);
 			
 			
@@ -56,8 +59,10 @@ public class Init extends StateBasedGame {
 	@Override
 	// Call the init routines of the various states of the game
 	public void initStatesList(GameContainer container) throws SlickException {
-		this.addState(new MainMenuState(Constants.MAINMENUSTATE));
-		this.addState(new IntroState(Constants.INTROSTATE));
+		// Init these states - call in order of expected display
+		this.getState(Constants.INTROSTATE).init(thisGameContainer, this);
+		this.getState(Constants.MAINMENUSTATE).init(thisGameContainer, this);
+		
 	}
 	
 }

@@ -1,10 +1,14 @@
 package ca.keefer.sanemethod;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+
+import ca.keefer.sanemethod.Interface.SaneSystem;
+import ca.keefer.sanemethod.Tests.Test;
 
 /**
  * This class contains the resources and logic for the introductory sequence
@@ -16,6 +20,10 @@ public class IntroState extends BasicGameState {
 	
 	// Class Variables
 	int stateID = -1;
+	
+	SaneSystem systemTest;
+	
+	
 	
 	// Constructor receives stateID
 	public IntroState(int stateID){
@@ -33,7 +41,7 @@ public class IntroState extends BasicGameState {
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 		// TODO Auto-generated method stub
-		
+		systemTest = new SaneSystem();
 	}
 
 	@Override
@@ -41,7 +49,10 @@ public class IntroState extends BasicGameState {
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
 		// TODO Auto-generated method stub
+		g.setBackground(Color.black);
 		
+		// For testing purposes
+		Test.drawStringTest(systemTest);
 	}
 
 	@Override
