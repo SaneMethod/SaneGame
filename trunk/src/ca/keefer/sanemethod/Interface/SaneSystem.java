@@ -23,12 +23,7 @@ public class SaneSystem {
 	/*
 	 * Defined Resources:
 	 * -Fonts-
-	 * interfaceFont
-	 * dataFont
-	 * standardFont
-	 * scaryFont
-	 * kingdomFont
-	 * elvenFont
+	 * see Constants class for font definitions
 	 */
 
 	// Hashtable for the fonts

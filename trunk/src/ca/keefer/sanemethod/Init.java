@@ -6,6 +6,8 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.Log;
 
+import ca.keefer.sanemethod.Tests.TestState;
+
 /**
  * This class instantiates an override of the StateBasedGame class, and initializes the various
  * game states.
@@ -36,9 +38,10 @@ public class Init extends StateBasedGame {
 			// Add states to this game container
 			this.addState(new MainMenuState(Constants.MAINMENUSTATE));
 			this.addState(new IntroState(Constants.INTROSTATE));
+			this.addState(new TestState(12));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.INTROSTATE);
+			this.enterState(12);
 			
 			
 		}catch (SlickException e){
@@ -59,7 +62,8 @@ public class Init extends StateBasedGame {
 	@Override
 	// Call the init routines of the various states of the game
 	public void initStatesList(GameContainer container) throws SlickException {
-		// Init these states - call in order of expected display
+		// Called when the entering the first game state
+		// Use to call any procedures needed at that time
 		
 	}
 	
