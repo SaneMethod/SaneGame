@@ -46,7 +46,7 @@ public class IntroState extends BasicGameState {
 		systemTest = new SaneSystem();
 		
 		// System reference variables
-		// Useful fo rmaking alterations to setup when outside of the supplying methods
+		// Useful for making alterations to setup when outside of the supplying methods
 		thisGame=game;
 		thisContainer=container;
 	}
