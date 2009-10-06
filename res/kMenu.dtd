@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Format 1.2 for kMenu XML loading 
+by Christopher Keefer
+First Design: 2009-07-15
+Last Updated: 2009-10-02
+-->
+<!ELEMENT Menu (Item*)>
+<!ATTLIST Menu
+	systemName CDATA #REQUIRED
+>
+<!ELEMENT Item EMPTY>
+<!ATTLIST Item
+	name CDATA #REQUIRED
+	type CDATA #REQUIRED
+	location CDATA #REQUIRED
+	fontLocation CDATA #IMPLIED
+	subImageX CDATA #IMPLIED
+	subImageY CDATA #IMPLIED
+	subImageWidth CDATA #IMPLIED
+	subImageHeight CDATA #IMPLIED
+>

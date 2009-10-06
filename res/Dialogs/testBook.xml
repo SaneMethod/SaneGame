@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Menu System "kText.dtd">
+<!-- Test Book -->
+<Dialog name="dialogTest">
+	<Text type="full" name="textTest" font="standardFont" colour="16777215" boxed="true" 
+	content="Hey There! This is just a test. I don't need to insert new lines, because this text will automatically be 
+	word-wrapped by my fancy algorithm! Pretty neat, huh? The only thing I have to be careful of is to leave 
+	a blank space at the end of what appears to be a line, so that the necessary whitespace token is found. 
+	Also, I probably ought to limit myself as to how much text is written in each entry, or the whole screen 
+	could end up covered in it."
+	/>
+</Dialog>

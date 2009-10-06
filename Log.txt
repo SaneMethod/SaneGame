@@ -1,0 +1,24 @@
+Christopher Keefer
+CSC-390 Log
+
+10/02/20090
+Started: 7 PM Finished: 9 PM
+Began sketching out program flow. Began work on basic classes. Reproduced some work from previous projects.
+
+10/03/09
+Started: 8 AM Finished: 2 PM
+Codified method of accessing system resources from XML files. Finished creating Font graphic files. Codified system-wide Constants.
+Finished Parser classes for accessing XML for System resources. Achieved run-window at 60 fps, displaying Glyphs.
+
+10/05/2009
+Started: 9:15 AM Finished: 12 PM
+Wrote a word-wrap routine based on the 'Greedy Algorithm', with a specific implementation operable with a number of
+different pre-defined fonts - namely, those I created earlier. Encapsulated within the Text object class, which can be
+called to draw itself to the screen. Will become part of the XML parsed Dialogs that will allow me to simply parse any
+dialog at will from an XML file, have the parser create the text object and pass that back, and then draw the text object.
+Worked for an hour on XML parser for text object, about half finished.
+
+10/05/2009 - 2
+Started: 6 PM Finished: 11 PM
+Finished XML parser for text. Considering adding Options tag to XML, to allow user to follow decision trees in the text. Worked
+on text box implementation using a OpenGL shape and a gradient fill. Considering using an expandable image texture instead.

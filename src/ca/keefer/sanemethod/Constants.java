@@ -2,6 +2,8 @@ package ca.keefer.sanemethod;
 
 import org.newdawn.slick.Input;
 
+import ca.keefer.sanemethod.Interface.SaneSystem;
+
 /**
  * This class contains configurable constants for a number of internal functions,
  * including game states, control bindings, and tile/sprite sizes.
@@ -25,6 +27,7 @@ public class Constants {
 	public static final int CONFIGMENUSTATE = 4;
 	public static final int SAVELOADMENUSTATE = 5;
 	public static final int CREDITSTATE = 6;
+	public static final int TESTSTATE = 12;
 	
 	// Animation direction constants
 	public static final int DIR_UP=0;
@@ -108,12 +111,6 @@ public class Constants {
 	public static final String FONT_KINGDOM = "kingdomFont";
 	public static final String FONT_ELVEN = "elvenFont";
 	
-	// Font Line Width constants - based on width of capital M
-	public static final int FONT_INTERFACE_MAX_WIDTH = 48; // 16 pixels indent either side
-	public static final int FONT_DATA_MAX_WIDTH = 30; // 25 pixels AA
-	public static final int FONT_STANDARD_MAX_WIDTH = 59; //Approx. 13 pixels AA
-	public static final int FONT_SCARY_MAX_WIDTH = 45; //Approx. 17 pixels AA
-	public static final int FONT_KINGDOM_MAX_WIDTH = 12; //Approx. 63 pixels AA
-	public static final int FONT_EVLEN_MAX_WIDTH = 130; //Approx. 6 pixels AA
-	
+	// SaneSystem for system-wide access
+	public static SaneSystem saneSystem = new SaneSystem();
 }
