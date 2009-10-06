@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Menu System "kmenu.dtd">
+<!DOCTYPE Menu System "kMenu.dtd">
 <Menu systemName="saneDef">
 <!-- Font Declarations -->
 	<Item name="interfaceFont" type="font" location="res/UI/Chapparel_00.png" fontLocation="res/UI/Chapparel.fnt" />

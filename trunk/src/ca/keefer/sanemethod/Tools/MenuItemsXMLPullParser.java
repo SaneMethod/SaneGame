@@ -52,7 +52,7 @@ public class MenuItemsXMLPullParser {
 				Log.info("XML Parsing Begun: "+Utility.getDateTime());
 			} else if(eventType == XmlPullParser.START_TAG) {
 				processStartElement(xpp);
-		}
+			}
 			eventType = xpp.next();
 		}while(eventType != XmlPullParser.END_DOCUMENT);
 		Log.info("XML Parsing Finished: "+Utility.getDateTime());

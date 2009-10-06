@@ -43,7 +43,7 @@ public class IntroState extends BasicGameState {
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 		// TODO Auto-generated method stub
-		systemTest = new SaneSystem();
+		systemTest = Constants.saneSystem;
 		
 		// System reference variables
 		// Useful for making alterations to setup when outside of the supplying methods
