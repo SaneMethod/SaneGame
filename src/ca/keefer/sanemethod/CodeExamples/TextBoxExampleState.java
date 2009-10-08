@@ -1,4 +1,4 @@
-package ca.keefer.sanemethod.Tests;
+package ca.keefer.sanemethod.CodeExamples;
 
 import java.util.ArrayList;
 
@@ -17,11 +17,11 @@ import ca.keefer.sanemethod.Tools.Text;
 import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 
 /**
- * This class is just a test-bed state for me to experiment in
+ * This code example illustrates two different ways to setup, update and draw text boxes to the screen
  * @author Christopher Keefer
  *
  */
-public class TestState extends BasicGameState {
+public class TextBoxExampleState extends BasicGameState {
 
 	// Global variables
 	int stateID=0;
@@ -32,7 +32,7 @@ public class TestState extends BasicGameState {
 	ArrayList<Text> thisDialog;
 	short proceed;
 	
-	public TestState(int stateID){
+	public TextBoxExampleState(int stateID){
 		this.stateID = stateID;
 	}
 	
