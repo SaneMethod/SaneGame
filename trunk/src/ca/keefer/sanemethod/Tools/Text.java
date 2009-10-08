@@ -2,34 +2,67 @@ package ca.keefer.sanemethod.Tools;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.geom.*;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.ShapeRenderer;
+import org.newdawn.slick.util.Log;
+
+import ca.keefer.sanemethod.Constants;
 
 import java.util.Scanner;
 
 /**
  * This class defines a Text object, with the following properties:
- * Font The font to use to print this Text object
- * Colour The colour to print the string in
- * Text The string to print
+ * name String of the object name derived from xml or direct input
+ * font The font to use to print this Text object
+ * colour The colour to print the string in
+ * text The string to print
+ * boxed boolean determining whether to draw a text box around the string or not
+ * resString the parsed string to print
+ * textTex Texture for text box
+ * position short determining vertical screen position
+ * x float x position
+ * y float y position
+ * prepared whether this text object is ready to drawn or not 
  * @author Christopher Keefer
+ * @version 1.4
  *
  */
 public class Text {
 	
+	// Object global variables
 	String name;
 	AngelCodeFont font;
 	Color colour;
 	String text;
 	boolean boxed;
-	final short BOTTOM = 0;
-	final short MIDDLE = 1;
-	final short TOP = 2;
-	int height; // This is known only after drawing the text
+	String resString;
+	Image textTex;
+	short position;
+	float x;
+	float y;
+	boolean prepared=false;
 	
-	// These variables are used for the morphable text box
-	Circle startShape;
-	RoundedRectangle finishShape;
-	MorphShape morphShape;
+	// Text box global variables
+	short boxState=0;
+	public static final short OPENING=0;
+	public static final short OPEN=1;
+	public static final short CLOSING=2;
+	public static final short CLOSED=3;
+	int boxHeight=0;
+	
+	// Letter-By-Letter drawing vars
+	int cOffset;
+	int accumulator;
+	
+	// Position statics
+	final public static short BOTTOM = 0;
+	final public static short MIDDLE = 1;
+	final public static short TOP = 2;
+	
+	int height; // This is known only after parsing the text
+	int width; // This is known only after parsing the text
 	
 	// Minimal constructor
 	public Text(AngelCodeFont font, String text){
@@ -38,34 +71,61 @@ public class Text {
 		colour=Color.black;
 		this.text=text;
 		this.boxed=true;
+		try {
+			textTex = new Image("res/textTex.png");
+		} catch (SlickException e) {
+			Log.error("Failure to load image in Text:"+e.getMessage());
+		}
 	}
 	
 	// Recommended Constructor
-	public Text(String name, AngelCodeFont font, Color colour, String text){
+	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text){
 		this.name = name;
 		this.font=font;
 		this.colour=colour;
 		this.text=text;
 		this.boxed=true;
+		try {
+			textTex = new Image("res/textTex.png");
+		} catch (SlickException e) {
+			Log.error("Failure to load image in Text:"+e.getMessage());
+		}
 	}
 	
 	// Full Constructor
-	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text){
+	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text, Image textTex){
 		this.name=name;
 		this.font=font;
 		this.colour=colour;
 		this.boxed=boxed;
 		this.text=text;
+		this.textTex=textTex;
 	}
 	
-	// This method implements the Greedy Algorithm to determine word placement on a line
-	public String wordWrap(int boxWidth, int xOffset){
+	// This method ensures the horizontal centering of the text box
+	public float centerWidth(float width){
+		float x = (Constants.SCREENWIDTH - width) / 2;
+		return x;
+	}
+	
+	// This method allows for the easy vertical centering of the text box
+	public float centerHeight(float height){
+		float y = (Constants.SCREENHEIGHT - height) / 2;
+		return y;
+	}
+	
+	// This method parses the text, wrapping it according to my implementation of the
+	// Greedy Algorithm - not optimal, perhaps, but efficient
+	// This requires that the text to print be split into words (searching for blank space
+	// as the token) and each word be considered as to whether it will fit in the remaining
+	// width or not - if not, it is placed on the next line, and the process continues
+	public String wordWrap(int boxWidth, int xOffset, String text){
 		int textWidth=xOffset;
 		String token="";
 		String temp="";
 		String product="";
 		// tokenize and split the text
-		Scanner thisScan = new Scanner(this.text);
+		Scanner thisScan = new Scanner(text);
 		while(thisScan.hasNext()){
 			token = thisScan.next()+" ";
 			// Add the width of this token to the currently tested width
@@ -86,25 +146,138 @@ public class Text {
 		return product;
 	}
 	
-	// This method draws the text, wrapping it according to my implementation of the
-	// Greedy Algorithm - not optimal, perhaps, but efficient - see method wordWrap, above
-	// This requires that the text to print be split into words (searching for blank space
-	// as the token) and each word be considered as to whether it will fit in the remaining
-	// width or not - if not, it is placed on the next line, and the process continues
 	
-	// Also, depending on the boxed variable, a morphable shape may be drawn in and around the
-	// the text at the specified x and y positions, plus a ten(?) pixel margin
-	public void draw(float x, float y, int boxWidth){
+	// This method draws the full text immediately to the screen
+	public void draw(){
+		
+		// Don't allow text drawing without preparation
+		if (this.prepared != true){
+			Log.warn("Attempt to draw text object without first calling prepare.");
+			// Insert default values
+			this.prepare(20,BOTTOM,750);
+		}
+		// if boxed==true, then draw a text box around the text
+		if (boxed){
+			x = centerWidth(width);
+			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,height+15), textTex);
+		}
+		// draw this text to the screen at given position
+		this.font.drawString(x, y, resString, this.colour);
+	}
+	
+	public short drawTextBox(){
+		// Don't allow box drawing without preparation
+		if (this.prepared != true){
+			Log.warn("Attempt to draw text object without first calling prepare.");
+			// Insert default values
+			this.prepare(20,BOTTOM,750);
+		}
+		switch(boxState){
+		case OPENING:
+			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,boxHeight), textTex);
+			if (boxHeight < height){
+				boxHeight += 25;
+			}else {
+				boxState = OPEN;
+			}
+			break;
+		case OPEN:
+			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,height+15), textTex);
+			break;
+		case CLOSING:
+			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,boxHeight), textTex);
+			if (boxHeight > 0){
+				boxHeight -= 25;
+			}else {
+				boxState = CLOSED;
+			}
+			break;
+		case CLOSED:
+			break;
+		}
+		return boxState;
+	}
+	
+	public void setBoxState (short s){
+		boxState = s;
+	}
+	public void switchBoxState(){
+		if (boxState == OPEN){
+			boxState = CLOSING;
+		}else{
+			boxState = OPENING;
+		}
+	}
+	
+	public void updateTextLetterByLetter(int delta){
+		// Update the offset for the text display based on how
+		// much time has passed
+		accumulator += delta;
+		if (cOffset < resString.length() && accumulator >= 10){
+			cOffset++;
+			accumulator = 0;
+		}
+	}
+	
+	// Draw the text letter by letter to the screen - must be called from render
+	public void drawTextLetterByLetter(){
+		// Don't allow text drawing without preparation
+		if (this.prepared != true){
+			Log.warn("Attempt to draw text object without first calling prepare.");
+			// Insert default values
+			this.prepare(20,BOTTOM,750);
+		}
+		this.font.drawString(x, y, resString.substring(0, cOffset), this.colour);
+	}
+	
+	// Called before any output functions, to ensure text is properly
+	// formatted and all text-dependant variables are set
+	public void prepare(float x, short pos, int boxWidth){
+		// float for y position based on short
+		this.y=0;
+		this.x=x;
 		
 		// Get word-wrapped version of text
-		this.text= wordWrap(boxWidth, (int) x);
-		
-		if (boxed){
-			
+		resString= wordWrap(boxWidth, (int) x, this.text);
+		// Set height and width
+		height = this.font.getHeight(resString);
+		width = this.font.getWidth(resString);
+		// Center x position
+		x = centerWidth(width);
+		// Depending on position variable and height, determine where to place the box vertically
+		if (pos == BOTTOM){
+			this.y = Constants.SCREENHEIGHT - height - 20;
+		}else if (pos == MIDDLE){
+			this.y = centerHeight(height);
+		}else if (pos == TOP){
+			this.y = 20;
 		}
+		cOffset=0;
+		accumulator=0;
+		this.prepared = true;
+	}
+	
+	public boolean isPrepared(){
+		return this.prepared;
+	}
+	
+	// Use this method when we just want the wordwrapped string returned
+	public String getString(float x, int boxWidth){
+		// Get word-wrapped version of text
+		resString= wordWrap(boxWidth, (int) x, this.text);
+		// Set height
+		height = this.font.getHeight(resString);
 		
-		// draw this text to the screen at given position
-		this.font.drawString(x, y, this.text, this.colour);
+		return resString;
+	}
+	
+	// use this to get the height of the word-wrapped string
+	public int getHeight(float x, int boxWidth){
+		resString= wordWrap(boxWidth, (int) x, this.text);
+		// Set height
+		height = this.font.getHeight(resString);
+		
+		return height;
 	}
 	
 }

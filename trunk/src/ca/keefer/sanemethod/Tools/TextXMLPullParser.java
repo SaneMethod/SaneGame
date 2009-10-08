@@ -18,6 +18,8 @@ import java.util.ArrayList;
  * to draw itself to the screen, before the state calls this routine again to fetch the next
  * part of the conversation
  * @author Christopher Keefer
+ * @version 1.1
+ * @see ca.keefer.sanemethod.Tools.Text
  *
  */
 public class TextXMLPullParser {
@@ -68,6 +70,7 @@ public class TextXMLPullParser {
 				Log.error("Error parsing Dialog:"+e.getMessage());
 			}
 		}while(eventType != XmlPullParser.END_DOCUMENT);
+		Log.info("Dialog Parsing Finished: "+Utility.getDateTime());
 		
 		return thisDialog;
 	}
@@ -84,7 +87,7 @@ public class TextXMLPullParser {
 			
 			//Check to see what type (either full, rec or min) of text tag we're dealing with
 			if (xpp.getAttributeValue(0).equals("full")){
-				
+				Log.info("Adding Text:"+xpp.getAttributeValue(1));
 				thisDialog.add(new Text(xpp.getAttributeValue(1),saneSystem.getFonts().get(xpp.getAttributeValue(2)),
 						Color.decode(xpp.getAttributeValue(3)),Boolean.parseBoolean(xpp.getAttributeValue(4)),
 						xpp.getAttributeValue(5)));
