@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Menu System "kText.dtd">
-<!-- Test Book -->
+<!-- Test Dialog -->
 <Dialog name="dialogTest">
-	<Text type="full" name="textTest" font="standardFont" colour="16777215" boxed="true" 
+	<Text type="rec" name="textTest" font="standardFont" colour="16777215" boxed="true" 
 	content="Hey There! This is just a test. I don't need to insert new lines, because this text will automatically be 
 	word-wrapped by my fancy algorithm! Pretty neat, huh? The only thing I have to be careful of is to leave 
 	a blank space at the end of what appears to be a line, so that the necessary whitespace token is found. 
 	Also, I probably ought to limit myself as to how much text is written in each entry, or the whole screen 
 	could end up covered in it."
+	/>
+	<Option name="testOption" font="standardFont" colour="16777215" boxed="true"
+	content="Wow this one is a really particularly long option isn't it! Woohoo!!@@
+	This is option two!@@This is option three! It's super duper long on purpose. Guess what the purpose
+	is! Guess! Okay, I'll tell you... test purposes! YAY! Wow... This can't really work on the first try, can it?
+	You mean, I don't have to spend the next hour tinkering with it? It's just going to work right off the bat?
+	Weird. But AWESOME! :)@@This is option four!"
+	caption="Here are your options:"
+	values="resText@@resText@@textTest@@textTest"
+	/>
+	<Text type="rec" name="resText" font="standardFont" colour="16777215" boxed="false"
+	content="You selected option one or two, didn't you!?"
 	/>
 </Dialog>

@@ -13,7 +13,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Interface.SaneSystem;
-import ca.keefer.sanemethod.Tools.Text;
+import ca.keefer.sanemethod.Interface.Text;
 import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 
 /**

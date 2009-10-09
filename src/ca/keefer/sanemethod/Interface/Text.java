@@ -1,4 +1,4 @@
-package ca.keefer.sanemethod.Tools;
+package ca.keefer.sanemethod.Interface;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
@@ -43,6 +43,7 @@ public class Text {
 	float x;
 	float y;
 	boolean prepared=false;
+	boolean isOption=false; // Boolean for the child Option class to set, to prevent word wrapping of options
 	
 	// Text box global variables
 	short boxState=0;
@@ -68,7 +69,7 @@ public class Text {
 	public Text(AngelCodeFont font, String text){
 		this.name="Unknown";
 		this.font=font;
-		colour=Color.black;
+		colour=Color.white;
 		this.text=text;
 		this.boxed=true;
 		try {
@@ -84,7 +85,7 @@ public class Text {
 		this.font=font;
 		this.colour=colour;
 		this.text=text;
-		this.boxed=true;
+		this.boxed=boxed;
 		try {
 			textTex = new Image("res/textTex.png");
 		} catch (SlickException e) {
@@ -146,9 +147,22 @@ public class Text {
 		return product;
 	}
 	
-	
 	// This method draws the full text immediately to the screen
 	public void draw(){
+		
+		// Don't allow text drawing without preparation
+		if (this.prepared != true){
+			Log.warn("Attempt to draw text object without first calling prepare.");
+			// Insert default values
+			//this.prepare(20,BOTTOM,750);
+		}
+		// draw this text to the screen at given position
+		this.font.drawString(x, y, resString, this.colour);
+	}
+	
+	
+	// This method draws the full text immediately to the screen with an immediate box
+	public void drawWithBox(){
 		
 		// Don't allow text drawing without preparation
 		if (this.prepared != true){
@@ -172,28 +186,32 @@ public class Text {
 			// Insert default values
 			this.prepare(20,BOTTOM,750);
 		}
-		switch(boxState){
-		case OPENING:
-			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,boxHeight), textTex);
-			if (boxHeight < height){
-				boxHeight += 25;
-			}else {
-				boxState = OPEN;
+		if (boxed){
+			switch(boxState){
+			case OPENING:
+				ShapeRenderer.textureFit(new Rectangle(x-15,y-5,width+30,boxHeight), textTex);
+				if (boxHeight < height){
+					boxHeight += 25;
+				}else {
+					boxState = OPEN;
+				}
+				break;
+			case OPEN:
+				ShapeRenderer.textureFit(new Rectangle(x-15,y-5,width+30,height+15), textTex);
+				break;
+			case CLOSING:
+				ShapeRenderer.textureFit(new Rectangle(x-15,y-5,width+30,boxHeight), textTex);
+				if (boxHeight > 0){
+					boxHeight -= 25;
+				}else {
+					boxState = CLOSED;
+				}
+				break;
+			case CLOSED:
+				break;
 			}
-			break;
-		case OPEN:
-			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,height+15), textTex);
-			break;
-		case CLOSING:
-			ShapeRenderer.textureFit(new Rectangle(x-10,y-5,width+20,boxHeight), textTex);
-			if (boxHeight > 0){
-				boxHeight -= 25;
-			}else {
-				boxState = CLOSED;
-			}
-			break;
-		case CLOSED:
-			break;
+		}else {
+			boxState = OPEN;
 		}
 		return boxState;
 	}
@@ -213,7 +231,7 @@ public class Text {
 		// Update the offset for the text display based on how
 		// much time has passed
 		accumulator += delta;
-		if (cOffset < resString.length() && accumulator >= 10){
+		if (cOffset < resString.length() && accumulator >= Constants.TEXT_SPEED){
 			cOffset++;
 			accumulator = 0;
 		}
@@ -237,13 +255,17 @@ public class Text {
 		this.y=0;
 		this.x=x;
 		
-		// Get word-wrapped version of text
-		resString= wordWrap(boxWidth, (int) x, this.text);
+		if (!isOption){
+			// Get word-wrapped version of text
+			resString= wordWrap(boxWidth, (int) x, this.text);
+		}else{
+			resString=text;
+		}
 		// Set height and width
 		height = this.font.getHeight(resString);
 		width = this.font.getWidth(resString);
 		// Center x position
-		x = centerWidth(width);
+		this.x = centerWidth(width);
 		// Depending on position variable and height, determine where to place the box vertically
 		if (pos == BOTTOM){
 			this.y = Constants.SCREENHEIGHT - height - 20;
