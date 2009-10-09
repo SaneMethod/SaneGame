@@ -111,6 +111,12 @@ public class Constants {
 	public static final String FONT_KINGDOM = "kingdomFont";
 	public static final String FONT_ELVEN = "elvenFont";
 	
+	// Text Display Speed Constants
+	public static final int TEXT_SPEED_FAST = 10;
+	public static final int TEXT_SPEED_MEDIUM = 50;
+	public static final int TEXT_SPEED_SLOW = 100;
+	public static int TEXT_SPEED = TEXT_SPEED_MEDIUM;
+	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();
 }

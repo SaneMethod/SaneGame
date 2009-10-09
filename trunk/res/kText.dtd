@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Format 1.1 for kText XML
+Format 1.2 for kText XML
 by Christopher Keefer
 First Design: 2009-10-04
-Last Updated: 2009-10-04
+Last Updated: 2009-10-09
 -->
 <!ELEMENT Dialog (Text*|Option*)>
 <!ATTLIST Dialog
 	name CDATA #REQUIRED
 >
-<!ELEMENT Text CDATA>
+<!ELEMENT Text EMPTY>
 <!ATTLIST Text
+	type CDATA #REQUIRED
 	name CDATA #REQUIRED
 	font CDATA #REQUIRED
 	colour CDATA #IMPLIED
 	boxed CDATA #IMPLIED
-	position CDATA #IMPLIED
+	content CDATA #REQUIRED
 >
-<!ELEMENT Option CDATA>
+<!ELEMENT Option EMPTY>
 <!ATTLIST Option
 	name CDATA #REQUIRED
-	value CDATA #REQUIRED
+	font CDATA #REQUIRED
+	colour CDATA #IMPLIED
+	boxed CDATA #IMPLIED
+	content CDATA #REQUIRED
+	caption CDATA #IMPLIED
+	values CDATA #REQUIRED
 >

@@ -22,3 +22,17 @@ Worked for an hour on XML parser for text object, about half finished.
 Started: 6 PM Finished: 11 PM
 Finished XML parser for text. Considering adding Options tag to XML, to allow user to follow decision trees in the text. Worked
 on text box implementation using a OpenGL shape and a gradient fill. Considering using an expandable image texture instead.
+
+10/08/2009
+Started:12 PM Finished: 5 PM
+Finished Animated Text box and letter-by-letter text display. Finished text box display using an expandable texture directly rendered
+by OpenGL to the screen context. Added two different ways to instantiate, update and display text objects. Created configurable text
+display speeds. Began work on main menu. 
+
+10/09/2009
+Started: 11 AM Finished: 4:30 PM
+Added Options Tag to Dialog XML standard (kText.dtd). Created Options class (extending Text class). Class now automatically parses a
+given content for a specific delimiter (@@) to define where one option ends, and another begins. Also, a caption can be added to the
+beginning of the Option text that isn't selectable, but rather instructs the user what to do, or informs he what he is choosing, etc.
+Also, the select box will automatically resize itself to the option, allowing the option to span multiple lines if necessary. Also
+created the ability to move a select box and choose an option to the class.

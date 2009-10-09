@@ -1,8 +1,13 @@
 package ca.keefer.sanemethod.Tools;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Interface.Option;
 import ca.keefer.sanemethod.Interface.SaneSystem;
+import ca.keefer.sanemethod.Interface.Text;
+
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -83,15 +88,35 @@ public class TextXMLPullParser {
 			Log.info("Dialog Name:"+xpp.getAttributeValue(0));
 		}else if (xpp.getName().equals("Text")){
 			// Index: 0 = type; 1 = name; 2 = AngelCodeFont name; 3 = Colour decimal value;
-			// 4 = whether to display the text box; 5 = box position; 6 = text content
+			// 4 = whether to display the text box; 5 = text content; 6 = Image ref for textbox
 			
 			//Check to see what type (either full, rec or min) of text tag we're dealing with
 			if (xpp.getAttributeValue(0).equals("full")){
 				Log.info("Adding Text:"+xpp.getAttributeValue(1));
+				try {
+					thisDialog.add(new Text(xpp.getAttributeValue(1),saneSystem.getFonts().get(xpp.getAttributeValue(2)),
+							Color.decode(xpp.getAttributeValue(3)),Boolean.parseBoolean(xpp.getAttributeValue(4)),
+							xpp.getAttributeValue(5), new Image(xpp.getAttributeValue(6))));
+				} catch (SlickException e) {
+					Log.error("Failed to load texture image in Text:"+e.getMessage());
+				}
+			}else if (xpp.getAttributeValue(0).equals("rec")){
+				Log.info("Adding Text:"+xpp.getAttributeValue(1));
 				thisDialog.add(new Text(xpp.getAttributeValue(1),saneSystem.getFonts().get(xpp.getAttributeValue(2)),
 						Color.decode(xpp.getAttributeValue(3)),Boolean.parseBoolean(xpp.getAttributeValue(4)),
 						xpp.getAttributeValue(5)));
+			}else if (xpp.getAttributeValue(0).equals("min")){
+				Log.info("Adding Text:"+xpp.getAttributeValue(1));
+				thisDialog.add(new Text(saneSystem.getFonts().get(xpp.getAttributeValue(2)), xpp.getAttributeValue(5)));
 			}
+		}else if (xpp.getName().equals("Option")){
+			// create an object of type Option, with an optional caption that will be displayed at the top
+			// of the text box, above the options
+			Log.info("Adding Option Text:"+xpp.getAttributeValue(0));
+			// Index: 0 = name; 1 = font; 2 = colour; 3 = boxed; 4 = options; 5 = caption; 6 = values;
+			thisDialog.add(new Option(xpp.getAttributeValue(0), saneSystem.getFonts().get(xpp.getAttributeValue(1)),
+					Color.decode(xpp.getAttributeValue(2)), Boolean.parseBoolean(xpp.getAttributeValue(3)), 
+					xpp.getAttributeValue(4), xpp.getAttributeValue(5), xpp.getAttributeValue(6)));
 		}
 	}
 	
