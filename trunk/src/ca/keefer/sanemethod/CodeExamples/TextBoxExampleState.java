@@ -49,7 +49,7 @@ public class TextBoxExampleState extends BasicGameState {
 		
 		thisText = new Text("testText",saneSystem.getFonts().get("kingdomFont"),Color.decode("16777215"),true,
 				"This is a really, truly, extraordinarily long string, especially considering " +
-				"that this will be printed in the huge kindgom font.");
+				"that this will be printed in the huge kindgom font.", Text.PROCEED_END);
 				
 		/*
 		TextXMLPullParser testPull = new TextXMLPullParser(ResourceLoader.getResourceAsStream("res/Dialogs/testBook.xml"));

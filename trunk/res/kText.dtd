@@ -15,9 +15,11 @@ Last Updated: 2009-10-09
 	type CDATA #REQUIRED
 	name CDATA #REQUIRED
 	font CDATA #REQUIRED
-	colour CDATA #IMPLIED
-	boxed CDATA #IMPLIED
+	colour CDATA #REQUIRED
+	boxed CDATA #REQUIRED
 	content CDATA #REQUIRED
+	texture CDATA #REQUIRED
+	proceed CDATA #REQUIRED
 >
 <!ELEMENT Option EMPTY>
 <!ATTLIST Option

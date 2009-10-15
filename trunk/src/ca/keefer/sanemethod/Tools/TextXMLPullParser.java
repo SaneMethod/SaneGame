@@ -89,6 +89,7 @@ public class TextXMLPullParser {
 		}else if (xpp.getName().equals("Text")){
 			// Index: 0 = type; 1 = name; 2 = AngelCodeFont name; 3 = Colour decimal value;
 			// 4 = whether to display the text box; 5 = text content; 6 = Image ref for textbox
+			// 7 = proceed
 			
 			//Check to see what type (either full, rec or min) of text tag we're dealing with
 			if (xpp.getAttributeValue(0).equals("full")){
@@ -96,7 +97,7 @@ public class TextXMLPullParser {
 				try {
 					thisDialog.add(new Text(xpp.getAttributeValue(1),saneSystem.getFonts().get(xpp.getAttributeValue(2)),
 							Color.decode(xpp.getAttributeValue(3)),Boolean.parseBoolean(xpp.getAttributeValue(4)),
-							xpp.getAttributeValue(5), new Image(xpp.getAttributeValue(6))));
+							xpp.getAttributeValue(5), new Image(xpp.getAttributeValue(6)),xpp.getAttributeValue(7)));
 				} catch (SlickException e) {
 					Log.error("Failed to load texture image in Text:"+e.getMessage());
 				}
@@ -104,10 +105,11 @@ public class TextXMLPullParser {
 				Log.info("Adding Text:"+xpp.getAttributeValue(1));
 				thisDialog.add(new Text(xpp.getAttributeValue(1),saneSystem.getFonts().get(xpp.getAttributeValue(2)),
 						Color.decode(xpp.getAttributeValue(3)),Boolean.parseBoolean(xpp.getAttributeValue(4)),
-						xpp.getAttributeValue(5)));
+						xpp.getAttributeValue(5), xpp.getAttributeValue(7)));
 			}else if (xpp.getAttributeValue(0).equals("min")){
 				Log.info("Adding Text:"+xpp.getAttributeValue(1));
-				thisDialog.add(new Text(saneSystem.getFonts().get(xpp.getAttributeValue(2)), xpp.getAttributeValue(5)));
+				thisDialog.add(new Text(saneSystem.getFonts().get(xpp.getAttributeValue(2)), xpp.getAttributeValue(5),
+						xpp.getAttributeValue(7)));
 			}
 		}else if (xpp.getName().equals("Option")){
 			// create an object of type Option, with an optional caption that will be displayed at the top
