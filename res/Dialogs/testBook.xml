@@ -7,7 +7,7 @@
 	word-wrapped by my fancy algorithm! Pretty neat, huh? The only thing I have to be careful of is to leave 
 	a blank space at the end of what appears to be a line, so that the necessary whitespace token is found. 
 	Also, I probably ought to limit myself as to how much text is written in each entry, or the whole screen 
-	could end up covered in it."
+	could end up covered in it." texture="" proceed="++"
 	/>
 	<Option name="testOption" font="standardFont" colour="16777215" boxed="true"
 	content="Wow this one is a really particularly long option isn't it! Woohoo!!@@
@@ -19,6 +19,6 @@
 	values="resText@@resText@@textTest@@textTest"
 	/>
 	<Text type="rec" name="resText" font="standardFont" colour="16777215" boxed="false"
-	content="You selected option one or two, didn't you!?"
+	content="You selected option one or two, didn't you!?" texture="" proceed="textTest"
 	/>
 </Dialog>

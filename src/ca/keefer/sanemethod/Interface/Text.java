@@ -26,7 +26,7 @@ import java.util.Scanner;
  * y float y position
  * prepared whether this text object is ready to drawn or not 
  * @author Christopher Keefer
- * @version 1.4
+ * @version 1.5
  *
  */
 public class Text {
@@ -37,13 +37,17 @@ public class Text {
 	Color colour;
 	String text;
 	boolean boxed;
+	String proceed; // Stores information on which (if any) Text object from the current dialog should be displayed
+	
 	String resString;
 	Image textTex;
 	short position;
 	float x;
 	float y;
 	boolean prepared=false;
-	boolean isOption=false; // Boolean for the child Option class to set, to prevent word wrapping of options
+	public boolean option=false; // Boolean for the child Option class to set, to prevent word wrapping of options
+	boolean finished=false; // Boolean for whether the text is finished displaying letter-by-letter
+	boolean skippable=false; // Boolean determining whether this text can be fast-forwarded through by the user
 	
 	// Text box global variables
 	short boxState=0;
@@ -57,6 +61,11 @@ public class Text {
 	int cOffset;
 	int accumulator;
 	
+	// proceed string statics
+	final public static String PROCEED_NEXT = "++";
+	final public static String PROCEED_LAST = "--";
+	final public static String PROCEED_END = "@@";
+	
 	// Position statics
 	final public static short BOTTOM = 0;
 	final public static short MIDDLE = 1;
@@ -66,10 +75,11 @@ public class Text {
 	int width; // This is known only after parsing the text
 	
 	// Minimal constructor
-	public Text(AngelCodeFont font, String text){
+	public Text(AngelCodeFont font, String text, String proceed){
 		this.name="Unknown";
 		this.font=font;
 		colour=Color.white;
+		this.proceed=proceed;
 		this.text=text;
 		this.boxed=true;
 		try {
@@ -80,12 +90,13 @@ public class Text {
 	}
 	
 	// Recommended Constructor
-	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text){
+	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text, String proceed){
 		this.name = name;
 		this.font=font;
 		this.colour=colour;
 		this.text=text;
 		this.boxed=boxed;
+		this.proceed=proceed;
 		try {
 			textTex = new Image("res/textTex.png");
 		} catch (SlickException e) {
@@ -94,13 +105,20 @@ public class Text {
 	}
 	
 	// Full Constructor
-	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text, Image textTex){
+	public Text(String name, AngelCodeFont font, Color colour, boolean boxed, String text, Image textTex, 
+			String proceed){
 		this.name=name;
 		this.font=font;
 		this.colour=colour;
 		this.boxed=boxed;
 		this.text=text;
 		this.textTex=textTex;
+		this.proceed=proceed;
+	}
+	
+	// returns name
+	public String getName(){
+		return this.name;
 	}
 	
 	// This method ensures the horizontal centering of the text box
@@ -149,13 +167,6 @@ public class Text {
 	
 	// This method draws the full text immediately to the screen
 	public void draw(){
-		
-		// Don't allow text drawing without preparation
-		if (this.prepared != true){
-			Log.warn("Attempt to draw text object without first calling prepare.");
-			// Insert default values
-			//this.prepare(20,BOTTOM,750);
-		}
 		// draw this text to the screen at given position
 		this.font.drawString(x, y, resString, this.colour);
 	}
@@ -163,13 +174,6 @@ public class Text {
 	
 	// This method draws the full text immediately to the screen with an immediate box
 	public void drawWithBox(){
-		
-		// Don't allow text drawing without preparation
-		if (this.prepared != true){
-			Log.warn("Attempt to draw text object without first calling prepare.");
-			// Insert default values
-			this.prepare(20,BOTTOM,750);
-		}
 		// if boxed==true, then draw a text box around the text
 		if (boxed){
 			x = centerWidth(width);
@@ -180,18 +184,12 @@ public class Text {
 	}
 	
 	public short drawTextBox(){
-		// Don't allow box drawing without preparation
-		if (this.prepared != true){
-			Log.warn("Attempt to draw text object without first calling prepare.");
-			// Insert default values
-			this.prepare(20,BOTTOM,750);
-		}
 		if (boxed){
 			switch(boxState){
 			case OPENING:
 				ShapeRenderer.textureFit(new Rectangle(x-15,y-5,width+30,boxHeight), textTex);
 				if (boxHeight < height){
-					boxHeight += 25;
+					boxHeight += 15;
 				}else {
 					boxState = OPEN;
 				}
@@ -202,7 +200,7 @@ public class Text {
 			case CLOSING:
 				ShapeRenderer.textureFit(new Rectangle(x-15,y-5,width+30,boxHeight), textTex);
 				if (boxHeight > 0){
-					boxHeight -= 25;
+					boxHeight -= 15;
 				}else {
 					boxState = CLOSED;
 				}
@@ -211,7 +209,11 @@ public class Text {
 				break;
 			}
 		}else {
+			if (boxState == OPENING){
 			boxState = OPEN;
+			}else if (boxState == CLOSING){
+				boxState = CLOSED;
+			}
 		}
 		return boxState;
 	}
@@ -234,17 +236,13 @@ public class Text {
 		if (cOffset < resString.length() && accumulator >= Constants.TEXT_SPEED){
 			cOffset++;
 			accumulator = 0;
+		}else{
+			this.finished = true;
 		}
 	}
 	
 	// Draw the text letter by letter to the screen - must be called from render
 	public void drawTextLetterByLetter(){
-		// Don't allow text drawing without preparation
-		if (this.prepared != true){
-			Log.warn("Attempt to draw text object without first calling prepare.");
-			// Insert default values
-			this.prepare(20,BOTTOM,750);
-		}
 		this.font.drawString(x, y, resString.substring(0, cOffset), this.colour);
 	}
 	
@@ -255,7 +253,7 @@ public class Text {
 		this.y=0;
 		this.x=x;
 		
-		if (!isOption){
+		if (!option){
 			// Get word-wrapped version of text
 			resString= wordWrap(boxWidth, (int) x, this.text);
 		}else{
@@ -281,6 +279,22 @@ public class Text {
 	
 	public boolean isPrepared(){
 		return this.prepared;
+	}
+	
+	public boolean isOption(){
+		return this.option;
+	}
+	
+	public String getProceed(){
+		return proceed;
+	}
+	
+	public boolean isSkippable(){
+		return skippable;
+	}
+	
+	public boolean isFinished(){
+		return finished;
 	}
 	
 	// Use this method when we just want the wordwrapped string returned

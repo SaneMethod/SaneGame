@@ -39,20 +39,21 @@ public class Option extends Text{
 	// Recommended Constructor
 	public Option (String name, AngelCodeFont font, Color colour, boolean boxed, String options,
 			String caption, String values){
-		super (name, font, colour, boxed, caption);
+		super (name, font, colour, boxed, caption,Text.PROCEED_END);
 		parse(values, options);
 	}
 	
 	// Full Constructor
 	public Option(String name, AngelCodeFont font, Color colour, boolean boxed,
 			String options, Image textTex, String caption, String values) {
-		super(name, font, colour, boxed, caption, textTex);
+		super(name, font, colour, boxed, caption, textTex, Text.PROCEED_END);
 		parse(values, options);
 	}
 	
 	public void parse(String values, String options){
 		// Set variable to prevent word-wrapping of options
-		this.isOption=true;
+		this.option=true;
+		this.finished=true;
 		// break up the text and values strings into new lines based on the delimiter '|'
 		optionCount=0;
 		text+="\n";
@@ -113,6 +114,14 @@ public class Option extends Text{
 			selected++;
 		}
 		Log.info("Selected:"+selected);
+	}
+	
+	// This method returns that string value of the selected option so that
+	// the Dialog ArrayList can be searched for the appropriately named Text or Option
+	// Allowing for branching conversation trees
+	public String getValue(){
+		// return string value of the option the selected var is currently pointing at
+		return values[selected-1];
 	}
 
 }

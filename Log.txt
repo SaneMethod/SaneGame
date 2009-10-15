@@ -36,3 +36,15 @@ given content for a specific delimiter (@@) to define where one option ends, and
 beginning of the Option text that isn't selectable, but rather instructs the user what to do, or informs he what he is choosing, etc.
 Also, the select box will automatically resize itself to the option, allowing the option to span multiple lines if necessary. Also
 created the ability to move a select box and choose an option to the class.
+
+10/14/2009
+Started:12 PM Finished: 3 PM
+Altered kText.dtd standard to incorporate a proceed field, which will contain information on whether to bo to the
+next Text object in the dialog, the previous one, or one specified by name, once the display of the current one is
+completed. Added code to the Pull Parser to handle this field, and to the Text/Option class as well.
+
+10/15/2009
+Started: 12:30 PM Finished: 5 PM
+Created TextHandler class, which abstracts away the gritty operations of the Text objects - now, a state need only
+call a very few functions from the TextHandler class in order to perform the necessary display, update and input
+handling processes.
