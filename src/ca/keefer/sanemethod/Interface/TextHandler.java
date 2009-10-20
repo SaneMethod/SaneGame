@@ -22,7 +22,6 @@ public class TextHandler {
 	int dialogToDisplay;
 	int queuedDialog;
 	short proceed;
-	
 	boolean done;
 	
 	/**
@@ -36,7 +35,11 @@ public class TextHandler {
 		queuedDialog=0;
 		done=false;
 		for (int i=0;i<thisDialog.size();i++){
-			thisDialog.get(i).prepare(50,Text.BOTTOM,750);
+			if (thisDialog.get(i).isOption()){
+				Option tOption = (Option) thisDialog.get(i);
+				tOption.parse(tOption.getValueTemp(), tOption.getOptionTemp(),50,750);
+			}
+			thisDialog.get(i).prepare(50,Text.BOTTOM,750);	
 		}
 	}
 	
@@ -57,7 +60,12 @@ public class TextHandler {
 		queuedDialog=0;
 		done=false;
 		for (int i=0;i<thisDialog.size();i++){
+			if (thisDialog.get(i).isOption()){
+				Option tOption = (Option) thisDialog.get(i);
+				tOption.parse(tOption.getValueTemp(), tOption.getOptionTemp(),x,boxWidth);
+			}
 			thisDialog.get(i).prepare(x,position,boxWidth);
+			
 		}
 	}
 	
