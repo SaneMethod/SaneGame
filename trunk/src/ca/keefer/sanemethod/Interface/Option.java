@@ -34,23 +34,31 @@ public class Option extends Text{
 	int selected=1;
 	Rectangle selectRect;
 	float selectX, selectY;
+	String valueTemp;
+	String optionTemp;
 	
 
 	// Recommended Constructor
 	public Option (String name, AngelCodeFont font, Color colour, boolean boxed, String options,
 			String caption, String values){
 		super (name, font, colour, boxed, caption,Text.PROCEED_END);
-		parse(values, options);
+		this.option = true;
+		this.finished = true;
+		valueTemp = values;
+		optionTemp = options;
 	}
 	
 	// Full Constructor
 	public Option(String name, AngelCodeFont font, Color colour, boolean boxed,
 			String options, Image textTex, String caption, String values) {
 		super(name, font, colour, boxed, caption, textTex, Text.PROCEED_END);
-		parse(values, options);
+		this.option = true;
+		this.finished = true;
+		valueTemp = values;
+		optionTemp = options;
 	}
 	
-	public void parse(String values, String options){
+	public void parse(String values, String options, float xOffset, int boxWidth){
 		// Set variable to prevent word-wrapping of options
 		this.option=true;
 		this.finished=true;
@@ -78,7 +86,9 @@ public class Option extends Text{
 		for (int i=0; i<optionCount;i++){
 			this.options[i] = thisScan.next();
 			// Word wrap the option, just in case it spans multiple lines
-			this.options[i] = this.wordWrap(750, 20, this.options[i]);
+			// TODO: This uses default values - WILL BREAK if the full constructor is used for TextHandler 
+			// and different values are specified
+			this.options[i] = this.wordWrap(boxWidth, (int)xOffset, this.options[i]);
 			this.text += this.options[i]+"\n";
 			optionHeight[i+1]=this.font.getHeight(this.options[i]);
 		}
@@ -122,6 +132,13 @@ public class Option extends Text{
 	public String getValue(){
 		// return string value of the option the selected var is currently pointing at
 		return values[selected-1];
+	}
+	
+	public String getValueTemp(){
+		return valueTemp;
+	}
+	public String getOptionTemp(){
+		return optionTemp;
 	}
 
 }

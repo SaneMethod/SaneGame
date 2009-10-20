@@ -39,8 +39,6 @@ public class Constants {
 	// Use these to search the property hashtables
 	public static String mapName = "name";
 	public static String mapType = "type";
-	public static String mapTypeStory = "story";
-	public static String mapTypeStrategy = "strategy";
 	
 	// Layer Property Definitions
 	public static String layerName = "name";
@@ -116,6 +114,11 @@ public class Constants {
 	public static final int TEXT_SPEED_MEDIUM = 50;
 	public static final int TEXT_SPEED_SLOW = 100;
 	public static int TEXT_SPEED = TEXT_SPEED_MEDIUM;
+	
+	// Physics System Constants
+	public static float FRICTION = 0.09f;
+	public static float GRAVITY = 0.5f;
+	public static float ACCELERATION = 0.4f;
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

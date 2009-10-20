@@ -44,10 +44,11 @@ public class Text {
 	short position;
 	float x;
 	float y;
+	int boxWidth;
 	boolean prepared=false;
 	public boolean option=false; // Boolean for the child Option class to set, to prevent word wrapping of options
 	boolean finished=false; // Boolean for whether the text is finished displaying letter-by-letter
-	boolean skippable=false; // Boolean determining whether this text can be fast-forwarded through by the user
+	boolean skippable=true; // Boolean determining whether this text can be fast-forwarded through by the user
 	
 	// Text box global variables
 	short boxState=0;
@@ -252,10 +253,11 @@ public class Text {
 		// float for y position based on short
 		this.y=0;
 		this.x=x;
+		this.boxWidth=boxWidth;
 		
 		if (!option){
 			// Get word-wrapped version of text
-			resString= wordWrap(boxWidth, (int) x, this.text);
+			resString= wordWrap(this.boxWidth, (int) x, this.text);
 		}else{
 			resString=text;
 		}
@@ -298,7 +300,7 @@ public class Text {
 	}
 	
 	// Use this method when we just want the wordwrapped string returned
-	public String getString(float x, int boxWidth){
+	public String getString(){
 		// Get word-wrapped version of text
 		resString= wordWrap(boxWidth, (int) x, this.text);
 		// Set height
@@ -308,10 +310,10 @@ public class Text {
 	}
 	
 	// use this to get the height of the word-wrapped string
-	public int getHeight(float x, int boxWidth){
-		resString= wordWrap(boxWidth, (int) x, this.text);
+	public int getHeight(String txt){
+		String thisString= wordWrap(boxWidth, (int) x, txt);
 		// Set height
-		height = this.font.getHeight(resString);
+		height = this.font.getHeight(thisString);
 		
 		return height;
 	}
