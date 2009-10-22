@@ -1,5 +1,7 @@
 package ca.keefer.sanemethod;
 
+import org.newdawn.slick.geom.Vector2f;
+
 import org.newdawn.slick.Input;
 
 import ca.keefer.sanemethod.Interface.SaneSystem;
@@ -35,10 +37,6 @@ public class Constants {
 	public static final int DIR_LEFT=2;
 	public static final int DIR_RIGHT=3;
 	
-	// Map Property Definitions
-	// Use these to search the property hashtables
-	public static String mapName = "name";
-	public static String mapType = "type";
 	
 	// Layer Property Definitions
 	public static String layerName = "name";
@@ -70,12 +68,12 @@ public class Constants {
 	// Tile Properties
 	public static String PASS = "passable";
 	public static String COST = "cost";
-	public static int TILEWIDTH=64;
-	public static int TILEHEIGHT=64;
-	public static int NOTPASSABLE=0;
+	public static int TILE_WIDTH=32;
+	public static int TILE_HEIGHT=32;
+	public static int NOT_PASSABLE=0;
 	public static int PASSABLE=1;
-	public static int PASSABLEBYSWIMMERSORFLYERS=2;
-	public static int PASSABLEBYFLYERS=3;
+	public static int PASSABLE_BY_SWIMMERS_OR_FLYERS=2;
+	public static int PASSABLE_BY_FLYERS=3;
 	
 	// Sprite defaults
 	public static int SPRITE_UPDATE_SPEED=5; // Sprite moves SPRITE_SPEED_PIXELS_PER_STEP pixels toward its destination every 5 milliseconds
@@ -117,8 +115,10 @@ public class Constants {
 	
 	// Physics System Constants
 	public static float FRICTION = 0.09f;
-	public static float GRAVITY = 0.5f;
 	public static float ACCELERATION = 0.4f;
+	public static float MAX_ACCELERATION = 1.5f;
+	public static Vector2f GRAVITY = new Vector2f(0,1.5f); // 0 pull on x axis, 5 pull down on y axis
+	public static int ITERATIONS = 10; // Number of iterations the phys2d engine should go through
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

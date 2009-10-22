@@ -10,15 +10,26 @@
 	could end up covered in it." texture="" proceed="++"
 	/>
 	<Option name="testOption" font="standardFont" colour="16777215" boxed="true"
-	content="Wow this one is a really particularly long option isn't it! Woohoo!!@@
-	This is option two!@@This is option three! It's super duper long on purpose. Guess what the purpose
-	is! Guess! Okay, I'll tell you... test purposes! YAY! Wow... This can't really work on the first try, can it?
+	content="Wow this one is a really particularly long option isn't it! When you select it with the accept key (default is the
+	a button), it will wrap back around to the first text we displayed!@@
+	This is option two. It goes on to some un-boxed text that eventually wraps round to the beginning again!@@
+	This is option three! It's super duper long on purpose. Guess what the purpose is! Guess! Okay, I'll tell you... 
+	test purposes! YAY! Wow... This can't really work on the first try, can it?
 	You mean, I don't have to spend the next hour tinkering with it? It's just going to work right off the bat?
-	Weird. But AWESOME! :)@@This is option four!"
+	Weird. But AWESOME! :)@@This is option four! It leads to some more text, which then ends this Dialog!"
 	caption="Here are your options:"
-	values="resText@@resText@@textTest@@textTest"
+	values="textTest@@resText@@threeText@@finalText"
 	/>
-	<Text type="rec" name="resText" font="standardFont" colour="16777215" boxed="false"
-	content="You selected option one or two, didn't you!?" texture="" proceed="textTest"
+	<Text type="rec" name="resText" font="kingdomFont" colour="16777215" boxed="false"
+	content="You selected option two, didn't you!?" texture="" proceed="textTest"
+	/>
+	<Text type="rec" name="threeText" font="scaryFont" colour="16777215" boxed="true"
+	content="You selected option three, didn't you!? Now I'll have to wrap back to the options again!"
+	texture="" proceed="testOption"
+	/>
+	<Text type="rec" name="finalText" font="standardFont" colour="16777215" boxed="true"
+	content="Well, this is it... after this is done displaying, this dialog will be completed, and we can all
+	move on with our lives. What a relief, eh?"
+	texture="" proceed="@@"
 	/>
 </Dialog>
