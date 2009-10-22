@@ -48,3 +48,9 @@ Started: 12:30 PM Finished: 5 PM
 Created TextHandler class, which abstracts away the gritty operations of the Text objects - now, a state need only
 call a very few functions from the TextHandler class in order to perform the necessary display, update and input
 handling processes.
+
+10/15/2009
+Started: 7 PM Finished: 11 PM
+Started work on the Entity set of classes, which will eventually contain all the necessary classes for the
+creation, maintenance, movement, properties etc. of all moveable objects, all non-player sprites, and the
+Player sprite.
