@@ -1,11 +1,10 @@
 package ca.keefer.sanemethod;
 
-import javax.swing.JOptionPane;
-
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.Log;
 
+import ca.keefer.sanemethod.LevelBuilder.TileShapeBuilder;
 import ca.keefer.sanemethod.Tests.TestState;
 
 /**
@@ -36,12 +35,13 @@ public class Init extends StateBasedGame {
 			
 			
 			// Add states to this game container
-			this.addState(new MainMenuState(Constants.MAINMENUSTATE));
-			this.addState(new IntroState(Constants.INTROSTATE));
-			this.addState(new TestState(Constants.TESTSTATE));
+			this.addState(new MainMenuState(Constants.STATE_MAIN_MENU));
+			this.addState(new IntroState(Constants.STATE_INTRO));
+			this.addState(new TileShapeBuilder(Constants.STATE_SHAPE_BUILDER));
+			//this.addState(new TestState(Constants.STATE_TEST));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.TESTSTATE);
+			this.enterState(Constants.STATE_SHAPE_BUILDER);
 			
 			
 		}catch (SlickException e){
