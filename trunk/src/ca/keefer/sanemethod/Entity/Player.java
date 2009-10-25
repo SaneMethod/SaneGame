@@ -9,7 +9,6 @@ import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
-import ca.keefer.sanemethod.Environment.TiledHandler;
 
 public class Player implements Entity{
 
@@ -17,7 +16,6 @@ public class Player implements Entity{
 	float yPos; // y position of sprite
 	int height; // height of the sprite
 	int width; // width of the sprite
-	TiledHandler tHandler;
 	Vector2f velocity;
 	float mass; // mass of the sprite
 	Image thisImage; // temporary image for testing movement
@@ -32,11 +30,10 @@ public class Player implements Entity{
 	public static final boolean DIR_LEFT = true;
 	public static final boolean DIR_RIGHT = false;
 	
-	public Player (float x, float y, Image image, TiledHandler tHandler){
+	public Player (float x, float y, Image image){
 		this.xPos=x;
 		this.yPos=y;
 		this.mass = 1;
-		this.tHandler = tHandler;
 		this.velocity = new Vector2f(0,0);
 		this.thisImage=image;
 		this.velocityX=0;
@@ -104,11 +101,11 @@ public class Player implements Entity{
 	
 	public void move(int delta){
 		if (jumping){
-			if (this.yPos <= 40){
+			if (this.yPos <= 500){
 			//this.yPos -= velocityY;
 				this.yPos -= velocity.getY();
 			}else {
-				this.yPos = 40;
+				this.yPos = 500;
 				jumping =false;
 			}
 		

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Format 1.0 for kShape XML
+by Christopher Keefer
+First Design: 2009-10-24
+-->
+<!ELEMENT TileShapes (Tile*)>
+<!ATTLIST TileShapes
+	name CDATA #REQUIRED
+	sheet CDATA #REQUIRED
+	tileSizeX CDATA #REQUIRED
+	tileSizeY CDATA #REQUIRED
+>
+
+<!ELEMENT Tile EMPTY>
+<!ATTLIST Tile
+	name CDATA #REQUIRED
+	tileSheetX CDATA #REQUIRED
+	tileSheetY CDATA #REQUIRED
+	pointCount CDATA #REQUIRED
+	point$x CDATA #REQUIRED
+	point$y CDATA #REQUIRED
+>

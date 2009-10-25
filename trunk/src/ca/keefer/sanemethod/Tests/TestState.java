@@ -2,13 +2,21 @@ package ca.keefer.sanemethod.Tests;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.svg.Diagram;
+import org.newdawn.slick.svg.Figure;
+import org.newdawn.slick.svg.InkscapeLoader;
+import org.newdawn.slick.svg.NonGeometricData;
+import org.newdawn.slick.svg.SimpleDiagramRenderer;
+import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
@@ -37,7 +45,7 @@ public class TestState extends BasicGameState {
 	Player testSprite;
 	Player tSprite2;
 	
-	TiledHandler tHandler;
+	Diagram thisLevel;
 	
 	public TestState(int stateID){
 		this.stateID = stateID;
@@ -60,12 +68,15 @@ public class TestState extends BasicGameState {
 		
 		//tHandle = new TextHandler(thisDialog, 40, Text.BOTTOM, 740);
 		
-		//Wow - TiledHandler!
-		tHandler = new TiledHandler("/res/testMap.tmx",true);
+		Polygon polygon = new Polygon();
 		
+		// Aha! Diagram!
+		Log.info("TrigLevel:"+InkscapeLoader.RADIAL_TRIANGULATION_LEVEL);
+		//InkscapeLoader.RADIAL_TRIANGULATION_LEVEL = 5;
+		thisLevel = InkscapeLoader.load("res/SVG/testPath.svg");
+			
 		// Oooh... testSprite!
-		testSprite = new Player(0,0,new Image("/res/ball.png"),tHandler);
-		//tSprite2 = new Player(200,500,new Image("/res/ball.png"),tHandler);
+		testSprite = new Player(0,0,new Image("/res/ball.png"));
 		
 		
 		
@@ -75,18 +86,11 @@ public class TestState extends BasicGameState {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		//g.setBackground(Color.decode("52326"));
+		g.setBackground(Color.white);
 		//tHandle.display(g);
 		
 		testSprite.render(g);
-		Polygon yada = new Polygon();
-		yada.addPoint(0,0);
-		yada.addPoint(100,100);
-		yada.addPoint(0,80);
-		yada.setLocation(60, 60);
-		g.draw(yada);
-		
-		
+		SimpleDiagramRenderer.render(g, thisLevel);
 
 	}
 

@@ -22,14 +22,15 @@ public class Constants {
 	public static int FRAMERATE = 60;
 	
 	// Game State Definitions
-	public static final int INTROSTATE = 0;
-	public static final int MAINMENUSTATE = 1;
-	public static final int INGAMESTATE = 2;
-	public static final int INGAMEMENUSTATE = 3;
-	public static final int CONFIGMENUSTATE = 4;
-	public static final int SAVELOADMENUSTATE = 5;
-	public static final int CREDITSTATE = 6;
-	public static final int TESTSTATE = 12;
+	public static final int STATE_INTRO = 0;
+	public static final int STATE_MAIN_MENU = 1;
+	public static final int STATE_IN_GAME = 2;
+	public static final int STATE_IN_GAME_MENU = 3;
+	public static final int STATE_CONFIG_MENU = 4;
+	public static final int STATE_SAVE_LOAD_MENU = 5;
+	public static final int STATE_CREDITS = 6;
+	public static final int STATE_TEST = 12;
+	public static final int STATE_SHAPE_BUILDER = 13;
 	
 	// Animation direction constants
 	public static final int DIR_UP=0;
