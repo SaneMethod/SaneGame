@@ -6,25 +6,25 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.svg.Diagram;
-import org.newdawn.slick.svg.Figure;
-import org.newdawn.slick.svg.InkscapeLoader;
-import org.newdawn.slick.svg.NonGeometricData;
-import org.newdawn.slick.svg.SimpleDiagramRenderer;
 import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Player;
-import ca.keefer.sanemethod.Environment.TiledHandler;
+import ca.keefer.sanemethod.Environment.TiledEnvironment;
 import ca.keefer.sanemethod.Interface.SaneSystem;
 import ca.keefer.sanemethod.Interface.Text;
 import ca.keefer.sanemethod.Interface.TextHandler;
+import ca.keefer.sanemethod.LevelBuilder.TileShape;
+import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
+import ca.keefer.sanemethod.Tools.TSXGen;
 import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 
 /**
@@ -37,6 +37,10 @@ public class TestState extends BasicGameState {
 	// Global variables
 	int stateID=0;
 	
+	// Self-reference
+	GameContainer container;
+	StateBasedGame game;
+	
 	// Test variables
 	SaneSystem saneSystem;
 	Text thisText;
@@ -44,8 +48,11 @@ public class TestState extends BasicGameState {
 	TextHandler tHandle;
 	Player testSprite;
 	Player tSprite2;
+	ArrayList<TileShape> tileList;
 	
-	Diagram thisLevel;
+	TiledEnvironment thisBridge;
+	
+	
 	
 	public TestState(int stateID){
 		this.stateID = stateID;
@@ -53,32 +60,47 @@ public class TestState extends BasicGameState {
 	
 	@Override
 	public int getID() {
-		// TODO Auto-generated method stub
 		return stateID;
 	}
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
+		this.container = container;
+		this.game = game;
+		
 		saneSystem = Constants.saneSystem;
 		Constants.TEXT_SPEED = Constants.TEXT_SPEED_FAST;
 					
 		TextXMLPullParser testPull = new TextXMLPullParser(ResourceLoader.getResourceAsStream("res/Dialogs/testBook.xml"));
 		thisDialog = testPull.processDialog();
+		testPull = null;
 		
 		//tHandle = new TextHandler(thisDialog, 40, Text.BOTTOM, 740);
 		
-		Polygon polygon = new Polygon();
-		
-		// Aha! Diagram!
-		Log.info("TrigLevel:"+InkscapeLoader.RADIAL_TRIANGULATION_LEVEL);
-		//InkscapeLoader.RADIAL_TRIANGULATION_LEVEL = 5;
-		thisLevel = InkscapeLoader.load("res/SVG/testPath.svg");
-			
 		// Oooh... testSprite!
 		testSprite = new Player(0,0,new Image("/res/ball.png"));
 		
 		
+		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/Tiles.png.xml"),
+				new SpriteSheet("res/Tiles/Tiles.png",64,64));
+		tileList = x.processXML();
+		
+		thisBridge = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,true);
+		
+		
+		// Mwa ha ha... XMLShapePullParser...
+		/*
+		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/tilesheettest.png.xml"),
+				new SpriteSheet("res/Tiles/TileSheetTest.png",64,64));
+		tileList = x.processXML();
+			
+		
+		
+		thisBridge = new TiledEnvironment("res/Tiles/testMap.tmx",tileList,true);
+		
+		//TSXGen.makeTSX(0, 1023, "Tiles", 64, 64);
+		*/
 		
 		
 	}
@@ -90,7 +112,12 @@ public class TestState extends BasicGameState {
 		//tHandle.display(g);
 		
 		testSprite.render(g);
-		SimpleDiagramRenderer.render(g, thisLevel);
+		
+		thisBridge.render(g);
+		thisBridge.renderBounds(g);
+		
+		
+		
 
 	}
 
@@ -117,8 +144,9 @@ public class TestState extends BasicGameState {
 	 * @param keyChar ascii char
 	 */
 	public void keyPressed(int keyPressed, char keyChar){
-		// TODO: On key press, exit this state for now
-		//System.exit(0);
+		if (keyPressed == Input.KEY_ESCAPE){
+			this.container.exit();
+		}
 		
 		//tHandle.acceptInput(keyPressed);
 		

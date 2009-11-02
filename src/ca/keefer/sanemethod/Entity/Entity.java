@@ -1,13 +1,16 @@
 package ca.keefer.sanemethod.Entity;
 
 
+import net.phys2d.raw.Body;
+import net.phys2d.raw.World;
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Rectangle;
 
 /**
  * This interface defines the methods all classes implementing the Entity interface must possess.
- * @author Christopher Keefer
- * @version 1.1
+ * @author Christopher Keefer, Kevin Glass
+ * @version 1.2
  * @see ca.keefer.sanemethod.PhysObject
  * @see ca.keefer.sanemethod.Sprite
  * @see ca.keefer.sanemethod.Player
@@ -24,6 +27,14 @@ public interface Entity {
 	public Rectangle getBoundingBox();
 	
 	/**
+	 * Update this entity. This method is called once before physical world is updated
+	 * each cycle. It is only ever called once per update.
+	 * 
+	 * @param delta The amount of time passed since last update
+	 */
+	public void preUpdate(int delta);
+	
+	/**
 	 * Update this entity's position, state, etc. during the physical loop.
 	 * Called each time the World is updated.
 	 * @param delta int Time elapsed since last update
@@ -35,4 +46,22 @@ public interface Entity {
 	 * @param g Graphics context to draw to
 	 */
 	public void render(Graphics g);
+	
+	/**
+	 * Get the physical body of this Entity for interaction
+	 * with the Phys2D World
+	 */
+	public Body getBody();
+	
+	/**
+	 * Set the Phys2D world this Entity belongs to
+	 * @param world
+	 */
+	public void setWorld(World world);
+	
+	/**
+	 * Get the phys2D World this Entity belongs to
+	 * @return
+	 */
+	public World getWorld();
 }

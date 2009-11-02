@@ -1,6 +1,6 @@
 package ca.keefer.sanemethod;
 
-import org.newdawn.slick.geom.Vector2f;
+import net.phys2d.math.Vector2f;
 
 import org.newdawn.slick.Input;
 
