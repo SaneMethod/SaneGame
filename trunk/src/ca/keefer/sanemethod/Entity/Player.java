@@ -1,6 +1,9 @@
 package ca.keefer.sanemethod.Entity;
 
 
+import net.phys2d.raw.Body;
+import net.phys2d.raw.World;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -10,7 +13,7 @@ import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
-public class Player implements Entity{
+public class Player implements Entity {
 
 	float xPos; // x position of sprite
 	float yPos; // y position of sprite
@@ -175,6 +178,30 @@ public class Player implements Entity{
 	@Override
 	public Rectangle getBoundingBox() {
 		return new Rectangle(this.xPos,this.yPos,this.thisImage.getWidth(),this.thisImage.getHeight());
+	}
+
+	@Override
+	public Body getBody() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public World getWorld() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void preUpdate(int delta) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setWorld(World world) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

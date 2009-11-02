@@ -13,29 +13,31 @@ import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Transform;
+import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.Log;
+import org.newdawn.slick.util.ResourceLoader;
 
 /**
- * This class allows me to draw paths/polygons overlaying individual tiles, and save the points of the
- * polygon as a text representation of an array of floats in an xml
- * file which contains information on the shape, and the location of the tile with which it is to
- * be associated in the tileSheet. <br /> This then allows me, when parsing in the tiles, to have a shape
- * to pass as the DynamicShape for each tile to SlickSet's Tile model, allowing for proper collision
- * handling. The file name of the output xml file will be the name of the tilesheet image with a 
+ * This class allows me to draw paths/polygons overlaying individual elements of, 
+ *  a tile map, and save the points of the polygon as a text representation of an array of floats in an xml
+ * file which contains information on the shape, and the location of the element within the context
+ * of the tile map. <br /> This then allows me, when parsing in the tile map, to create static bodies
+ * for phys2D to deal with representing the shapes of the map elements, allowing for proper collision
+ * handling. The file name of the output xml file will be the name of the tile map tmx with an
  * '.xml' tacked on the end.
  * @author Christopher Keefer
  * @version 1.1
  */
 /*
  * Format of the xml file:
- * <TileShapes name="name" sheet="tileSheet.png" tileSizeX="##" tileSizeY="##">
- * 	<!-- Point count refers to how many pairs of x,y float values there are to parse for a given Tile -->
- * <!-- tilesheetX and tileSheetY refer to the x and y position of the tile in the tile sheet -->	
- * 	<Tile name="name" tileSheetX="x" tileSheetY="y" pointCount="###" point0X="x" point0Y="y" point1X="x" ... />
+ * <MapShapes name="name" map="tileMap.tmx" tileSizeX="##" tileSizeY="##">
+ * 	<!-- Point count refers to how many pairs of x,y float values there are to parse for a given Map Element -->
+ *  <!-- TileMapX/Y refer to the upper left hand corner of the shape of this element -->a	
+ * 	<Element name="name" tileMapX="x" tileMapY="y" pointCount="###" point0X="x" point0Y="y" point1X="x" ... />
  * 	...
- * </TileShapes>
+ * </MapShapes>
  */
 /* Interface appearance:
  * ++++    ++++  Left rectangle contains finished tiles with their shapes drawn over them - can be reloaded and
@@ -54,12 +56,21 @@ public class TileShapeBuilder extends BasicGameState{
 	// Tilesheet
 	SpriteSheet tileSheet;
 	
+	// Self-referencing
 	StateBasedGame game;
 	GameContainer container;
+	
+	// Simple OPENGL GUI for text fields
+	boolean showTileNameField;
+	TextField tileNameField;
 	
 	String ref;
 	int cellWidth;
 	int cellHeight;
+	
+	// File type constants
+	final int FILE_TYPE_PNG = 0;
+	final int FILE_TYPE_XML = 1;
 	
 	// Temporary holder shapes for any drawn shapes
 	Rectangle tempRect;
@@ -120,6 +131,10 @@ public class TileShapeBuilder extends BasicGameState{
 		this.container = container;
 		this.game = game;
 		
+		// Textfield for spritesheet name
+		showTileNameField = false;
+		tileNameField = new TextField(container,container.getDefaultFont(),200,200,100,30);
+		
 		ref = null;
 		cellWidth=0;
 		cellHeight=0;
@@ -170,6 +185,13 @@ public class TileShapeBuilder extends BasicGameState{
 		g.drawRect(650,0,150,600);
 		// Draw arrows for moving raw or selected tile display up or down
 		drawArrows(g);
+		
+		if (showTileNameField){
+			g.setColor(Color.red);
+			g.drawString("SpriteSheet Name:", 200, 170);
+			tileNameField.render(container, g);
+			g.setColor(Color.white);
+		}
 		
 		// Draw raw tiles on right side of screen, four at a time, 
 		// starting at the current offset as determined rawOffset, which is set with the arrows
@@ -256,7 +278,12 @@ public class TileShapeBuilder extends BasicGameState{
 			ref = dialog.getReference();
 			cellWidth = dialog.getCellWidth();
 			cellHeight = dialog.getCellHeight();
-			loadTileSheet(ref,cellWidth,cellHeight);
+			int fileType = checkFileType(ref);
+			if (fileType == FILE_TYPE_PNG){
+				loadTileSheet(ref,cellWidth,cellHeight);
+			}else if (fileType == FILE_TYPE_XML){
+				loadXML(ref,cellWidth,cellHeight);
+			}
 			break;
 		case Input.KEY_1:
 			currentShape = SHAPE_SQUARE;
@@ -269,22 +296,74 @@ public class TileShapeBuilder extends BasicGameState{
 			break;
 		case Input.KEY_RETURN:
 			commitShape();
+			// show the tile name Field so we can enter a name for this newly made TileShape object
+			showTileNameField = !showTileNameField;
 			break;
 		case Input.KEY_SPACE:
+			currentTile.setTileName(tileNameField.getText());
 			finishedTiles.add(currentTile);
+			Log.info("CurrentTileName:"+currentTile.getTileName());
 			currentTile = null;
 			drawState = DRAW_STATE_NONE;
+			// setTile field name to blank and turn off until next shape
+			showTileNameField = !showTileNameField;
+			tileNameField.setText("");
+			tileNameField.deactivate();
 			break;
 		case Input.KEY_S:
 			if (ref != null){
-				XMLShapeOutput xso = new XMLShapeOutput(ref, cellWidth, cellHeight,finishedTiles.toArray(new TileShape[0]));
-				xso.createOutputFile();
-				Log.info("File:"+ref+".xml has been created successfully.");
+				fileType = checkFileType(ref);
+				if (fileType == FILE_TYPE_PNG){
+					XMLShapeOutput xso = new XMLShapeOutput(ref, cellWidth, cellHeight,finishedTiles.toArray(new TileShape[0]));
+					xso.createOutputFile();
+					Log.info("File:"+ref+".xml has been created successfully.");
+				}else{
+					String thisRef = ref.substring(0, ref.length()-4);
+					XMLShapeOutput xso = new XMLShapeOutput(thisRef, cellWidth, cellHeight,finishedTiles.toArray(new TileShape[0]));
+					xso.createOutputFile();
+					Log.info("File:"+thisRef+".xml has been created successfully.");
+				}
 			}
 			break;
 		case Input.KEY_ESCAPE:
 			this.container.exit();
 			break;
+		}
+	}
+	
+	public int checkFileType(String fileName){
+		String ext = fileName.substring(fileName.length()-3,fileName.length());
+		Log.debug("Extension:"+ext);
+		if (ext.equalsIgnoreCase("PNG")){
+			return FILE_TYPE_PNG;
+		}else if (ext.equalsIgnoreCase("XML")){
+			return FILE_TYPE_XML;
+		}
+		return -1;
+	}
+	
+	public void loadXML(String ref, int cellWidth, int cellHeight){
+		String pngFileName = ref.substring(0, ref.length()-4);
+		Log.debug("PngFileName:"+pngFileName);
+		XMLShapePullParser x=null;
+		try {
+			x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(ref),
+					new SpriteSheet(pngFileName,cellWidth,cellHeight));
+		} catch (SlickException e) {
+			Log.error(e.getMessage());
+		}
+		finishedTiles = x.processXML();
+		loadTileSheet(pngFileName,cellWidth,cellHeight);
+		
+		//Check to see which tiles are already in the finishedTiles list by comparing
+		//tilesheet values, and remove any matches from the raw list
+		for (int i=0;i<finishedTiles.size();i++){
+			for (int z=0;z<rawTiles.size();z++){
+				if (finishedTiles.get(i).getTileSheetX() == rawTiles.get(z).getTileSheetX() &&
+						finishedTiles.get(i).getTileSheetY() == rawTiles.get(z).getTileSheetY()){
+					rawTiles.remove(z);
+				}
+			}
 		}
 	}
 	
@@ -462,32 +541,52 @@ public class TileShapeBuilder extends BasicGameState{
 		
 		switch(highlightArrow){
 		case HIGH_DOWN_LEFT:
-			g.setColor(Color.red);
-			g.fill(leftDownArrow);
+			if (finishedTilesOffset < finishedTiles.size()){
+				g.setColor(Color.red);
+				g.fill(leftDownArrow);
+			}else{
+				g.setColor(Color.blue);
+				g.fill(leftDownArrow);
+			}
 			g.setColor(Color.white);
 			g.draw(rightDownArrow);
 			g.draw(leftUpArrow);
 			g.draw(rightUpArrow);
 			break;
 		case HIGH_DOWN_RIGHT:
-			g.setColor(Color.red);
-			g.fill(rightDownArrow);
+			if (rawTilesOffset < rawTiles.size()){
+				g.setColor(Color.red);
+				g.fill(rightDownArrow);
+			}else{
+				g.setColor(Color.blue);
+				g.fill(rightDownArrow);
+			}
 			g.setColor(Color.white);
 			g.draw(leftDownArrow);
 			g.draw(leftUpArrow);
 			g.draw(rightUpArrow);
 			break;
 		case HIGH_UP_LEFT:
-			g.setColor(Color.red);
-			g.fill(leftUpArrow);
+			if (finishedTilesOffset > 0){
+				g.setColor(Color.red);
+				g.fill(leftUpArrow);
+			}else{
+				g.setColor(Color.blue);
+				g.fill(leftUpArrow);
+			}
 			g.setColor(Color.white);
 			g.draw(leftDownArrow);
 			g.draw(rightDownArrow);
 			g.draw(rightUpArrow);
 			break;
 		case HIGH_UP_RIGHT:
-			g.setColor(Color.red);
-			g.fill(rightUpArrow);
+			if (rawTilesOffset > 0){
+				g.setColor(Color.red);
+				g.fill(rightUpArrow);
+			}else{
+				g.setColor(Color.blue);
+				g.fill(rightUpArrow);
+			}
 			g.setColor(Color.white);
 			g.draw(leftUpArrow);
 			g.draw(leftDownArrow);
@@ -516,9 +615,9 @@ public class TileShapeBuilder extends BasicGameState{
 		}
 		if (tileSheet != null){
 			//if loaded successfully, get the images of each tile on each layer,
-			for (int xi=0;xi<tileSheet.getHorizontalCount();xi++){
-				for (int yi=0;yi<tileSheet.getVerticalCount();yi++){
-					rawTiles.add(new TileShape(null,tileSheet.getSprite(xi, yi),xi,yi));
+			for (int yi=0;yi<tileSheet.getVerticalCount();yi++){	
+				for (int xi=0;xi<tileSheet.getHorizontalCount();xi++){
+					rawTiles.add(new TileShape("",null,tileSheet.getSprite(xi, yi),xi,yi));
 				}
 			}
 		}

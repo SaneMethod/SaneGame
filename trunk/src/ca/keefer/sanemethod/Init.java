@@ -38,10 +38,10 @@ public class Init extends StateBasedGame {
 			this.addState(new MainMenuState(Constants.STATE_MAIN_MENU));
 			this.addState(new IntroState(Constants.STATE_INTRO));
 			this.addState(new TileShapeBuilder(Constants.STATE_SHAPE_BUILDER));
-			//this.addState(new TestState(Constants.STATE_TEST));
+			this.addState(new TestState(Constants.STATE_TEST));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.STATE_SHAPE_BUILDER);
+			this.enterState(Constants.STATE_TEST);
 			
 			
 		}catch (SlickException e){

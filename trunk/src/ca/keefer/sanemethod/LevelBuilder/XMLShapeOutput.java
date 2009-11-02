@@ -42,7 +42,8 @@ public class XMLShapeOutput {
 			
 			// Now we enter the for loops where we write Tile information
 			for (int i=0; i< shapeList.length;i++){
-				fw.write("<Tile name=\"Shape"+i+"\" tileSheetX=\""+shapeList[i].getTileSheetX()+
+				fw.write("<Tile name=\""+shapeList[i].getTileName()+
+						"\" tileSheetX=\""+shapeList[i].getTileSheetX()+
 						"\" tileSheetY=\""+shapeList[i].getTileSheetY()+"\" pointCount=\""+
 						shapeList[i].getShape().getPointCount()+"\" \n");
 				// output the various points to this tag
