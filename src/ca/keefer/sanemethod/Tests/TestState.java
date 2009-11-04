@@ -11,18 +11,20 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
 import ca.keefer.sanemethod.Interface.SaneSystem;
 import ca.keefer.sanemethod.Interface.Text;
 import ca.keefer.sanemethod.Interface.TextHandler;
-import ca.keefer.sanemethod.LevelBuilder.TileShape;
+import ca.keefer.sanemethod.LevelBuilder.MapShape;
 import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
 import ca.keefer.sanemethod.Tools.TSXGen;
 import ca.keefer.sanemethod.Tools.TextXMLPullParser;
@@ -46,11 +48,11 @@ public class TestState extends BasicGameState {
 	Text thisText;
 	ArrayList<Text> thisDialog;
 	TextHandler tHandle;
-	Player testSprite;
+	Platformer testSprite;
 	Player tSprite2;
-	ArrayList<TileShape> tileList;
+	ArrayList<MapShape> tileList;
 	
-	TiledEnvironment thisBridge;
+	TiledEnvironment environment;
 	
 	
 	
@@ -79,14 +81,19 @@ public class TestState extends BasicGameState {
 		//tHandle = new TextHandler(thisDialog, 40, Text.BOTTOM, 740);
 		
 		// Oooh... testSprite!
-		testSprite = new Player(0,0,new Image("/res/ball.png"));
+		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
+		dimensions[0]= new net.phys2d.math.Vector2f();
+		dimensions[0].x=48; dimensions[0].y=48;
+		testSprite = new Platformer(0,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),false, new Image("/res/ball.png"));
+		//testSprite.setGravityEffected(false);
+		//testSprite = new Player(0,0,new Image("/res/ball.png"));
 		
 		
-		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/Tiles.png.xml"),
-				new SpriteSheet("res/Tiles/Tiles.png",64,64));
+		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/testMap3.tmx.xml"));
 		tileList = x.processXML();
 		
-		thisBridge = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,true);
+		environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,true);
+		environment.addEntity(testSprite);
 		
 		
 		// Mwa ha ha... XMLShapePullParser...
@@ -111,10 +118,11 @@ public class TestState extends BasicGameState {
 		g.setBackground(Color.white);
 		//tHandle.display(g);
 		
-		testSprite.render(g);
+		//Entity rendering is now handled by the environment
+		//testSprite.render(g);
 		
-		thisBridge.render(g);
-		thisBridge.renderBounds(g);
+		environment.render(g);
+		environment.renderBounds(g);
 		
 		
 		
@@ -127,7 +135,8 @@ public class TestState extends BasicGameState {
 			
 		//tHandle.update(delta);
 		
-		testSprite.update(delta);
+		//testSprite.update(delta);
+		environment.update(delta);
 
 	}
 	
@@ -146,6 +155,8 @@ public class TestState extends BasicGameState {
 	public void keyPressed(int keyPressed, char keyChar){
 		if (keyPressed == Input.KEY_ESCAPE){
 			this.container.exit();
+		}else if (keyPressed == Input.KEY_1){
+			testSprite.setGravityEffected(true);
 		}
 		
 		//tHandle.acceptInput(keyPressed);

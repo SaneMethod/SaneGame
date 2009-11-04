@@ -15,14 +15,14 @@ import net.phys2d.raw.World;
  */
 public abstract class AbstractEnvironment implements Environment {
 	/** The physical world the environment provides to it's entities */
-	protected World world = new World(Constants.GRAVITY, 20); 
+	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS); 
 
 	/** The entities list */
 	protected ArrayList<Entity> entities = new ArrayList<Entity>();
 	/** The amount time in ms passed since last update */
 	private int totalDelta;
 	/** The amount of time to pass before updating the physics world */
-	private int stepSize = 10;
+	private int stepSize = 1000/60;
 
 	/**
 	 * Add an entity to the environment. This will include it's physical

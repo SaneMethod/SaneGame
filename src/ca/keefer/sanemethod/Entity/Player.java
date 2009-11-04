@@ -13,7 +13,7 @@ import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
-public class Player implements Entity {
+public class Player extends AbstractEntity implements Entity{
 
 	float xPos; // x position of sprite
 	float yPos; // y position of sprite
