@@ -115,11 +115,11 @@ public class Constants {
 	public static int TEXT_SPEED = TEXT_SPEED_MEDIUM;
 	
 	// Physics System Constants
-	public static float FRICTION = 0.09f;
-	public static float ACCELERATION = 0.4f;
-	public static float MAX_ACCELERATION = 1.5f;
-	public static Vector2f GRAVITY = new Vector2f(0,1.5f); // 0 pull on x axis, 5 pull down on y axis
-	public static int ITERATIONS = 10; // Number of iterations the phys2d engine should go through
+	public static float FRICTION = 0.045f;
+	public static float ACCELERATION = 0.6f;
+	public static float MAX_ACCELERATION = 2.5f;
+	public static Vector2f GRAVITY = new Vector2f(0,5f); // 0 pull on x axis, 5 pull down on y axis
+	public static int ITERATIONS = 20; // Number of iterations the phys2d engine should go through
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

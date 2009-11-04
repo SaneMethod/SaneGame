@@ -37,7 +37,7 @@ public class Init extends StateBasedGame {
 			// Add states to this game container
 			this.addState(new MainMenuState(Constants.STATE_MAIN_MENU));
 			this.addState(new IntroState(Constants.STATE_INTRO));
-			this.addState(new TileShapeBuilder(Constants.STATE_SHAPE_BUILDER));
+			//this.addState(new TileShapeBuilder(Constants.STATE_SHAPE_BUILDER));
 			this.addState(new TestState(Constants.STATE_TEST));
 			
 			// Enter first game state and begin render/update loop

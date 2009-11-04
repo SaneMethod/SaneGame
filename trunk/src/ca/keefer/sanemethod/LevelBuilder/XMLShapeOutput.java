@@ -12,14 +12,10 @@ public class XMLShapeOutput {
 	File toSaveTo;
 	String name;
 	String fileName;
-	int tileSizeX;
-	int tileSizeY;
-	TileShape[] shapeList;
+	MapShape[] shapeList;
 
-	public XMLShapeOutput(String fileName, int tileSizeX, int tileSizeY, TileShape[] shapeList){
+	public XMLShapeOutput(String fileName, MapShape[] shapeList){
 		this.fileName = fileName;
-		this.tileSizeX = tileSizeX;
-		this.tileSizeY = tileSizeY;
 		this.shapeList = shapeList;
 		toSaveTo = new File(fileName+".xml");
 		name = fileName;
@@ -37,14 +33,11 @@ public class XMLShapeOutput {
 					"by Christopher Keefer\n"+
 					"Last Updated 2009-10-24\n" +
 					"See www.sanemethod.com for more -->\n");
-			fw.write("<TileShapes name=\""+name+"\" sheet=\""+fileName+"\" tileSizeX=\""+
-					tileSizeX+"\" tileSizeY=\""+tileSizeY+"\">\n");
+			fw.write("<MapShapes name=\""+name+"\" map=\""+fileName+"\">\n");
 			
 			// Now we enter the for loops where we write Tile information
 			for (int i=0; i< shapeList.length;i++){
-				fw.write("<Tile name=\""+shapeList[i].getTileName()+
-						"\" tileSheetX=\""+shapeList[i].getTileSheetX()+
-						"\" tileSheetY=\""+shapeList[i].getTileSheetY()+"\" pointCount=\""+
+				fw.write("<Element pointCount=\""+
 						shapeList[i].getShape().getPointCount()+"\" \n");
 				// output the various points to this tag
 				float[] points = shapeList[i].getShape().getPoints();
@@ -58,7 +51,7 @@ public class XMLShapeOutput {
 				fw.write("/>\n");
 			}
 			// write close TileShapes tag
-			fw.write("</TileShapes>");
+			fw.write("</MapShapes>");
 			
 			//Done.
 			fw.close();
