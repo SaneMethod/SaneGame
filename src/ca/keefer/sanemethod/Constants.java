@@ -31,6 +31,7 @@ public class Constants {
 	public static final int STATE_CREDITS = 6;
 	public static final int STATE_TEST = 12;
 	public static final int STATE_SHAPE_BUILDER = 13;
+	public static final int STATE_DEMO = 14;
 	
 	// Animation direction constants
 	public static final int DIR_UP=0;

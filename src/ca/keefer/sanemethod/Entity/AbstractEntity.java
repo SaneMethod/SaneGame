@@ -2,7 +2,6 @@ package ca.keefer.sanemethod.Entity;
 
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
-import net.phys2d.raw.World;
 
 /**
  * The common bits of all entities. A bunch of utility methods

@@ -84,9 +84,13 @@ public class TestState extends BasicGameState {
 		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite = new Platformer(0,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),false, new Image("/res/ball.png"));
+		testSprite = new Platformer(0,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true, new Image("/res/ball.png"));
 		//testSprite.setGravityEffected(false);
 		//testSprite = new Player(0,0,new Image("/res/ball.png"));
+		dimensions = new net.phys2d.math.Vector2f[1];
+		dimensions[0]= new net.phys2d.math.Vector2f();
+		dimensions[0].x=48; dimensions[0].y=48;
+		Platformer testSprite2 = new Platformer(20,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true, new Image("/res/ball.png"));
 		
 		
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/testMap3.tmx.xml"));
@@ -94,6 +98,7 @@ public class TestState extends BasicGameState {
 		
 		environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,true);
 		environment.addEntity(testSprite);
+		environment.addEntity(testSprite2);
 		
 		
 		// Mwa ha ha... XMLShapePullParser...
@@ -115,7 +120,7 @@ public class TestState extends BasicGameState {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		g.setBackground(Color.white);
+		g.setBackground(Color.black);
 		//tHandle.display(g);
 		
 		//Entity rendering is now handled by the environment

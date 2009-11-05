@@ -4,6 +4,7 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.Log;
 
+import ca.keefer.sanemethod.Demo.DemoState;
 import ca.keefer.sanemethod.LevelBuilder.TileShapeBuilder;
 import ca.keefer.sanemethod.Tests.TestState;
 
@@ -38,10 +39,11 @@ public class Init extends StateBasedGame {
 			this.addState(new MainMenuState(Constants.STATE_MAIN_MENU));
 			this.addState(new IntroState(Constants.STATE_INTRO));
 			//this.addState(new TileShapeBuilder(Constants.STATE_SHAPE_BUILDER));
+			this.addState(new DemoState(Constants.STATE_DEMO));
 			this.addState(new TestState(Constants.STATE_TEST));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.STATE_TEST);
+			this.enterState(Constants.STATE_DEMO);
 			
 			
 		}catch (SlickException e){

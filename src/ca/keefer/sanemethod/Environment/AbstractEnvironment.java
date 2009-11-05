@@ -6,6 +6,7 @@ import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
 import net.phys2d.raw.World;
+import net.phys2d.raw.strategies.QuadSpaceStrategy;
 
 /**
  * The common bits of all environments. Holds a physics world, allows addition
@@ -15,7 +16,7 @@ import net.phys2d.raw.World;
  */
 public abstract class AbstractEnvironment implements Environment {
 	/** The physical world the environment provides to it's entities */
-	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS); 
+	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new QuadSpaceStrategy(25,30)); 
 
 	/** The entities list */
 	protected ArrayList<Entity> entities = new ArrayList<Entity>();
