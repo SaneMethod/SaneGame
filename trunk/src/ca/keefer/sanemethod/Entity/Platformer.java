@@ -247,8 +247,20 @@ public class Platformer extends AbstractEntity{
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
 		if (image !=null){
-			g.drawImage(image,body.getPosition().getX()-body.getShape().getBounds().getWidth()/2
-					,body.getPosition().getY()-body.getShape().getBounds().getHeight()/2);
+			if (shapeType==SHAPE_TYPE_CIRCLE){
+				if (body.isRotatable()){
+					g.rotate(body.getPosition().getX(),body.getPosition().getY(),(float) Math.toDegrees(body.getRotation()));
+					
+					g.drawImage(image,body.getPosition().getX()-body.getShape().getBounds().getWidth()/2
+							,body.getPosition().getY()-body.getShape().getBounds().getHeight()/2);
+					g.rotate(body.getPosition().getX(),body.getPosition().getY(),(float) -Math.toDegrees(body.getRotation()));
+				}else{
+					g.drawImage(image,body.getPosition().getX()-body.getShape().getBounds().getWidth()/2
+							,body.getPosition().getY()-body.getShape().getBounds().getHeight()/2);
+				}
+			}else if (shapeType==SHAPE_TYPE_BOX || shapeType==SHAPE_TYPE_POLYGON){
+				g.drawImage(image,body.getPosition().getX(),body.getPosition().getY());
+			}
 		}
 		
 	}
