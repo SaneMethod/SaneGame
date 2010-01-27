@@ -54,17 +54,18 @@ public class TiledEnvironment extends AbstractEnvironment{
 	private int tileHeight;
 	/** The bounds of the entire environment - set from the TilEd map */
 	private Rectangle bounds;
+	/** ViewPort for this game */
+	ViewPort viewPort;
 	
 	
-	public TiledEnvironment(String mapFile, ArrayList<MapShape> tileList, boolean buildStatic) {
+	public TiledEnvironment(String mapFile, ArrayList<MapShape> tileList, ViewPort viewPort) {
 		
-		if (buildStatic){
+		this.viewPort=viewPort;
 			try {
 				buildStatic(mapFile, tileList);
 			} catch (SlickException e) {
 				Log.error(e.getMessage());
 			}
-		}
 	}
 	
 	public void buildStatic(String mapFile, ArrayList<MapShape> tileList)throws SlickException{
@@ -92,6 +93,7 @@ public class TiledEnvironment extends AbstractEnvironment{
 	public void init() {
 		world.addListener(new CollisionEcho());
 		buildSimpleSection();
+		buildLayers();
 		
 	}
 	
@@ -115,6 +117,37 @@ public class TiledEnvironment extends AbstractEnvironment{
 			}
 		}
 	}
+	
+	public void buildLayers(){
+		// layerOffset controls how much to offset the layer ids, so they line up
+		// with their render priorities
+		int layerOffset = 0;
+		
+		// create any background image layer and increment layerOffset
+		layerOffset+=1;
+		// create any background effect layer and increment layerOffset
+		layerOffset+=1;
+		
+		// Build Tile Layers 0->2 behind Entities
+		for (int i=0; i<layers && i<3; i++){
+			TileLayer tLayer = new TileLayer(tiledMap, i,i+layerOffset, true);
+			viewPort.attachLayer(tLayer);
+			layerOffset+=1;
+		}
+		// Build Entity Layer 3
+		eLayer = new EntityLayer(3+layerOffset,true);
+		viewPort.attachLayer(eLayer);
+		layerOffset+=1;
+		
+		// Build Tile Layers 4+
+		for (int i=3;i<layers;i++){
+			TileLayer tLayer = new TileLayer(tiledMap,i,i+layerOffset, true);
+			viewPort.attachLayer(tLayer);
+			layerOffset +=1;
+		}
+		
+		//create any foreground effect/image/whatever layers
+	}
 			
 
 	@Override
@@ -130,10 +163,12 @@ public class TiledEnvironment extends AbstractEnvironment{
 			tiledMap.render(0, 0, l);
 		}
 		
+		/*
 		// Render entities
 		for (int i=0;i<entities.size();i++) {
 			entities.get(i).render(g);
 		}
+		*/
 		
 		// Render the above layers(layers 3+) of tiles
 		for (int l=3;l<layers;l++){
@@ -173,15 +208,15 @@ public class TiledEnvironment extends AbstractEnvironment{
 		g.setLineWidth(1);
 		
 		// Render entities
-		for (int i=0;i<entities.size();i++) {
-			if (entities.get(i).getBody().getShape() instanceof net.phys2d.raw.shapes.Circle){
-				org.newdawn.slick.geom.Circle circle = new org.newdawn.slick.geom.Circle(entities.get(i).getBody().getPosition().getX(),
-						entities.get(i).getBody().getPosition().getY(),entities.get(i).getBody().getShape().getBounds().getWidth()/2);
+		for (int i=0;i<eLayer.getEntityList().size();i++) {
+			if (eLayer.getEntityList().get(i).getBody().getShape() instanceof net.phys2d.raw.shapes.Circle){
+				org.newdawn.slick.geom.Circle circle = new org.newdawn.slick.geom.Circle(eLayer.getEntityList().get(i).getBody().getPosition().getX(),
+						eLayer.getEntityList().get(i).getBody().getPosition().getY(),eLayer.getEntityList().get(i).getBody().getShape().getBounds().getWidth()/2);
 				g.draw(circle);
 			}else{
-			org.newdawn.slick.geom.Rectangle box = new org.newdawn.slick.geom.Rectangle(entities.get(i).getBody().getPosition().getX(),
-					entities.get(i).getBody().getPosition().getY(),entities.get(i).getBody().getShape().getBounds().getWidth(),
-					entities.get(i).getBody().getShape().getBounds().getHeight());
+			org.newdawn.slick.geom.Rectangle box = new org.newdawn.slick.geom.Rectangle(eLayer.getEntityList().get(i).getBody().getPosition().getX(),
+					eLayer.getEntityList().get(i).getBody().getPosition().getY(),eLayer.getEntityList().get(i).getBody().getShape().getBounds().getWidth(),
+					eLayer.getEntityList().get(i).getBody().getShape().getBounds().getHeight());
 			
 				
 				g.draw(box);

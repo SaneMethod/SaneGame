@@ -46,6 +46,8 @@ public class Platformer extends AbstractEntity{
 	boolean onGround;
 	/** shapeType controls which kind of shape we'll assign to this Entity for collision detection */
 	int shapeType;
+	/** zOrder controls the depth of this entity */
+	private int zOrder;
 	
 	public static int SHAPE_TYPE_BOX=0;
 	public static int SHAPE_TYPE_CIRCLE=1;
@@ -69,10 +71,11 @@ public class Platformer extends AbstractEntity{
 	 * @param friction
 	 * @param MaxVelocity
 	 * @param rotatable
+	 * @param zOrder
 	 * @param image
 	 */
 	public Platformer(float x, float y,int shapeType, Vector2f[] dimensions, float mass, float restitution, 
-			float friction, Vector2f maxVelocity, boolean rotatable, Image image){
+			float friction, Vector2f maxVelocity, boolean rotatable, int zOrder, Image image){
 		this.shapeType=shapeType;
 		if (shapeType == SHAPE_TYPE_CIRCLE){
 			this.body = new Body(new Circle(dimensions[0].x/2),mass);
@@ -111,7 +114,7 @@ public class Platformer extends AbstractEntity{
 	 * @param rotatable
 	 */
 	public Platformer(float x, float y, float height, float width, float mass, float restitution, 
-			float friction, Vector2f MaxVelocity, boolean rotatable){
+			float friction, Vector2f MaxVelocity, int zOrder, boolean rotatable){
 		
 	}
 	
@@ -253,10 +256,10 @@ public class Platformer extends AbstractEntity{
 					
 					g.drawImage(image,body.getPosition().getX()-body.getShape().getBounds().getWidth()/2
 							,body.getPosition().getY()-body.getShape().getBounds().getHeight()/2);
-					g.rotate(body.getPosition().getX(),body.getPosition().getY(),(float) -Math.toDegrees(body.getRotation()));
+					//g.rotate(body.getPosition().getX(),body.getPosition().getY(),(float) -Math.toDegrees(body.getRotation()));
 				}else{
-					g.drawImage(image,body.getPosition().getX()-body.getShape().getBounds().getWidth()/2
-							,body.getPosition().getY()-body.getShape().getBounds().getHeight()/2);
+					g.drawImage(image,(body.getPosition().getX()-body.getShape().getBounds().getWidth()/2)
+							,(body.getPosition().getY()-body.getShape().getBounds().getHeight()/2));
 				}
 			}else if (shapeType==SHAPE_TYPE_BOX || shapeType==SHAPE_TYPE_POLYGON){
 				g.drawImage(image,body.getPosition().getX(),body.getPosition().getY());
@@ -343,6 +346,16 @@ public class Platformer extends AbstractEntity{
 		}
 		
 		return false;
+	}
+
+	@Override
+	public int getZOrder() {
+		return zOrder;
+	}
+
+	@Override
+	public void setZOrder(int z) {
+		zOrder=z;
 	}
 	
 }

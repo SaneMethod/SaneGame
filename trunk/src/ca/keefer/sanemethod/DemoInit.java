@@ -16,12 +16,12 @@ import ca.keefer.sanemethod.Tests.TestState;
  * @version 1.1
  * @see org.newdawn.StateBasedGame
  */
-public class Init extends StateBasedGame {
+public class DemoInit extends StateBasedGame {
 	
 	// Container object for the game
 	private AppGameContainer thisGameContainer;
 	
-	public Init(){
+	public DemoInit(int stateToEnter){
 		// create the StateBasedGame and assign it to a gamecontainer
 		super("Sane Method v0.1");
 		
@@ -34,7 +34,7 @@ public class Init extends StateBasedGame {
 			thisGameContainer.setTargetFrameRate(60);
 			//Set console output to verbose to help diagnose problems
 			thisGameContainer.setVerbose(true);
-			thisGameContainer.setVSync(true);
+			//thisGameContainer.setVSync(true);
 			
 			
 			// Add states to this game container and initialize them
@@ -46,11 +46,11 @@ public class Init extends StateBasedGame {
 			this.addState(new TextBoxExampleState(Constants.STATE_TEXT_DEMO));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.STATE_TEST);
+			this.enterState(stateToEnter);
 			
 			
 		}catch (SlickException e){
-			Log.error("Error in Init:"+e.getMessage());
+			Log.error("Error in DemoInit:"+e.getMessage());
 			System.exit(-1);
 		}
 		

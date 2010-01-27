@@ -1,7 +1,5 @@
 package ca.keefer.sanemethod.Environment;
 
-import java.util.ArrayList;
-
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
@@ -18,8 +16,8 @@ public abstract class AbstractEnvironment implements Environment {
 	/** The physical world the environment provides to it's entities */
 	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new QuadSpaceStrategy(25,30)); 
 
-	/** The entities list */
-	protected ArrayList<Entity> entities = new ArrayList<Entity>();
+	/** The Entity Layer */
+	EntityLayer eLayer;
 	/** The amount time in ms passed since last update */
 	private int totalDelta;
 	/** The amount of time to pass before updating the physics world */
@@ -36,8 +34,9 @@ public abstract class AbstractEnvironment implements Environment {
 			world.add(entity.getBody());
 		}
 		
-		entities.add(entity);
 		entity.setWorld(world);
+		
+		eLayer.addEntity(entity);
 	}
 	
 	@Override
@@ -51,13 +50,13 @@ public abstract class AbstractEnvironment implements Environment {
 
 			if (first) {
 				first = false;
-				for (int i=0;i<entities.size();i++) {
-					entities.get(i).preUpdate(stepSize);
+				for (int i=0;i<eLayer.getEntityList().size();i++) {
+					eLayer.getEntity(i).preUpdate(stepSize);
 				}
 			}
 			
-			for (int i=0;i<entities.size();i++) {
-				entities.get(i).update(stepSize);
+			for (int i=0;i<eLayer.getEntityList().size();i++) {
+				eLayer.getEntity(i).update(stepSize);
 			}
 		}
 	}

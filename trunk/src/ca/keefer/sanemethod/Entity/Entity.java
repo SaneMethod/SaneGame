@@ -27,6 +27,20 @@ public interface Entity {
 	public Rectangle getBoundingBox();
 	
 	/**
+	 * Get the zOrder (depth) of an Entity - an Entity with a higher zOrder will
+	 * be drawn after/over an Entity with a lower zOrder.
+	 * @return zOrder/depth of this enttiy
+	 */
+	public int getZOrder();
+	
+	/**
+	 * Get the zOrder (depth) of an Entity - an Entity with a higher zOrder will
+	 * be drawn after/over an Entity with a lower zOrder.
+	 * @param z the zOrder to be set for this Entity.
+	 */
+	public void setZOrder(int z);
+	
+	/**
 	 * Update this entity. This method is called once before physical world is updated
 	 * each cycle. It is only ever called once per update.
 	 * 
