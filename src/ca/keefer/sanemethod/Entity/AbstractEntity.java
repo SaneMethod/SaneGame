@@ -104,8 +104,17 @@ public abstract class AbstractEntity implements Entity {
 		body.adjustVelocity(v);
 	}
 	
-	
-	
+	public void setIgnoreCollision(boolean ignore){
+		if (ignore){
+			for (int i=0;i<this.getWorld().getBodies().size();i++){
+				this.body.addExcludedBody(this.getWorld().getBodies().get(i));
+			}
+		}else {
+			for (int i=0;i<this.getWorld().getBodies().size();i++){
+				this.body.removeExcludedBody(this.getWorld().getBodies().get(i));
+			}	
+		}
+	}
 	
 	
 }

@@ -21,6 +21,7 @@ import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
+import ca.keefer.sanemethod.Environment.ViewPort;
 import ca.keefer.sanemethod.Interface.SaneSystem;
 import ca.keefer.sanemethod.Interface.Text;
 import ca.keefer.sanemethod.Interface.TextHandler;
@@ -49,11 +50,17 @@ public class TestState extends BasicGameState {
 	ArrayList<Text> thisDialog;
 	TextHandler tHandle;
 	Platformer testSprite;
+	Platformer testSprite2;
 	Player tSprite2;
 	ArrayList<MapShape> tileList;
 	
 	TiledEnvironment environment;
+	ViewPort viewPort;
 	
+	int xT=0;
+	int yT=0;
+	boolean goRight = true;
+	boolean goDown = true;
 	
 	
 	public TestState(int stateID){
@@ -84,23 +91,24 @@ public class TestState extends BasicGameState {
 		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite = new Platformer(0,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true, new Image("/res/ball.png"));
+		testSprite = new Platformer(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1, new Image("/res/ball.png"));
 		//testSprite.setGravityEffected(false);
 		//testSprite = new Player(0,0,new Image("/res/ball.png"));
 		dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=48; dimensions[0].y=48;
-		Platformer testSprite2 = new Platformer(20,0,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true, new Image("/res/ball.png"));
+		testSprite2 = new Platformer(80,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,2, new Image("/res/ball.png"));
 		
 		
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/testMap3.tmx.xml"));
 		tileList = x.processXML();
 		
-		environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,true);
+		viewPort = new ViewPort(game);
+		environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,viewPort);
 		environment.addEntity(testSprite);
 		environment.addEntity(testSprite2);
 		
-		
+		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
 		// Mwa ha ha... XMLShapePullParser...
 		/*
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/tilesheettest.png.xml"),
@@ -126,8 +134,10 @@ public class TestState extends BasicGameState {
 		//Entity rendering is now handled by the environment
 		//testSprite.render(g);
 		
-		environment.render(g);
-		environment.renderBounds(g);
+		viewPort.render(g);
+		
+		//environment.render(g);
+		//environment.renderBounds(g);
 		
 		
 		
@@ -139,7 +149,33 @@ public class TestState extends BasicGameState {
 			throws SlickException {
 			
 		//tHandle.update(delta);
+		//viewPort.centerOn(testSprite);
 		
+		/*
+		if (xT > 400){
+			goRight = false;
+		}else if (xT < 0){
+			goRight = true;
+		}
+		if (yT > 500){
+			goDown = false;
+		}else if (yT < 0){
+			goDown = true;
+		}
+		if (goRight){
+			xT +=5;
+		}else{
+			xT -=5;
+		}
+		if (goDown){
+			yT +=5;
+		}else{
+			yT -=5;
+		}
+		viewPort.setPosition(xT, yT);
+		*/
+		
+		viewPort.update(delta);
 		//testSprite.update(delta);
 		environment.update(delta);
 
@@ -161,7 +197,9 @@ public class TestState extends BasicGameState {
 		if (keyPressed == Input.KEY_ESCAPE){
 			this.container.exit();
 		}else if (keyPressed == Input.KEY_1){
-			testSprite.setGravityEffected(true);
+			viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
+		}else if (keyPressed == Input.KEY_2){
+			viewPort.trackEntity(testSprite2,ViewPort.TRACK_MODE_CENTER);
 		}
 		
 		//tHandle.acceptInput(keyPressed);

@@ -32,6 +32,7 @@ public class Constants {
 	public static final int STATE_TEST = 12;
 	public static final int STATE_SHAPE_BUILDER = 13;
 	public static final int STATE_DEMO = 14;
+	public static final int STATE_TEXT_DEMO = 15;
 	
 	// Animation direction constants
 	public static final int DIR_UP=0;
@@ -121,6 +122,10 @@ public class Constants {
 	public static float MAX_ACCELERATION = 2.5f;
 	public static Vector2f GRAVITY = new Vector2f(0,5f); // 0 pull on x axis, 5 pull down on y axis
 	public static int ITERATIONS = 20; // Number of iterations the phys2d engine should go through
+	
+	// Layer Constants
+	public static int LAYER_ENTITY = 1;
+	public static int LAYER_TILE = 2;
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

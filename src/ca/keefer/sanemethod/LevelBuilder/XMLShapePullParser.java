@@ -35,7 +35,7 @@ public class XMLShapePullParser {
 		tileList = new ArrayList<MapShape>();
 		
 		try{
-			// Init the factory for a new pull parser
+			// DemoInit the factory for a new pull parser
 			factory = XmlPullParserFactory.newInstance(
 					System.getProperty(XmlPullParserFactory.PROPERTY_NAME), 
 					Thread.currentThread().getContextClassLoader().getClass());

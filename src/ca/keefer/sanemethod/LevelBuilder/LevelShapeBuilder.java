@@ -50,7 +50,7 @@ import ca.keefer.sanemethod.Constants;
  * enter = commit current shape to list; , = increase map scroll speed; . = decrease map scroll speed;
  * F1->F10 = toggle layers 0-9 on/off;
  */
-public class TileShapeBuilder extends BasicGameState{
+public class LevelShapeBuilder extends BasicGameState{
 
 	int stateID;
 	
@@ -107,7 +107,7 @@ public class TileShapeBuilder extends BasicGameState{
 	final int SHAPE_CIRCLE = 1;
 	final int SHAPE_PATH = 2;
 	
-	public TileShapeBuilder(int id){
+	public LevelShapeBuilder(int id){
 		stateID = id;
 	}
 	

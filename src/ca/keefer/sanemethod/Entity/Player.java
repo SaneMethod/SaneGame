@@ -203,6 +203,18 @@ public class Player extends AbstractEntity implements Entity{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public int getZOrder() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZOrder(int z) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 
