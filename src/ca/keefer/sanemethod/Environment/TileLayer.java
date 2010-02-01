@@ -5,6 +5,13 @@ import org.newdawn.slick.tiled.TiledMap;
 
 import ca.keefer.sanemethod.Constants;
 
+/**
+ * This class defines a TileLayer, which implements the Layer interface,
+ * and stores a reference to the TiledMap from which it is derived, as well
+ * as the ViewPort to which it is attached.
+ * @author Christopher Keefer
+ *
+ */
 public class TileLayer implements Layer{
 	
 	private int id;

@@ -71,8 +71,8 @@ public class Constants {
 	// Tile Properties
 	public static String PASS = "passable";
 	public static String COST = "cost";
-	public static int TILE_WIDTH=32;
-	public static int TILE_HEIGHT=32;
+	public static int TILE_WIDTH=64;
+	public static int TILE_HEIGHT=64;
 	public static int NOT_PASSABLE=0;
 	public static int PASSABLE=1;
 	public static int PASSABLE_BY_SWIMMERS_OR_FLYERS=2;
@@ -95,7 +95,10 @@ public class Constants {
 	
 	// Key Defaults
 	public static int KEY_ACCEPT = Input.KEY_A;
-	public static int KEY_CANCEL = Input.KEY_C;
+	public static int KEY_JUMP = Input.KEY_C;
+	public static int KEY_PUNCH = Input.KEY_S;
+	public static int KEY_KICK = Input.KEY_D;
+	public static int KEY_PICK_UP = Input.KEY_V;
 	public static int KEY_INFO = Input.KEY_I;
 	public static int KEY_UP = Input.KEY_UP;
 	public static int KEY_DOWN = Input.KEY_DOWN;
@@ -118,9 +121,9 @@ public class Constants {
 	
 	// Physics System Constants
 	public static float FRICTION = 0.045f;
-	public static float ACCELERATION = 0.6f;
-	public static float MAX_ACCELERATION = 2.5f;
-	public static Vector2f GRAVITY = new Vector2f(0,5f); // 0 pull on x axis, 5 pull down on y axis
+	public static float ACCELERATION = 0.9f;
+	public static float MAX_ACCELERATION = 6.5f;
+	public static Vector2f GRAVITY = new Vector2f(0,10f); // 0 pull on x axis, 5 pull down on y axis
 	public static int ITERATIONS = 20; // Number of iterations the phys2d engine should go through
 	
 	// Layer Constants

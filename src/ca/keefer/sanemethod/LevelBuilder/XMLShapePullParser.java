@@ -100,7 +100,7 @@ public class XMLShapePullParser {
 				pointCount +=2;
 			}
 			Polygon thisPoly = new Polygon(points);
-			// And now lets slot it all into the TileShape
+			// And now lets slot it all into the MapShape
 			MapShape mapShape = new MapShape(thisPoly);
 			tileList.add(mapShape);
 		}

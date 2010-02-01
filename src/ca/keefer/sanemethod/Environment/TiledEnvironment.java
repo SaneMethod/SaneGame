@@ -19,6 +19,7 @@ import net.phys2d.raw.CollisionListener;
 import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.shapes.Polygon;
 
+import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.LevelBuilder.MapShape;
 import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
 
@@ -59,15 +60,28 @@ public class TiledEnvironment extends AbstractEnvironment{
 	
 	
 	public TiledEnvironment(String mapFile, ArrayList<MapShape> tileList, ViewPort viewPort) {
-		
 		this.viewPort=viewPort;
-			try {
-				buildStatic(mapFile, tileList);
-			} catch (SlickException e) {
-				Log.error(e.getMessage());
+			if (tileList != null){
+				try {
+					buildStatic(mapFile, tileList);
+				} catch (SlickException e) {
+					Log.error(e.getMessage());
+				}
+			}else{
+				try {
+					buildDynamic(mapFile);
+				}catch (SlickException e){
+					Log.error(e.getMessage());
+				}
 			}
 	}
 	
+	/**
+	 * Build the physical shapes of the map based on a static XML file
+	 * @param mapFile
+	 * @param tileList
+	 * @throws SlickException
+	 */
 	public void buildStatic(String mapFile, ArrayList<MapShape> tileList)throws SlickException{
 		// Get the specified tiledMap
 		tiledMap = new TiledMap(mapFile, true);
@@ -81,6 +95,44 @@ public class TiledEnvironment extends AbstractEnvironment{
 		shapes = new Shape[tileList.size()];
 		for (int i=0;i<tileList.size();i++){
 			shapes[i] = tileList.get(i).getShape();
+		}
+		
+		this.init();
+	}
+	
+	/**
+	 * Dynamically populate the shapes array with polygons based on
+	 * the presence of tiles on the collision layer (named "Collision")<br>
+	 * TODO:For now, makes only boxes - consider enabling this to handle 
+	 * more complex shapes as well
+	 * @param mapFile
+	 * @throws SlickException
+	 */
+	public void buildDynamic(String mapFile) throws SlickException{
+		tiledMap = new TiledMap(mapFile,true);
+		this.width = tiledMap.getWidth();
+		this.height = tiledMap.getHeight();
+		this.layers = tiledMap.getLayerCount();
+		this.tileWidth = tiledMap.getTileWidth();
+		this.tileHeight = tiledMap.getTileHeight();
+		
+		// Populate shapes array with polygons based on tile presence
+		// on Collision Layer
+		ArrayList<Shape> tempShapeList = new ArrayList<Shape>();
+		int layerID = tiledMap.getLayerIndex("Collision");
+		for (int x=0;x<this.width;x++){
+			for (int y=0;y<this.width;y++){
+				if (tiledMap.getTileImage(x, y, layerID) != null){
+					
+					// Simple method based on turning every occupied tile into a rectangle
+					tempShapeList.add(new Rectangle(x*Constants.TILE_WIDTH,y*Constants.TILE_HEIGHT,
+							Constants.TILE_WIDTH,Constants.TILE_HEIGHT));
+				}
+			}
+		}
+		shapes = new Shape[tempShapeList.size()];
+		for (int i=0;i<tempShapeList.size();i++){
+			shapes[i] = tempShapeList.get(i);
 		}
 		
 		this.init();
@@ -233,8 +285,8 @@ public class TiledEnvironment extends AbstractEnvironment{
 
 		@Override
 		public void collisionOccured(CollisionEvent event) {
-			// TODO Do Something when we encounter a collision?
-			Log.debug("Collision Occured:"+event.getTime());
+			// TODO: Do Something when we encounter a collision?
+			//Log.debug("Collision Occured:"+event.getTime());
 		}
 		
 	}
