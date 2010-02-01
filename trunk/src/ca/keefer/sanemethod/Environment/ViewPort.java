@@ -2,13 +2,10 @@ package ca.keefer.sanemethod.Environment;
 
 import java.util.ArrayList;
 
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.util.MaskUtil;
 
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
@@ -108,7 +105,6 @@ public class ViewPort {
 	
 	/**
 	 * Attach a layer to this viewport
-	 * @param id
 	 * @param layer
 	 */
 	public void attachLayer(Layer layer){
@@ -200,6 +196,10 @@ public class ViewPort {
 		this.trackMode=trackMode;
 	}
 	
+	/**
+	 * FIXME: This doesn't work as intended - needs to be fixed someday
+	 * @param e Entity to follow
+	 */
 	public void follow(Entity e){
 		// create a bounding rectangle around the current area to determine the
 		// entity's position in relation to it
@@ -267,6 +267,7 @@ public class ViewPort {
 		int xPos = (x + (width / 2) - (int)(clip.getWidth() / 2));
 		int yPos = (y + (height / 2) - (int)(clip.getHeight() / 2));
 		
+		/*
 		// Clamp screen scroll to limits of map
 		if (xPos < minX){
 			xPos = minX;
@@ -277,7 +278,7 @@ public class ViewPort {
 			yPos = minY;
 		}else if (yPos > maxY){
 			yPos = maxY;
-		}
+		}*/
 		
 		
 		setPosition (xPos, yPos);

@@ -49,7 +49,7 @@ public class TestState extends BasicGameState {
 	Text thisText;
 	ArrayList<Text> thisDialog;
 	TextHandler tHandle;
-	Platformer testSprite;
+	Player testSprite;
 	Platformer testSprite2;
 	Player tSprite2;
 	ArrayList<MapShape> tileList;
@@ -90,14 +90,16 @@ public class TestState extends BasicGameState {
 		// Oooh... testSprite!
 		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
-		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite = new Platformer(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1, new Image("/res/ball.png"));
-		//testSprite.setGravityEffected(false);
-		//testSprite = new Player(0,0,new Image("/res/ball.png"));
+		dimensions[0].x=50; dimensions[0].y=64;
+		//testSprite = new Platformer(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1, new Image("/res/ball.png"));
+		SpriteSheet spriteSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
+		testSprite = new Player(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1,spriteSheet);
+		
+		// TestSprite2
 		dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite2 = new Platformer(80,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,2, new Image("/res/ball.png"));
+		testSprite2 = new Platformer(300,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),true,2, new Image("/res/ball.png"));
 		
 		
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/testMap3.tmx.xml"));
@@ -105,6 +107,7 @@ public class TestState extends BasicGameState {
 		
 		viewPort = new ViewPort(game);
 		environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,viewPort);
+		//environment = new TiledEnvironment("res/Tiles/testMap3.tmx",null,viewPort);
 		environment.addEntity(testSprite);
 		environment.addEntity(testSprite2);
 		
@@ -137,7 +140,7 @@ public class TestState extends BasicGameState {
 		viewPort.render(g);
 		
 		//environment.render(g);
-		//environment.renderBounds(g);
+		environment.renderBounds(g);
 		
 		
 		
@@ -176,7 +179,6 @@ public class TestState extends BasicGameState {
 		*/
 		
 		viewPort.update(delta);
-		//testSprite.update(delta);
 		environment.update(delta);
 
 	}

@@ -7,6 +7,14 @@ import org.newdawn.slick.Graphics;
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
+/**
+ * The EntityLayer class implements the Layer interface,
+ * and provides a common layer for entities on the same 
+ * level to be drawn together. This layer is attached to
+ * a specific ViewPort, to which a reference is maintained.
+ * @author Christopher Keefer
+ *
+ */
 public class EntityLayer implements Layer{
 	
 	private int id;
