@@ -123,8 +123,13 @@ public class Constants {
 	public static float FRICTION = 0.045f;
 	public static float ACCELERATION = 0.9f;
 	public static float MAX_ACCELERATION = 6.5f;
-	public static Vector2f GRAVITY = new Vector2f(0,10f); // 0 pull on x axis, 5 pull down on y axis
-	public static int ITERATIONS = 20; // Number of iterations the phys2d engine should go through
+	public static Vector2f GRAVITY = new Vector2f(0f,15f); // 0 pull on x axis, 10 pull down on y axis
+	public static int ITERATIONS = 20; // Number of iterations the phys engine should go through per update cycle
+	
+	// Body Shape Constants
+	public static int SHAPE_TYPE_BOX=0;
+	public static int SHAPE_TYPE_CIRCLE=1;
+	public static int SHAPE_TYPE_POLYGON=2;
 	
 	// Layer Constants
 	public static int LAYER_ENTITY = 1;
