@@ -9,6 +9,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Vector2f;
@@ -18,8 +19,11 @@ import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Entity.Elevator;
 import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
+import ca.keefer.sanemethod.Entity.Spring;
+import ca.keefer.sanemethod.Entity.Switch;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
 import ca.keefer.sanemethod.Environment.ViewPort;
 import ca.keefer.sanemethod.Interface.SaneSystem;
@@ -91,16 +95,40 @@ public class TestState extends BasicGameState {
 		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=50; dimensions[0].y=64;
-		//testSprite = new Platformer(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1, new Image("/res/ball.png"));
 		SpriteSheet spriteSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
-		testSprite = new Player(40,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,1,spriteSheet);
-		
+		testSprite = new Player(540,-30,Constants.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,4,spriteSheet);
+		//testSprite.getBody().setRotation(-90);
 		// TestSprite2
 		dimensions = new net.phys2d.math.Vector2f[1];
 		dimensions[0]= new net.phys2d.math.Vector2f();
 		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite2 = new Platformer(300,-30,Platformer.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),true,2, new Image("/res/ball.png"));
+		testSprite2 = new Platformer(300,-30,Constants.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),false,3, new Image("/res/ball.png"));
+		Platformer testSprite3 = new Platformer(400,-30,Constants.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),true,2, new Image("/res/ball.png"));
 		
+		dimensions[0].x=64;
+		Spring testSpring = new Spring(500,400,Constants.SHAPE_TYPE_CIRCLE,dimensions,10,0,0,1,1000,new SpriteSheet("res/Sprites/Jellyfish.png",128,128));
+		
+		dimensions = new net.phys2d.math.Vector2f[4];
+		dimensions[0] = new net.phys2d.math.Vector2f();
+		dimensions[1] = new net.phys2d.math.Vector2f();
+		dimensions[2] = new net.phys2d.math.Vector2f();
+		dimensions[3] = new net.phys2d.math.Vector2f();
+		dimensions[0].x=0; dimensions[0].y=0;
+		dimensions[1].x=0; dimensions[1].y=64;
+		dimensions[2].x=64; dimensions[2].y=64;
+		dimensions[3].x=64; dimensions[0].y=0;
+		Switch testSwitch = new Switch(200,370,Constants.SHAPE_TYPE_POLYGON,dimensions,10,0,0,1,Switch.UP,false,new SpriteSheet("res/Tiles/Blocks.png",64,64));
+		
+		dimensions = new net.phys2d.math.Vector2f[4];
+		dimensions[0] = new net.phys2d.math.Vector2f();
+		dimensions[1] = new net.phys2d.math.Vector2f();
+		dimensions[2] = new net.phys2d.math.Vector2f();
+		dimensions[3] = new net.phys2d.math.Vector2f();
+		dimensions[0].x=0; dimensions[0].y=0;
+		dimensions[1].x=0; dimensions[1].y=60;
+		dimensions[2].x=90; dimensions[2].y=60;
+		dimensions[3].x=90; dimensions[0].y=0;
+		Elevator testElevator = new Elevator (600f,200f,Constants.SHAPE_TYPE_POLYGON,dimensions,100f,0f,0f,1,Elevator.UP,true,100,new Line(600,200,600,-100),new net.phys2d.math.Vector2f(50,100),new SpriteSheet("res/Sprites/Elevator.png",136,192));
 		
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/testMap3.tmx.xml"));
 		tileList = x.processXML();
@@ -110,6 +138,10 @@ public class TestState extends BasicGameState {
 		//environment = new TiledEnvironment("res/Tiles/testMap3.tmx",null,viewPort);
 		environment.addEntity(testSprite);
 		environment.addEntity(testSprite2);
+		environment.addEntity(testSprite3);
+		environment.addEntity(testSpring);
+		environment.addEntity(testSwitch);
+		environment.addEntity(testElevator);
 		
 		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
 		// Mwa ha ha... XMLShapePullParser...

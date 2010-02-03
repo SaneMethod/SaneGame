@@ -33,6 +33,7 @@ public class Player extends Platformer{
 	int idleTimer=0;
 	/** Are we trying to grab something */
 	boolean grabbing=false;
+	/** FixedJoint for establishing a grabbed relationship */
 	FixedJoint grabJoint;
 	
 	boolean sliding=false;
@@ -158,6 +159,7 @@ public class Player extends Platformer{
 	@Override
 	/** Draw a specific animation at this  player's current position */
 	public void render (Graphics g){
+		//g.rotate(body.getPosition().getX(), body.getPosition().getX(), body.getRotation());
 		if (this.getDirection() == DIR_LEFT){
 			animTable.get(currentAnim).updateNoDraw();
 			g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, false),
@@ -166,7 +168,7 @@ public class Player extends Platformer{
 		}else{
 			g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-50);
 		}
-
+		//g.rotate(body.getPosition().getX(), body.getPosition().getX(), -body.getRotation());
 	}
 	
 	@Override 
@@ -186,8 +188,10 @@ public class Player extends Platformer{
 	public void update (int delta){
 		super.update(delta);
 		if (grabbing){
-			pickUpOnCollide();
-			if (grabJoint != null){
+			if (grabJoint == null){
+				pickUpOnCollide();
+			}
+			else if (grabJoint != null){
 				grabJoint.applyImpulse();
 			}
 		}
@@ -265,7 +269,7 @@ public class Player extends Platformer{
 			// make sure this collision occurred by running into this object
 			// and that its mass is not too great for our player to lift
 			if (events[i].getBodyA()==body){
-				if (events[i].getBodyB().getMass() < body.getMass()*4){
+				if (events[i].getBodyB().getMass() < body.getMass()*4 && events[i].getBodyB().isMoveable()){
 					if (grabJoint == null){
 						grabJoint = new FixedJoint(events[i].getBodyB(),body);
 						//events[i].getBodyB().setPosition(body.getPosition().getX(), body.getPosition().getY());

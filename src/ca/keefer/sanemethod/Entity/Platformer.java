@@ -53,18 +53,17 @@ public class Platformer extends AbstractEntity{
 	int shapeType;
 	/** zOrder controls the depth of this entity */
 	private int zOrder;
-	
+	/** Determines whether we're currently pressing the jump button */
 	private boolean activeJump;
+	/** Times how long the jump button has been held down, to a max value */
 	private int jumpTimer=0;
-	
-	public static int SHAPE_TYPE_BOX=0;
-	public static int SHAPE_TYPE_CIRCLE=1;
-	public static int SHAPE_TYPE_POLYGON=2;
 	
 	public static boolean DIR_LEFT = false;
 	public static boolean DIR_RIGHT = true;
 	
+	/** The maximum value alllowed for the jumpTimer */
 	public static int MAX_JUMP = 500;
+	/** The velocity required before the 'reversing' animation should be played */
 	public static int REV_VELOCITY = 20;
 	
 	
@@ -89,11 +88,11 @@ public class Platformer extends AbstractEntity{
 			float friction, Vector2f maxVelocity, boolean rotatable, int zOrder, Image image){
 		
 		this.shapeType=shapeType;
-		if (shapeType == SHAPE_TYPE_CIRCLE){
+		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
 			this.body = new Body(new Circle(dimensions[0].x/2),mass);
-		}else if (shapeType  == SHAPE_TYPE_BOX){
+		}else if (shapeType  == Constants.SHAPE_TYPE_BOX){
 			this.body = new Body(new Box(dimensions[0].x,dimensions[0].y),mass);
-		}else if (shapeType == SHAPE_TYPE_POLYGON){
+		}else if (shapeType == Constants.SHAPE_TYPE_POLYGON){
 			this.body = new Body(new Polygon(dimensions),mass);
 		}
 		body.setUserData(this);
@@ -135,11 +134,11 @@ public class Platformer extends AbstractEntity{
 			float friction, Vector2f maxVelocity, boolean rotatable, int zOrder){
 		
 		this.shapeType=shapeType;
-		if (shapeType == SHAPE_TYPE_CIRCLE){
+		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
 			this.body = new Body(new Circle(dimensions[0].x/2),mass);
-		}else if (shapeType  == SHAPE_TYPE_BOX){
+		}else if (shapeType  == Constants.SHAPE_TYPE_BOX){
 			this.body = new Body(new Box(dimensions[0].x,dimensions[0].y),mass);
-		}else if (shapeType == SHAPE_TYPE_POLYGON){
+		}else if (shapeType == Constants.SHAPE_TYPE_POLYGON){
 			this.body = new Body(new Polygon(dimensions),mass);
 		}
 		body.setUserData(this);
@@ -337,7 +336,7 @@ public class Platformer extends AbstractEntity{
 	@Override
 	public void render(Graphics g) {
 		if (image !=null){
-			if (shapeType==SHAPE_TYPE_CIRCLE){
+			if (shapeType==Constants.SHAPE_TYPE_CIRCLE){
 				if (body.isRotatable()){
 					g.rotate(body.getPosition().getX(),body.getPosition().getY(),(float) Math.toDegrees(body.getRotation()));
 					
@@ -348,7 +347,7 @@ public class Platformer extends AbstractEntity{
 					g.drawImage(image,(body.getPosition().getX()-body.getShape().getBounds().getWidth()/2)
 							,(body.getPosition().getY()-body.getShape().getBounds().getHeight()/2));
 				}
-			}else if (shapeType==SHAPE_TYPE_BOX || shapeType==SHAPE_TYPE_POLYGON){
+			}else if (shapeType==Constants.SHAPE_TYPE_BOX || shapeType==Constants.SHAPE_TYPE_POLYGON){
 				g.drawImage(image,body.getPosition().getX(),body.getPosition().getY());
 			}
 		}
@@ -411,8 +410,7 @@ public class Platformer extends AbstractEntity{
 			return false;
 		}
 		
-		// loop through the collision events that have occured in the
-		// world
+		// loop through the collision events that have occured in the world
 		CollisionEvent[] events = world.getContacts(body);
 		
 		for (int i=0;i<events.length;i++) {
@@ -426,13 +424,13 @@ public class Platformer extends AbstractEntity{
 				// below it then we're on the ground
 				if (events[i].getNormal().getY() < -0.5) {
 					if (events[i].getBodyB() == body) {
-						//System.out.println(events[i].getPoint()+","+events[i].getNormal());
+						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
 						return true;
 					}
 				}
 				if (events[i].getNormal().getY() > 0.5) {
 					if (events[i].getBodyA() == body) {
-						//System.out.println(events[i].getPoint()+","+events[i].getNormal());
+						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
 						return true;
 					}
 				}

@@ -55,6 +55,9 @@ public class EntityLayer implements Layer{
 		}
 		
 	}
+	/**
+	 * Render only those entities on-screen
+	 */
 	public void render(Graphics g, int xOffset, int yOffset, int xLimit, int yLimit){
 		// Make sure entities don't stop getting drawn until they're
 		// definitely off-screen

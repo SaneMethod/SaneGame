@@ -208,6 +208,10 @@ public class TiledEnvironment extends AbstractEnvironment{
 		return bounds;
 	}
 
+	/**
+	 * @deprecated
+	 * @see ca.keefer.sanemethod.Environment.ViewPort
+	 */
 	@Override
 	public void render(Graphics g) {
 		// render the bottom and parity layers of tile images
@@ -252,8 +256,11 @@ public class TiledEnvironment extends AbstractEnvironment{
 				for (int k=0;k<verts.length;k++) {
 					p.addPoint(verts[k].getX(), verts[k].getY());
 				}
-				
+				g.translate(-list.get(i).getPosition().getX(), 
+						-list.get(i).getPosition().getY());
 				g.draw(p);
+				g.translate(list.get(i).getPosition().getX(), 
+						list.get(i).getPosition().getY());
 			}
 		}
 
@@ -265,15 +272,27 @@ public class TiledEnvironment extends AbstractEnvironment{
 				org.newdawn.slick.geom.Circle circle = new org.newdawn.slick.geom.Circle(eLayer.getEntityList().get(i).getBody().getPosition().getX(),
 						eLayer.getEntityList().get(i).getBody().getPosition().getY(),eLayer.getEntityList().get(i).getBody().getShape().getBounds().getWidth()/2);
 				g.draw(circle);
-			}else{
+			}else if (eLayer.getEntityList().get(i).getBody().getShape() instanceof net.phys2d.raw.shapes.Box){
 			org.newdawn.slick.geom.Rectangle box = new org.newdawn.slick.geom.Rectangle(eLayer.getEntityList().get(i).getBody().getPosition().getX(),
 					eLayer.getEntityList().get(i).getBody().getPosition().getY(),eLayer.getEntityList().get(i).getBody().getShape().getBounds().getWidth(),
 					eLayer.getEntityList().get(i).getBody().getShape().getBounds().getHeight());
 			
 				
 				g.draw(box);
+			}else if (eLayer.getEntityList().get(i).getBody().getShape() instanceof Polygon) {
+				Polygon poly = (Polygon) eLayer.getEntityList().get(i).getBody().getShape();
+				org.newdawn.slick.geom.Polygon p = new org.newdawn.slick.geom.Polygon();
+				ROVector2f[] verts = poly.getVertices();
+				for (int k=0;k<verts.length;k++) {
+					p.addPoint(verts[k].getX(), verts[k].getY());
+				}
+				g.translate(-list.get(i).getPosition().getX(), 
+						-list.get(i).getPosition().getY());
+				g.draw(p);
+				g.translate(list.get(i).getPosition().getX(), 
+						list.get(i).getPosition().getY());
 			}
-			}
+		}
 	}
 	
 	/**
