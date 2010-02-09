@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
+<map version="1.0" orientation="orthogonal" width="13" height="37" tilewidth="64" tileheight="64">
+ <tileset name="Field" firstgid="1" tilewidth="64" tileheight="64">
+  <image source="Tile_field.png"/>
+ </tileset>
+ <layer name="Background" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjgIGhmQycDcT8QCwAxIJQdg4Uw8RykHAuEHMDsSYJWA+ItaFsaSCWwYNloeqCgNgbyrYGYhs82BZJDzcZerRJ1FNEhtt4yNCjA8RsUHY0EMfgwbFQdexAzEQGPgskzgHxSSA+BcSngfgME37xt0D8DohfAvErIH4NxG8IiOMyH589eQyjeBQPbgwAfUJYFIQHAAA=
+  </data>
+ </layer>
+ <layer name="GrassDetail" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjgL6gDYjbicAdSHqWAfFyIvCKIaLnGFqYgPjHgfgEmjg6n9bADojlsIjBMDZxeoFgIBYBYlEoOwTKD4FiUSS+CBSXQPFcJFxMQBwG9iJhBiLEQeAOEiZGfDABByxiCnR2w2AF4Uy0MxsAL1v264QHAAA=
+  </data>
+ </layer>
+ <layer name="FringeDetail" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjgDiwCIgXA/ESKpj1AkqzM6KKP8OhnoMRIvcMyobpZWVE6HuBpocVzWxs9sHMJsatuEAjUH8TEDcDcQsQtzJCzMQmDgMLgexFQLwYiJcA8VJG/OIgwE/Andj8s4k4LQw8RJo9CkbBKKAuAAAn/pSMhAcAAA==
+  </data>
+ </layer>
+ <layer name="HouseDetail" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAUjEfQD8QQgngjlLwLidiBegkfPeiDeAMQbSbDnPBBfAOKLJOh5D8QfgPgjkpgiIwODEhArA7EKEKtCMTZxGHAEsp2A2BmIXYDYFYhP4RCHgUQgOwmIk4E4BYhToXqwieMDp0jwLyl6TID2mgKxGSNx4qNgFIyCwQ0AGf265YQHAAA=
+  </data>
+ </layer>
+ <layer name="Collision" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjgDrgJBoeBdgBqWFDTniSq2cUjIJRQF8AAM6CKDaEBwAA
+  </data>
+ </layer>
+ <layer name="Doors" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBRQCkIYGRhCgTiMEVV8CpA/FYinMWLqKQGKlQJxGZrcFiB/KxBvw6JnFIyCUTC8AADhdMuchAcAAA==
+  </data>
+ </layer>
+ <layer name="Foreground" width="13" height="37">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBSMglEwCkbBQAAAxksqBYQHAAA=
+  </data>
+ </layer>
+ <objectgroup name="Object Group 7" width="0" height="0"/>
+</map>

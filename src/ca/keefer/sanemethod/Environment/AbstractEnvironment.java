@@ -1,5 +1,7 @@
 package ca.keefer.sanemethod.Environment;
 
+import org.newdawn.slick.util.Log;
+
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
@@ -14,7 +16,7 @@ import net.phys2d.raw.strategies.QuadSpaceStrategy;
  */
 public abstract class AbstractEnvironment implements Environment {
 	/** The physical world the environment provides to it's entities */
-	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new QuadSpaceStrategy(25,30)); 
+	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new QuadSpaceStrategy(15,50)); 
 
 	/** The Entity Layer */
 	EntityLayer eLayer;
@@ -37,6 +39,11 @@ public abstract class AbstractEnvironment implements Environment {
 		entity.setWorld(world);
 		
 		eLayer.addEntity(entity);
+	}
+	
+	/** Get the physics world encapsulated by this environment */
+	public World getWorld(){
+		return world;
 	}
 	
 	@Override

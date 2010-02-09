@@ -14,7 +14,6 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
@@ -32,7 +31,7 @@ public class Elevator extends AbstractEntity{
 	/** moving references the obvious */
 	private boolean moving;
 	/** Images for the various directions */
-	Image eLeft, eRight, eUp, eDown;
+	Image eLeft, eRight, eUp, eDown, eStop;
 	/** auto determines whether the platform moves on its own following a simple line path */
 	private boolean auto;
 	/** line controls the movement of simple automated platform */
@@ -43,6 +42,8 @@ public class Elevator extends AbstractEntity{
 	SpriteSheet spriteSheet;
 	/** fixedJoint applies movement of this Elevator to whatever is riding it */
 	FixedJoint fixedJoint;
+	/** attachedBody is the body attached to this elevator by the fixedJoint */
+	Body attachedBody;
 	
 	public static final short UP = 1;
 	public static final short DOWN = 2;
@@ -101,6 +102,7 @@ public class Elevator extends AbstractEntity{
 		eDown = spriteSheet.getSubImage(0, 1);
 		eRight = spriteSheet.getSubImage(0, 2);
 		eLeft = spriteSheet.getSubImage(0, 3);
+		eStop = spriteSheet.getSubImage(0,4);
 	}
 	
 	public short getDirection(){
@@ -153,8 +155,14 @@ public class Elevator extends AbstractEntity{
 		if (fixedJoint != null){
 			fixedJoint.preStep(delta);
 		}
-		if (considerCollision()){
-			Log.debug("Collision on top of elevator");
+		if (fixedJoint == null){
+			if (considerCollision()){
+			//Log.debug("Collision on top of elevator");
+				if (attachedBody.getUserData().getClass() == Player.class){
+					fixedJoint = new FixedJoint(this.body,attachedBody);
+					world.add(fixedJoint);
+				}
+			}
 		}
 		
 	}
@@ -196,6 +204,19 @@ public class Elevator extends AbstractEntity{
 		
 		if (fixedJoint != null){
 			fixedJoint.applyImpulse();
+			Player yada = (Player) attachedBody.getUserData();
+			if (yada.getLastKey() == Constants.KEY_JUMP){
+				world.remove(fixedJoint);
+				fixedJoint = null;
+			}else if (yada.getLastKey() == Constants.KEY_UP && !auto){
+				this.direction = UP;
+			}else if (yada.getLastKey() == Constants.KEY_DOWN && !auto){
+				this.direction = DOWN;
+			}else if (yada.getLastKey() == Constants.KEY_LEFT && !auto){
+				this.direction = LEFT;
+			}else if (yada.getLastKey() == Constants.KEY_RIGHT && !auto){
+				this.direction = RIGHT;
+			}
 		}
 		
 	}
@@ -217,6 +238,10 @@ public class Elevator extends AbstractEntity{
 			break;
 		case RIGHT:
 			g.drawImage(eRight, body.getPosition().getX()-width/6, 
+					body.getPosition().getY()-eUp.getHeight()+height/4);
+			break;
+		case STOP:
+			g.drawImage(eStop, body.getPosition().getX()-width/6, 
 					body.getPosition().getY()-eUp.getHeight()+height/4);
 			break;
 		}
@@ -242,12 +267,14 @@ public class Elevator extends AbstractEntity{
 				if (events[i].getNormal().getY() == 1.0) {
 					if (events[i].getBodyB() == body) {
 						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
+						attachedBody = events[i].getBodyA();
 						return true;
 					}
 				}
 				if (events[i].getNormal().getY() == 1.0) {
 					if (events[i].getBodyA() == body) {
 						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
+						attachedBody = events[i].getBodyB();
 						return true;
 					}
 				}

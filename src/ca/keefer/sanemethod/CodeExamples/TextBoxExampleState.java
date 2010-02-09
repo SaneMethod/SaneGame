@@ -60,7 +60,7 @@ public class TextBoxExampleState extends BasicGameState {
 		thisDialog = testPull.processDialog();
 		testPull = null;
 		
-		tHandle = new TextHandler(thisDialog, 40, Text.BOTTOM, 740);
+		tHandle = new TextHandler(thisDialog, 40,0, Text.BOTTOM, 740);
 	}
 
 	@Override

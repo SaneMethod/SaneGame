@@ -84,7 +84,7 @@ public class Text {
 		this.text=text;
 		this.boxed=true;
 		try {
-			textTex = new Image("res/textTex.png");
+			textTex = new Image("res/UI/texWin.png");
 		} catch (SlickException e) {
 			Log.error("Failure to load image in Text:"+e.getMessage());
 		}
@@ -99,7 +99,7 @@ public class Text {
 		this.boxed=boxed;
 		this.proceed=proceed;
 		try {
-			textTex = new Image("res/textTex.png");
+			textTex = new Image("res/UI/texWin.png");
 		} catch (SlickException e) {
 			Log.error("Failure to load image in Text:"+e.getMessage());
 		}
@@ -249,9 +249,9 @@ public class Text {
 	
 	// Called before any output functions, to ensure text is properly
 	// formatted and all text-dependant variables are set
-	public void prepare(float x, short pos, int boxWidth){
+	public void prepare(float x, float y, short pos, int boxWidth){
 		// float for y position based on short
-		this.y=0;
+		this.y=y;
 		this.x=x;
 		this.boxWidth=boxWidth;
 		
@@ -268,11 +268,11 @@ public class Text {
 		this.x = centerWidth(width);
 		// Depending on position variable and height, determine where to place the box vertically
 		if (pos == BOTTOM){
-			this.y = Constants.SCREENHEIGHT - height - 20;
+			this.y = Constants.SCREENHEIGHT - height - 20 + y;
 		}else if (pos == MIDDLE){
-			this.y = centerHeight(height);
+			this.y = centerHeight(height) + y;
 		}else if (pos == TOP){
-			this.y = 20;
+			this.y = 20 + y;
 		}
 		cOffset=0;
 		accumulator=0;
