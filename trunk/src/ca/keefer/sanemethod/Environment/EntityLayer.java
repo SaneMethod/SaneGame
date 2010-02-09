@@ -92,11 +92,9 @@ public class EntityLayer implements Layer{
 
 	@Override
 	public void update(int delta) {
-		
 		for (int i=0;i<entityList.size();i++){
 			entityList.get(i).update(delta);
 		}
-		
 	}
 	
 	public void addEntity(Entity e){

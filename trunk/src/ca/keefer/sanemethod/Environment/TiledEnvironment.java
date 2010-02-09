@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.GeomUtil;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.tiled.TiledMap;
@@ -48,7 +50,8 @@ public class TiledEnvironment extends AbstractEnvironment{
 	private int height;
 	/** The number of layers in the tile environment */
 	private int layers;
-	
+	/** The utility used to combine tile shapes */
+	private GeomUtil util = new GeomUtil();
 	/** The width in pixels of each tile - set from the TilEd map */
 	private int tileWidth;
 	/** The height in pixels of each tile - set from the TilEd map */
@@ -115,24 +118,24 @@ public class TiledEnvironment extends AbstractEnvironment{
 		this.layers = tiledMap.getLayerCount();
 		this.tileWidth = tiledMap.getTileWidth();
 		this.tileHeight = tiledMap.getTileHeight();
+		ArrayList<Shape> shapeList = new ArrayList<Shape>();
 		
 		// Populate shapes array with polygons based on tile presence
 		// on Collision Layer
-		ArrayList<Shape> tempShapeList = new ArrayList<Shape>();
 		int layerID = tiledMap.getLayerIndex("Collision");
 		for (int x=0;x<this.width;x++){
-			for (int y=0;y<this.width;y++){
+			for (int y=0;y<this.height;y++){
 				if (tiledMap.getTileImage(x, y, layerID) != null){
-					
-					// Simple method based on turning every occupied tile into a rectangle
-					tempShapeList.add(new Rectangle(x*Constants.TILE_WIDTH,y*Constants.TILE_HEIGHT,
-							Constants.TILE_WIDTH,Constants.TILE_HEIGHT));
+					shapeList.add(new Rectangle(x*Constants.TILE_WIDTH,y*Constants.TILE_HEIGHT,
+							Constants.TILE_WIDTH, Constants.TILE_HEIGHT));
 				}
 			}
 		}
-		shapes = new Shape[tempShapeList.size()];
-		for (int i=0;i<tempShapeList.size();i++){
-			shapes[i] = tempShapeList.get(i);
+		
+		// init arrays
+		shapes = new Shape[shapeList.size()];
+		for (int i=0;i<shapeList.size();i++){
+			shapes[i] = shapeList.get(i);
 		}
 		
 		this.init();
@@ -144,6 +147,7 @@ public class TiledEnvironment extends AbstractEnvironment{
 	 */
 	public void init() {
 		world.addListener(new CollisionEcho());
+		viewPort.setTiledDimensions(this.width*Constants.TILE_WIDTH, this.height*Constants.TILE_HEIGHT);
 		buildSimpleSection();
 		buildLayers();
 		
@@ -174,17 +178,30 @@ public class TiledEnvironment extends AbstractEnvironment{
 		// layerOffset controls how much to offset the layer ids, so they line up
 		// with their render priorities
 		int layerOffset = 0;
-		
+		// get the layer ID of the collision layer, so this won't be drawn
+		int colLayerID = tiledMap.getLayerIndex("Collision");
+		String backImage;
 		// create any background image layer and increment layerOffset
+		if ((backImage = tiledMap.getMapProperty("background", null)) != null){
+			BackgroundLayer bg = new BackgroundLayer(layerOffset,true);
+			try {
+				bg.add(backImage);
+			} catch (SlickException e) {
+				Log.error("Failed to load background image");
+			}
+			viewPort.attachLayer(bg);
+		}
 		layerOffset+=1;
 		// create any background effect layer and increment layerOffset
 		layerOffset+=1;
 		
 		// Build Tile Layers 0->2 behind Entities
 		for (int i=0; i<layers && i<3; i++){
-			TileLayer tLayer = new TileLayer(tiledMap, i,i+layerOffset, true);
-			viewPort.attachLayer(tLayer);
-			layerOffset+=1;
+			if (i != colLayerID){
+				TileLayer tLayer = new TileLayer(tiledMap, i,i+layerOffset, true);
+				viewPort.attachLayer(tLayer);
+				layerOffset+=1;
+			}
 		}
 		// Build Entity Layer 3
 		eLayer = new EntityLayer(3+layerOffset,true);
@@ -193,9 +210,11 @@ public class TiledEnvironment extends AbstractEnvironment{
 		
 		// Build Tile Layers 4+
 		for (int i=3;i<layers;i++){
-			TileLayer tLayer = new TileLayer(tiledMap,i,i+layerOffset, true);
-			viewPort.attachLayer(tLayer);
-			layerOffset +=1;
+			if (i != colLayerID){
+				TileLayer tLayer = new TileLayer(tiledMap,i,i+layerOffset, true);
+				viewPort.attachLayer(tLayer);
+				layerOffset +=1;
+			}
 		}
 		
 		//create any foreground effect/image/whatever layers

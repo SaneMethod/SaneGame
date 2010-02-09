@@ -39,7 +39,7 @@ public class TextHandler {
 				Option tOption = (Option) thisDialog.get(i);
 				tOption.parse(tOption.getValueTemp(), tOption.getOptionTemp(),50,750);
 			}
-			thisDialog.get(i).prepare(50,Text.BOTTOM,750);	
+			thisDialog.get(i).prepare(50,0,Text.BOTTOM,750);	
 		}
 	}
 	
@@ -54,7 +54,7 @@ public class TextHandler {
 	 * @param position short for position of text vertically on screen (Text.BOTTOM, MIDDLE or TOP)
 	 * @param boxWidth width of the text box versus the right margin
 	 */
-	public TextHandler(ArrayList<Text> thisDialog, float x, short position, int boxWidth){
+	public TextHandler(ArrayList<Text> thisDialog, float x, float y, short position, int boxWidth){
 		this.thisDialog = thisDialog;
 		dialogToDisplay=0;
 		queuedDialog=0;
@@ -64,7 +64,7 @@ public class TextHandler {
 				Option tOption = (Option) thisDialog.get(i);
 				tOption.parse(tOption.getValueTemp(), tOption.getOptionTemp(),x,boxWidth);
 			}
-			thisDialog.get(i).prepare(x,position,boxWidth);
+			thisDialog.get(i).prepare(x,y,position,boxWidth);
 			
 		}
 	}
@@ -189,7 +189,10 @@ public class TextHandler {
 	public void setDone(boolean t){
 		done = t;
 	}
-	
+	/**
+	 * Get whether this textHandler is finished displaying its contents
+	 * @return true if all contents have been displayed
+	 */
 	public boolean getDone(){
 		return done;
 	}

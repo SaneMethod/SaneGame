@@ -35,6 +35,10 @@ public class Player extends Platformer{
 	boolean grabbing=false;
 	/** FixedJoint for establishing a grabbed relationship */
 	FixedJoint grabJoint;
+	/** The last key pressed */
+	int lastKey;
+	/** yOffset for image display */
+	int yOffset;
 	
 	boolean sliding=false;
 	
@@ -58,6 +62,7 @@ public class Player extends Platformer{
 		super(x, y, shapeType, dimensions, mass, restitution, friction, maxVelocity,
 				rotatable, zOrder);
 		this.spriteSheet = spriteSheet;
+		yOffset = 58;
 		animTable = new Hashtable<String,Animation>();
 		currentAnim = "Run";
 		buildExpectedPlayerTable();
@@ -155,20 +160,40 @@ public class Player extends Platformer{
 		currentAnim = animToDraw;
 	}
 	
+	public int getLastKey(){
+		return lastKey;
+	}
 	
+	
+	@SuppressWarnings("deprecation")
 	@Override
 	/** Draw a specific animation at this  player's current position */
 	public void render (Graphics g){
-		//g.rotate(body.getPosition().getX(), body.getPosition().getX(), body.getRotation());
+		boolean yInverse;
+		if (Constants.GRAVITY.getY() > 0){
+			yInverse = false;
+		}else{
+			yInverse = true;
+		}
+		
 		if (this.getDirection() == DIR_LEFT){
 			animTable.get(currentAnim).updateNoDraw();
-			g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, false),
-					super.getX()-50, super.getY()-50);
-			//g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-50);
+			if (yInverse){
+				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, true),
+						super.getX()-50, super.getY()-yOffset+16);
+			}else{
+				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, false),
+						super.getX()-50, super.getY()-yOffset);
+			}
 		}else{
-			g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-50);
+			if (yInverse){
+				animTable.get(currentAnim).updateNoDraw();
+				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(false, true),
+						super.getX()-50, super.getY()-yOffset+16);
+			}else{
+				g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-yOffset);
+			}
 		}
-		//g.rotate(body.getPosition().getX(), body.getPosition().getX(), -body.getRotation());
 	}
 	
 	@Override 
@@ -199,7 +224,7 @@ public class Player extends Platformer{
 		idleTimer += delta;
 		}
 		if (idleTimer >= 20000){
-			setAnimToDraw("Idle");
+			setAnimToDraw("Stand");
 		} else if (isReversing() && !sliding){
 			setAnimToDraw("Stopping");
 		}else if (this.isMoving() && onGround){
@@ -213,7 +238,8 @@ public class Player extends Platformer{
 		}
 		
 		else{
-			setAnimToDraw("Stand");
+			//yOffset = 50;
+			setAnimToDraw("Idle");
 		}
 		
 		// check to see if certain animations have reached a point where they should be swapped out
@@ -226,6 +252,7 @@ public class Player extends Platformer{
 	
 	@Override
 	public void receiveKeyPress(int keyPressed){
+		lastKey = keyPressed;
 		// reset the idle timer
 		idleTimer = 0;
 		if (keyPressed == Constants.KEY_DOWN && onGround && isMoving()){

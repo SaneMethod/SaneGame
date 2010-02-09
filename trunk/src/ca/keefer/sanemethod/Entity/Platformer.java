@@ -4,19 +4,16 @@ import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.World;
-import net.phys2d.raw.shapes.AABox;
 import net.phys2d.raw.shapes.Box;
 import net.phys2d.raw.shapes.Circle;
 import net.phys2d.raw.shapes.Polygon;
 
-import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
-import ca.keefer.sanemethod.Tools.Utility;
 
 /**
  * A special type of entity that implements platformer-style physical dynamics
@@ -264,7 +261,17 @@ public class Platformer extends AbstractEntity{
 		}
 		// Check to see if we're falling by determing whether the y velocity is greater
 		// than 0, and the onGround flag is not set
-		if (getVelocityY() >= 0 && onGround == false){
+		boolean yInverse;
+		if (Constants.GRAVITY.getY() > 0){
+			yInverse = false;
+		}else{
+			yInverse = true;
+		}
+		
+		if (getVelocityY() >= 0 && onGround == false && yInverse == false){
+			jumping = false;
+			falling = true;
+		}else if (getVelocityY() <= 0 && onGround == false && yInverse == true){
 			jumping = false;
 			falling = true;
 		}
@@ -297,11 +304,22 @@ public class Platformer extends AbstractEntity{
 		
 		// Update speed throughout physics/frame updates
 		
+		boolean yInverse;
+		if (Constants.GRAVITY.getY() > 0){
+			yInverse = false;
+		}else{
+			yInverse = true;
+		}
+		
 		// For jumping
 		if (activeJump){
 			jumpTimer += delta/2;
 			if (jumpTimer < MAX_JUMP){
-				this.setVelocityY(-jumpTimer);
+				if (!yInverse){
+					this.setVelocityY(-jumpTimer);
+				}else{
+					this.setVelocityY(jumpTimer);
+				}
 			}else{
 				activeJump = false;
 				jumpTimer = 0;
@@ -399,8 +417,7 @@ public class Platformer extends AbstractEntity{
 	}
 	
 	/**
-	 * Implementation on ground check. This can be expensive so best
-	 * to try and limit its use by caching
+	 * Implementation on ground check. This can be expensive so best to try and limit its use by caching
 	 * FIXED[more or less]: We check this only when we might suspect the body is not on the ground
 	 * (ie. when falling) - this helps make the expense of this function less onerous
 	 * @return True if the body is resting on the ground
@@ -410,25 +427,35 @@ public class Platformer extends AbstractEntity{
 			return false;
 		}
 		
+		boolean yInverse;
+		if (Constants.GRAVITY.getY() > 0){
+			yInverse = false;
+		}else{
+			yInverse = true;
+		}
+		
 		// loop through the collision events that have occured in the world
 		CollisionEvent[] events = world.getContacts(body);
 		
 		for (int i=0;i<events.length;i++) {
-			//Log.debug("CollisionEvent:"+events[i].getPenetrationDepth());
+			Log.debug("CollisionEvent:"+events[i].getNormal());
 			
 			// if the point of collision was below the centre of the actor
 			// i.e. near the feet
-			if (events[i].getPoint().getY() > getY()+(height/4)) {
+			if ((events[i].getPoint().getY() > getY()+(height/4) && !yInverse) ||
+					(events[i].getPoint().getY() < getY()+(height/4) && yInverse)) {
 				// check the normal to work out which body we care about
 				// if the right body is involved and a collision has happened
 				// below it then we're on the ground
-				if (events[i].getNormal().getY() < -0.5) {
+				if ((events[i].getNormal().getY() < -0.5 && !yInverse) || 
+						(events[i].getNormal().getY() < -0.5 && yInverse)) {
 					if (events[i].getBodyB() == body) {
 						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
 						return true;
 					}
 				}
-				if (events[i].getNormal().getY() > 0.5) {
+				if ((events[i].getNormal().getY() > 0.5 & !yInverse) || 
+						(events[i].getNormal().getY() < -0.5 && yInverse)) {
 					if (events[i].getBodyA() == body) {
 						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
 						return true;

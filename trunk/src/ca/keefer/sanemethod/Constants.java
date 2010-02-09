@@ -134,6 +134,8 @@ public class Constants {
 	// Layer Constants
 	public static int LAYER_ENTITY = 1;
 	public static int LAYER_TILE = 2;
+	public static int LAYER_PARTICLE = 3;
+	public static int LAYER_BACKGROUND = 4;
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

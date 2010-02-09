@@ -1,10 +1,14 @@
 package ca.keefer.sanemethod.Environment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.StateBasedGame;
 
 import ca.keefer.sanemethod.Constants;
@@ -23,7 +27,7 @@ import ca.keefer.sanemethod.Entity.Entity;
 public class ViewPort {
 	
 	/** Definitions for the dimensions of the viewport and its boundaries */
-	private int x,y,minX,minY,width,height,maxX,maxY;
+	private int x,y,minX,minY,width,height,maxX,maxY,tileMapWidth,tileMapHeight;
 	/** Layer hashTable object for layers attached to this viewport for rendering */
 	private ArrayList<Layer> layerList;
 	/** Clipping shape for mask if defined viewport size is smaller than the screenheight and width */
@@ -109,7 +113,7 @@ public class ViewPort {
 	 */
 	public void attachLayer(Layer layer){
 		layer.setViewPort(this);
-		layer.setActive(true);
+		//layer.setActive(true);
 		layerList.add(layer);
 	}
 	
@@ -125,7 +129,7 @@ public class ViewPort {
 	/**
 	 * Get a layer by its id from this viewport
 	 * @param id
-	 * @ return The layer with a matching id, or null if none match
+	 * @return The layer with a matching id, or null if none match
 	 */
 	public Layer getLayerById(int id){
 		for (int i=0;i<layerList.size();i++){
@@ -136,6 +140,23 @@ public class ViewPort {
 		return null;
 	}
 	
+	/**
+	 * Set the width and height of the tiled layers, if existant
+	 */
+	public void setTiledDimensions(int width, int height){
+		tileMapWidth=width;
+		tileMapHeight=height;
+		maxX=width;
+		maxY=height;
+	}
+	/**
+	 * Get the dimensions of the tiled map
+	 * @return The dimensions of the tiled map
+	 */
+	public Vector2f getTiledDimensions(){
+		return new Vector2f(tileMapWidth,tileMapHeight);
+	}
+	
 	
 	/**
 	 * Update all the layers attached to this viewport
@@ -143,7 +164,6 @@ public class ViewPort {
 	 */
 	public void update(int delta){
 		// Set this viewport's position to track the set entity, if not null
-		
 		
 		for (int i=0;i<layerList.size();i++){
 			if (layerList.get(i).isActive()){
@@ -172,19 +192,26 @@ public class ViewPort {
 		*/
 		for (int i=0; i< layerList.size(); i++){
 			if (layerList.get(i).isActive()){
-				//layerList.get(i).render(g);
+				layerList.get(i).render(g);
+				
+				/*
 				layerList.get(i).render(g, x, y, 
 						x+(Constants.SCREENWIDTH), y+(Constants.SCREENWIDTH));
+						*/
+						
 			}
 		}
-		//MaskUtil.resetMask();
-		g.translate(x, y);
-		//g.flush();
+		
+		//g.translate(x, y);
 	}
 	
 	public void setPosition(int x, int y){
 			this.x=x;
 			this.y=y;
+	}
+	
+	public Vector2f getPosition(){
+		return new Vector2f(this.x,this.y);
 	}
 	
 	/** Once this is called, if the entity is not set to null, the
@@ -267,7 +294,7 @@ public class ViewPort {
 		int xPos = (x + (width / 2) - (int)(clip.getWidth() / 2));
 		int yPos = (y + (height / 2) - (int)(clip.getHeight() / 2));
 		
-		/*
+		
 		// Clamp screen scroll to limits of map
 		if (xPos < minX){
 			xPos = minX;
@@ -278,10 +305,9 @@ public class ViewPort {
 			yPos = minY;
 		}else if (yPos > maxY){
 			yPos = maxY;
-		}*/
+		}
 		
 		
 		setPosition (xPos, yPos);
 	}
-
 }

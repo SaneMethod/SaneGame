@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
+<map version="1.0" orientation="orthogonal" width="65" height="60" tilewidth="64" tileheight="64">
+ <properties>
+  <property name="background" value="res/Background/background02.png"/>
+ </properties>
+ <tileset firstgid="1" source="JumpTiles.tsx"/>
+ <layer name="Base" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3SRw6DMBRFUVsC0laR3laRXlhFetv/PI8pA0KkIINzj3Rl6Y/sLxsDAAAA4NcCa0yoIlWzn+c+6ul9fTVQQ5s9r+tsqKZqebSXpd6yUmu1sdnzkc6xmqipRzs46y0XdVU3mz3f6typvYo92sE37nr3Qz3V6093AKD8AhWmipzeCFWW/k/8peprq07Ouo7uWLSZmuds4eiORWMH7CDBDthBgh0Yc1DHnJ0c3REAAAAAAAAAAAAAyuANJlGSPfA8AAA=
+  </data>
+ </layer>
+ <layer name="Detail" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3USQrCQBBG4crKJE7XcBb1Es7iLZxdeBL1JOoF/Xf2JhHBGGneBw+aQKCrCDEDAAAAshMGZpGKVTF4PS/pXFYVVQ2S3/dBTfPVVUM1nVlbOrdVR3U938FQ843UWE2cWac6z9RcLTzfwUrzrdVGbZ1Zdzrv1UEdPd8B4LOzuqR0ze9qP7O09B2c8rva1xVUqCIVO8/ffQc+7SAJO/h8Bz3VV4Mf3jFr/BPNbuqe0iO/qwEAAAAAAAAAAAAAAADAX3oCDiopH/A8AAA=
+  </data>
+ </layer>
+ <layer name="Fringe" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3TWwqDMBAF0AitbsTHRoRuROv+d2CEFEQqiFD6MefAJb+TO0xKAAAAwF2PKqVnTv3l3dJU/57w99r8x+4kfc4QpIP5pIN3kA4+2t3uo+z/aDx08ArYwVRuYi43sATsAAAAAAAAAAAAALhuBbwKMOfwPAAA
+  </data>
+ </layer>
+ <layer name="Collision" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3BMQEAAADCoPVPbQwfoAAAAAAAAAAAAAAAAAAAAD4GY7wge/A8AAA=
+  </data>
+ </layer>
+ <layer name="Above" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3UTQrCMBAG0OwULyJ6Em+mOYnaUzZCA3FIqKBQF+/BLL5k8tdFUwIAAABYdy11K5VDfrmXepR6LvNtjr2jdXGunhP72p62r45PS546+8czermuGa3r7dvmqekd9bVj+cM7xPfFc3s57tvryWF87XuR0ikUfGNXal/qsPVF+Kljev9PXEI+b3c1AAAAAAAAAACAvzQDs5+iCPA8AAA=
+  </data>
+ </layer>
+ <layer name="Foreground" width="65" height="60">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3HIREAAAgAMeLQhP6NMBjQyM38fQQAAAAAAPCtpnkeAAAAAAAAAACArQEX5mpX8DwAAA==
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="0" height="0"/>
+</map>

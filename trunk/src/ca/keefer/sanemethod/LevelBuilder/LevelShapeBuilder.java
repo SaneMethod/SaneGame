@@ -21,8 +21,8 @@ import org.newdawn.slick.util.ResourceLoader;
 import ca.keefer.sanemethod.Constants;
 
 /**
- * This class allows me to draw paths/polygons overlaying individual elements of, 
- *  a tile map, and save the points of the polygon as a text representation of an array of floats in an xml
+ * This class allows me to draw paths/polygons overlaying individual elements of a tile map,
+ * and save the points of the polygon as a text representation of an array of floats in an xml
  * file which contains information on the shape, and the location of the element within the context
  * of the tile map. <br /> This then allows me, when parsing in the tile map, to create static bodies
  * for phys2D to deal with representing the shapes of the map elements, allowing for proper collision
@@ -395,6 +395,10 @@ public class LevelShapeBuilder extends BasicGameState{
 		try {
 			x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(ref));
 			tiledMap = new TiledMap(tmxFileName,true);
+			displayLayer = new boolean[tiledMap.getLayerCount()];
+			for (int i=0;i<displayLayer.length;i++){
+				displayLayer[i]=true;
+			}
 		} catch (SlickException e) {
 			Log.error(e.getMessage());
 		}

@@ -109,7 +109,9 @@ public class Option extends Text{
 		// Draw the selection rectangle around the current selected item
 		selectRect = new Rectangle(selectX-2,selectY,width+2,optionHeight[selected]);
 		Color tColor = g.getColor(); // preserve current color in temp var
-		g.setColor(Color.decode(colour)); // set color to our select bar color - red, for now
+		Color thisColor = Color.decode(colour); // get color to be displayed
+		thisColor.a = 0.5f; // set this colours transparency
+		g.setColor(thisColor); // set color to our select bar color as defined in the XML
 		g.fill(selectRect); // draw the select rectangle
 		g.setColor(tColor); // set color back to original
 		super.draw();
