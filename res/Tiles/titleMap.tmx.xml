@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TileShapes SYSTEM "kShape.dtd">
+<!--Format 1.0 for kShape XML generation
+by Christopher Keefer
+Last Updated 2009-10-24
+See www.sanemethod.com for more -->
+<MapShapes name="res/Tiles/titleMap.tmx" map="res/Tiles/titleMap.tmx">
+<Element pointCount="8" 
+point0X="756.0" point0Y="382.0" 
+point1X="587.0" point1Y="383.0" 
+point2X="575.0" point2Y="397.0" 
+point3X="576.0" point3Y="414.0" 
+point4X="586.0" point4Y="426.0" 
+point5X="756.0" point5Y="424.0" 
+point6X="767.0" point6Y="412.0" 
+point7X="768.0" point7Y="393.0" 
+/>
+</MapShapes>

@@ -13,6 +13,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.particles.ParticleIO;
@@ -23,11 +24,17 @@ import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Entity.ClamMook;
+import ca.keefer.sanemethod.Entity.Coin;
+import ca.keefer.sanemethod.Entity.Crate;
+import ca.keefer.sanemethod.Entity.Door;
 import ca.keefer.sanemethod.Entity.Elevator;
+import ca.keefer.sanemethod.Entity.JumpingMook;
 import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
 import ca.keefer.sanemethod.Entity.Spring;
 import ca.keefer.sanemethod.Entity.Switch;
+import ca.keefer.sanemethod.Entity.TitleEntity;
 import ca.keefer.sanemethod.Environment.BackgroundLayer;
 import ca.keefer.sanemethod.Environment.ParticleLayer;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
@@ -48,7 +55,7 @@ import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 public class TestState extends BasicGameState {
 
 	// Global variables
-	int stateID=0;
+	int stateID=-1;
 	
 	// Self-reference
 	GameContainer container;
@@ -91,71 +98,26 @@ public class TestState extends BasicGameState {
 		this.container = container;
 		this.game = game;
 		
-		saneSystem = Constants.saneSystem;
-		Constants.TEXT_SPEED = Constants.TEXT_SPEED_FAST;
-					
-		TextXMLPullParser testPull = new TextXMLPullParser(ResourceLoader.getResourceAsStream("res/Dialogs/testBook.xml"));
-		thisDialog = testPull.processDialog();
-		testPull = null;
+		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/SaneMap1.tmx.xml"));
+		tileList = x.processXML();
+		viewPort = new ViewPort(game);
+		environment = new TiledEnvironment("res/Tiles/SaneMap1.tmx",tileList,viewPort);
+		testSprite = environment.getPlayer();
+		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
 		
-		
-		// Oooh... testSprite!
-		net.phys2d.math.Vector2f[] dimensions = new net.phys2d.math.Vector2f[1];
-		dimensions[0]= new net.phys2d.math.Vector2f();
-		dimensions[0].x=50; dimensions[0].y=64;
-		SpriteSheet spriteSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
-		testSprite = new Player(30,-50,Constants.SHAPE_TYPE_CIRCLE,dimensions,5,0,0,new net.phys2d.math.Vector2f(30,50),true,4,spriteSheet);
-		testSprite.getBody().setRotation(90);
-		// TestSprite2
-		dimensions = new net.phys2d.math.Vector2f[1];
-		dimensions[0]= new net.phys2d.math.Vector2f();
-		dimensions[0].x=48; dimensions[0].y=48;
-		testSprite2 = new Platformer(300,-30,Constants.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),false,3, new Image("/res/ball.png"));
-		
-		Platformer testSprite3 = new Platformer(400,-30,Constants.SHAPE_TYPE_CIRCLE,dimensions,1,0,0,new net.phys2d.math.Vector2f(100,50),true,2, new Image("/res/ball.png"));
-		
-		dimensions[0].x=64;
-		Spring testSpring = new Spring(500,400,Constants.SHAPE_TYPE_CIRCLE,dimensions,10,0,0,1,1000,new SpriteSheet("res/Sprites/Jellyfish.png",128,128));
-		
-		dimensions = new net.phys2d.math.Vector2f[4];
-		dimensions[0] = new net.phys2d.math.Vector2f();
-		dimensions[1] = new net.phys2d.math.Vector2f();
-		dimensions[2] = new net.phys2d.math.Vector2f();
-		dimensions[3] = new net.phys2d.math.Vector2f();
-		dimensions[0].x=0; dimensions[0].y=0;
-		dimensions[1].x=0; dimensions[1].y=64;
-		dimensions[2].x=64; dimensions[2].y=64;
-		dimensions[3].x=64; dimensions[0].y=0;
-		Switch testSwitch = new Switch(200,370,Constants.SHAPE_TYPE_POLYGON,dimensions,10,0,0,1,Switch.UP,false,new SpriteSheet("res/Tiles/Blocks.png",64,64));
-		
-		dimensions = new net.phys2d.math.Vector2f[4];
-		dimensions[0] = new net.phys2d.math.Vector2f();
-		dimensions[1] = new net.phys2d.math.Vector2f();
-		dimensions[2] = new net.phys2d.math.Vector2f();
-		dimensions[3] = new net.phys2d.math.Vector2f();
-		dimensions[0].x=0; dimensions[0].y=0;
-		dimensions[1].x=0; dimensions[1].y=60;
-		dimensions[2].x=90; dimensions[2].y=60;
-		dimensions[3].x=90; dimensions[0].y=0;
-		Elevator testElevator = new Elevator (600f,200f,Constants.SHAPE_TYPE_POLYGON,dimensions,21f,0f,0f,1,Elevator.STOP,false,100,new Line(600,200,600,-100),new net.phys2d.math.Vector2f(50,100),new SpriteSheet("res/Sprites/Elevator.png",136,192));
+		/*
 		
 		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/SaneMap1.tmx.xml"));
 		tileList = x.processXML();
 		
 		viewPort = new ViewPort(game);
-		//environment = new TiledEnvironment("res/Tiles/testMap3.tmx",tileList,viewPort);
+		
 		environment = new TiledEnvironment("res/Tiles/SaneMap1.tmx",tileList,viewPort);
-		// Define an environment that simply assigns squares to all tiles (as opposed to hand-drawn XML-defined shapes):
+				
+		// Define an environment that creates only map-defined borders (as opposed to hand-drawn XML-defined shapes):
 		//environment = new TiledEnvironment("res/Tiles/testMap3.tmx",null,viewPort);
-		
-		
-		// Add all entities to the environment
-		environment.addEntity(testSprite);
-		environment.addEntity(testSprite2);
-		environment.addEntity(testSprite3);
-		environment.addEntity(testSpring);
-		environment.addEntity(testSwitch);
-		//environment.addEntity(testElevator); //Elevator still doesn't work right...
+	
+		testSprite = environment.getPlayer();
 		
 		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
 		
@@ -167,16 +129,7 @@ public class TestState extends BasicGameState {
 		viewPort.attachLayer(pLayer);
 		*/
 		
-		// Mwa ha ha... XMLShapePullParser...
-		/*
-		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/tilesheettest.png.xml"),
-				new SpriteSheet("res/Tiles/TileSheetTest.png",64,64));
-		tileList = x.processXML();
-		
-		//TSXGen.makeTSX(0, 1023, "Tiles", 64, 64);
-		*/
-		
-		tHandle = new TextHandler(thisDialog, viewPort.getPosition().getX(), viewPort.getPosition().getY(), Text.BOTTOM, 740);
+		//tHandle = new TextHandler(thisDialog, viewPort.getPosition().getX(), viewPort.getPosition().getY(), Text.BOTTOM, 740);
 		
 	}
 
@@ -185,15 +138,21 @@ public class TestState extends BasicGameState {
 			throws SlickException {
 		g.setBackground(Color.black);
 		
-		//Entity rendering is now handled by the environment
-		//testSprite.render(g);
-		
-		viewPort.render(g);
+		if (viewPort != null){
+			viewPort.render(g);
+		}else{
+			Color.red.a=0.5f;
+			g.setColor(Color.red);
+			g.fill(new Rectangle(-10,250,(Constants.SCREENWIDTH+10),100));
+			Color.red.a=1f;
+			Constants.saneSystem.getFonts().get("creditFont").drawString(
+					(Constants.SCREENWIDTH/2)-Constants.saneSystem.getFonts().get("creditFont").getWidth("Loading Level")/2, 300, "Loading Level", Color.white);
+		}
 		
 		//environment.render(g);
-		environment.renderBounds(g);
+		//environment.renderBounds(g);
 		
-		tHandle.display(g);
+		//tHandle.display(g);
 
 	}
 
@@ -201,7 +160,7 @@ public class TestState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 			
-		tHandle.update(delta);
+		//tHandle.update(delta);
 		//viewPort.centerOn(testSprite);
 		
 		/*
@@ -228,8 +187,13 @@ public class TestState extends BasicGameState {
 		viewPort.setPosition(xT, yT);
 		*/
 		
+		if (viewPort != null){
 		environment.update(delta);
 		viewPort.update(delta);
+		if (testSprite.resetRequested()){
+			init(container,game);
+		}
+		}
 	}
 	
 	@Override
@@ -257,15 +221,30 @@ public class TestState extends BasicGameState {
 		}else if (keyPressed == Input.KEY_4){
 			Constants.GRAVITY = new net.phys2d.math.Vector2f(0,-15f);
 			environment.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+		}else if (keyPressed == Input.KEY_R){
+			testSprite.setReset(true);
+		}else if (keyPressed == Input.KEY_H){
+			environment.toggleHudLayer();
+		}else if (keyPressed == Input.KEY_M){
+			testSprite.setCoins(5000);
 		}
 		
-		tHandle.acceptInput(keyPressed);
+		//tHandle.acceptInput(keyPressed);
 		
 		testSprite.receiveKeyPress(keyPressed);
 	}
 	
 	public void keyReleased(int keyReleased, char keyChar){
 		testSprite.receiveKeyRelease(keyReleased);
+	}
+	
+	@Override
+	public void enter(GameContainer container, StateBasedGame game){
+		try {
+			this.init(container,game);
+		} catch (SlickException e) {
+			Log.debug("Error initiating on entrance to state.");
+		}
 	}
 
 }

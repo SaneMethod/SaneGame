@@ -6,6 +6,7 @@ import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
 import net.phys2d.raw.World;
+import net.phys2d.raw.strategies.BruteCollisionStrategy;
 import net.phys2d.raw.strategies.QuadSpaceStrategy;
 
 /**
@@ -16,7 +17,7 @@ import net.phys2d.raw.strategies.QuadSpaceStrategy;
  */
 public abstract class AbstractEnvironment implements Environment {
 	/** The physical world the environment provides to it's entities */
-	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new QuadSpaceStrategy(15,50)); 
+	protected World world = new World(Constants.GRAVITY, Constants.ITERATIONS, new BruteCollisionStrategy());
 
 	/** The Entity Layer */
 	EntityLayer eLayer;

@@ -6,7 +6,8 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.GeomUtil;
+import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.tiled.TiledMap;
@@ -22,12 +23,21 @@ import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.shapes.Polygon;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Entity.ClamMook;
+import ca.keefer.sanemethod.Entity.Coin;
+import ca.keefer.sanemethod.Entity.Door;
+import ca.keefer.sanemethod.Entity.JumpingMook;
+import ca.keefer.sanemethod.Entity.Platformer;
+import ca.keefer.sanemethod.Entity.Player;
+import ca.keefer.sanemethod.Entity.Spring;
+import ca.keefer.sanemethod.Entity.Switch;
+import ca.keefer.sanemethod.Entity.TitleEntity;
 import ca.keefer.sanemethod.LevelBuilder.MapShape;
 import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
 
 /**
- * This class helps bridge the gap between the Phys2D static bodies and the TilEd tmx maps
- * (thus the moniker). It relies on the MapShape class to provide a shape for a staticbody object.
+ * This class helps bridge the gap between the Phys2D static bodies and the TilEd tmx maps. 
+ * It relies on the MapShape class to provide a shape for a staticbody object.
  * @author Christopher Keefer, Kevin Glass
  * @version 1.3
  * @see ca.keefer.sanemethod.XMLShapePullParser
@@ -50,8 +60,6 @@ public class TiledEnvironment extends AbstractEnvironment{
 	private int height;
 	/** The number of layers in the tile environment */
 	private int layers;
-	/** The utility used to combine tile shapes */
-	private GeomUtil util = new GeomUtil();
 	/** The width in pixels of each tile - set from the TilEd map */
 	private int tileWidth;
 	/** The height in pixels of each tile - set from the TilEd map */
@@ -60,10 +68,32 @@ public class TiledEnvironment extends AbstractEnvironment{
 	private Rectangle bounds;
 	/** ViewPort for this game */
 	ViewPort viewPort;
+	/** SpriteSheets for the various possible map-defined entities */
+	SpriteSheet springSheet;
+	SpriteSheet switchSheet;
+	SpriteSheet doorSheet;
+	SpriteSheet playerSheet;
+	Image ballImage;
+	SpriteSheet jMookSheet;
+	SpriteSheet cMookSheet;
+	/** Player entity created set by this map */
+	Player thePlayer;
+	/** HudLayer created for this map if map property HUD == true */
+	HudLayer hudLayer;
 	
 	
 	public TiledEnvironment(String mapFile, ArrayList<MapShape> tileList, ViewPort viewPort) {
 		this.viewPort=viewPort;
+		try {
+			springSheet = new SpriteSheet("res/Sprites/Jellyfish.png",128,128);
+			doorSheet = switchSheet = new SpriteSheet("res/Tiles/Blocks.png",64,64);
+			playerSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
+			ballImage = new Image("/res/ball.png");
+			jMookSheet = new SpriteSheet("res/Sprites/MobA.png",96,112);
+			cMookSheet = new SpriteSheet("res/Sprites/Reserve_MobC.png",128,128);
+		} catch (SlickException e1) {
+			Log.error("Failed to load sprite sheet:"+e1.getMessage());
+		}
 			if (tileList != null){
 				try {
 					buildStatic(mapFile, tileList);
@@ -72,7 +102,7 @@ public class TiledEnvironment extends AbstractEnvironment{
 				}
 			}else{
 				try {
-					buildDynamic(mapFile);
+					buildOnlyBorders(mapFile);
 				}catch (SlickException e){
 					Log.error(e.getMessage());
 				}
@@ -104,39 +134,20 @@ public class TiledEnvironment extends AbstractEnvironment{
 	}
 	
 	/**
-	 * Dynamically populate the shapes array with polygons based on
-	 * the presence of tiles on the collision layer (named "Collision")<br>
-	 * TODO:For now, makes only boxes - consider enabling this to handle 
-	 * more complex shapes as well
+	 * Builds a map with only the borders filled in with static bodies
 	 * @param mapFile
 	 * @throws SlickException
 	 */
-	public void buildDynamic(String mapFile) throws SlickException{
+	public void buildOnlyBorders(String mapFile) throws SlickException{
 		tiledMap = new TiledMap(mapFile,true);
 		this.width = tiledMap.getWidth();
 		this.height = tiledMap.getHeight();
 		this.layers = tiledMap.getLayerCount();
 		this.tileWidth = tiledMap.getTileWidth();
 		this.tileHeight = tiledMap.getTileHeight();
-		ArrayList<Shape> shapeList = new ArrayList<Shape>();
-		
-		// Populate shapes array with polygons based on tile presence
-		// on Collision Layer
-		int layerID = tiledMap.getLayerIndex("Collision");
-		for (int x=0;x<this.width;x++){
-			for (int y=0;y<this.height;y++){
-				if (tiledMap.getTileImage(x, y, layerID) != null){
-					shapeList.add(new Rectangle(x*Constants.TILE_WIDTH,y*Constants.TILE_HEIGHT,
-							Constants.TILE_WIDTH, Constants.TILE_HEIGHT));
-				}
-			}
-		}
 		
 		// init arrays
-		shapes = new Shape[shapeList.size()];
-		for (int i=0;i<shapeList.size();i++){
-			shapes[i] = shapeList.get(i);
-		}
+		shapes = new Shape[0];
 		
 		this.init();
 	}
@@ -148,8 +159,84 @@ public class TiledEnvironment extends AbstractEnvironment{
 	public void init() {
 		world.addListener(new CollisionEcho());
 		viewPort.setTiledDimensions(this.width*Constants.TILE_WIDTH, this.height*Constants.TILE_HEIGHT);
+		buildBorders();
 		buildSimpleSection();
 		buildLayers();
+		
+	}
+	
+	private void buildBorders(){
+		// Left Border
+		Path border = new Path(-2,-2);
+		border.lineTo(-2, this.height*Constants.TILE_HEIGHT);
+		border.lineTo(0, this.height*Constants.TILE_HEIGHT);
+		border.lineTo(0, -2);
+		border.lineTo(-2, -2);
+		border.close();
+		
+		float[] pts = border.getPoints();
+		Vector2f[] vecs = new Vector2f[(pts.length / 2)];
+		for (int j=0;j<vecs.length;j++) {
+			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
+		}
+		StaticBody body = new StaticBody("leftBorder",new Polygon(vecs));
+		body.setFriction(0f);
+		body.setRestitution(1f);
+		world.add(body);
+		
+		// Right Border
+		border = new Path((this.width*Constants.TILE_WIDTH)+2,-2);
+		border.lineTo((this.width*Constants.TILE_WIDTH)+2, this.height*Constants.TILE_HEIGHT);
+		border.lineTo((this.width*Constants.TILE_WIDTH), this.height*Constants.TILE_HEIGHT);
+		border.lineTo((this.width*Constants.TILE_WIDTH), -2);
+		border.lineTo((this.width*Constants.TILE_WIDTH)+2, -2);
+		border.close();
+		
+		pts = border.getPoints();
+		vecs = new Vector2f[(pts.length / 2)];
+		for (int j=0;j<vecs.length;j++) {
+			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
+		}
+		body = new StaticBody("rightBorder",new Polygon(vecs));
+		body.setFriction(0f);
+		body.setRestitution(1f);
+		world.add(body);
+		
+		// Upper Border
+		border = new Path(0,-2);
+		border.lineTo((this.width*Constants.TILE_WIDTH), -2);
+		border.lineTo((this.width*Constants.TILE_WIDTH), 0);
+		border.lineTo(0, 0);
+		border.lineTo(0, -2);
+		border.close();
+		
+		pts = border.getPoints();
+		vecs = new Vector2f[(pts.length / 2)];
+		for (int j=0;j<vecs.length;j++) {
+			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
+		}
+		body = new StaticBody("upperBorder",new Polygon(vecs));
+		body.setFriction(0f);
+		body.setRestitution(1f);
+		world.add(body);
+		
+		// Right Border
+		border = new Path(0,(this.height*Constants.TILE_HEIGHT)+2);
+		border.lineTo((this.width*Constants.TILE_WIDTH), (this.height*Constants.TILE_HEIGHT)+2);
+		border.lineTo((this.width*Constants.TILE_WIDTH), (this.height*Constants.TILE_HEIGHT));
+		border.lineTo(0, (this.height*Constants.TILE_HEIGHT));
+		border.lineTo(0, (this.height*Constants.TILE_HEIGHT)+2);
+		border.close();
+		
+		pts = border.getPoints();
+		vecs = new Vector2f[(pts.length / 2)];
+		for (int j=0;j<vecs.length;j++) {
+			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
+		}
+		body = new StaticBody("lowerBorder",new Polygon(vecs));
+		body.setFriction(0f);
+		body.setRestitution(1f);
+		world.add(body);
 		
 	}
 	
@@ -172,6 +259,10 @@ public class TiledEnvironment extends AbstractEnvironment{
 				world.add(body);
 			}
 		}
+	}
+	
+	public Player getPlayer(){
+		return thePlayer;
 	}
 	
 	public void buildLayers(){
@@ -208,6 +299,67 @@ public class TiledEnvironment extends AbstractEnvironment{
 		viewPort.attachLayer(eLayer);
 		layerOffset+=1;
 		
+		// Add any Entities defined in the map on the objects layer
+		for (int i=0;i<=tiledMap.getObjectGroupCount();i++){
+			//Log.debug("Object groups found:"+tiledMap.getObjectGroupCount());
+			for (int j=0;j<tiledMap.getObjectCount(i);j++){
+				//Log.debug("Objects found:"+tiledMap.getObjectCount(i));
+				//Log.debug("ObjectType:"+tiledMap.getObjectType(i, j));
+			if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_PLAYER)){
+				thePlayer = new Player(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i,j),Constants.SHAPE_TYPE_CIRCLE,
+						new Vector2f(50,50),5,0,0,new net.phys2d.math.Vector2f(30,50),true,4,playerSheet);
+				this.addEntity(thePlayer);
+			}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_BALL)){
+				Platformer ball = new Platformer(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),
+						Constants.SHAPE_TYPE_CIRCLE,new Vector2f(48,48),1,0,0,new net.phys2d.math.Vector2f(100,50),
+						false,2,ballImage);
+				this.addEntity(ball);
+			}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_SPRING)){
+					Spring thisSpring = new Spring(tiledMap.getObjectX(i, j),
+							tiledMap.getObjectY(i, j)+19,10,1,1000,
+							Boolean.parseBoolean(tiledMap.getObjectProperty(i, j, "Inverted", "false")),springSheet);
+					this.addEntity(thisSpring);
+				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_SWITCH)){
+					// FIXME: The way this is setup, the switch MUST appear first in the tmx file - it works, but is rough
+					Switch thisSwitch = new Switch(Integer.parseInt(tiledMap.getObjectProperty(i, j, "refID", "-1")),
+							tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),10,1,Switch.UP,
+							Boolean.parseBoolean(tiledMap.getObjectProperty(i, j, "staysDown", "true")),switchSheet);
+					this.addEntity(thisSwitch);
+				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_DOOR)){
+					// FIXME: The way this is setup, the switch MUST appear first in the tmx file - it works, but is rough
+					// Get the switch connected to this door
+					Switch switchRef=null;
+					for (int x=0;x<eLayer.getEntityList().size();x++){
+						if (eLayer.getEntity(x).getClass() == Switch.class){
+							Switch tempSwitch = (Switch) eLayer.getEntity(x);
+							if (tempSwitch.getRefID() == 
+								Integer.parseInt(tiledMap.getObjectProperty(i, j, "switchRef", "-1"))){
+								switchRef=tempSwitch;
+								break;
+							}
+						}
+					}
+					
+					Door thisDoor = new Door(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j)-
+							((tiledMap.getObjectHeight(i, j)-1)*64),
+							tiledMap.getObjectWidth(i, j),tiledMap.getObjectHeight(i, j),1,true,switchRef,doorSheet);
+					this.addEntity(thisDoor);
+				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_COIN)){
+					Coin thisCoin = new Coin(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1);
+					this.addEntity(thisCoin);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_JMOOK)){
+					Log.debug("Making jMook");
+					JumpingMook jMook= new JumpingMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),40,
+							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xLower", "-1")),
+							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xUpper", "-1")),1,true,jMookSheet);
+					this.addEntity(jMook);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_CMOOK)){
+					ClamMook clamMook = new ClamMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1,true,cMookSheet);
+					this.addEntity(clamMook);
+				}
+			}
+		}
+		
 		// Build Tile Layers 4+
 		for (int i=3;i<layers;i++){
 			if (i != colLayerID){
@@ -218,6 +370,16 @@ public class TiledEnvironment extends AbstractEnvironment{
 		}
 		
 		//create any foreground effect/image/whatever layers
+		if (Boolean.parseBoolean(tiledMap.getMapProperty("HUD", "false"))){
+			hudLayer = new HudLayer(thePlayer);
+			viewPort.attachLayer(hudLayer);
+		}
+	}
+	
+	public void toggleHudLayer(){
+		if (hudLayer != null){
+			hudLayer.setActive(!hudLayer.isActive());
+		}
 	}
 			
 
@@ -275,17 +437,16 @@ public class TiledEnvironment extends AbstractEnvironment{
 				for (int k=0;k<verts.length;k++) {
 					p.addPoint(verts[k].getX(), verts[k].getY());
 				}
-				g.translate(-list.get(i).getPosition().getX(), 
-						-list.get(i).getPosition().getY());
+				//g.translate(-list.get(i).getPosition().getX(), -list.get(i).getPosition().getY());
 				g.draw(p);
-				g.translate(list.get(i).getPosition().getX(), 
-						list.get(i).getPosition().getY());
+				//g.translate(list.get(i).getPosition().getX(), list.get(i).getPosition().getY());
 			}
 		}
 
 		g.setLineWidth(1);
 		
 		// Render entities
+		
 		for (int i=0;i<eLayer.getEntityList().size();i++) {
 			if (eLayer.getEntityList().get(i).getBody().getShape() instanceof net.phys2d.raw.shapes.Circle){
 				org.newdawn.slick.geom.Circle circle = new org.newdawn.slick.geom.Circle(eLayer.getEntityList().get(i).getBody().getPosition().getX(),
@@ -296,22 +457,10 @@ public class TiledEnvironment extends AbstractEnvironment{
 					eLayer.getEntityList().get(i).getBody().getPosition().getY(),eLayer.getEntityList().get(i).getBody().getShape().getBounds().getWidth(),
 					eLayer.getEntityList().get(i).getBody().getShape().getBounds().getHeight());
 			
-				
 				g.draw(box);
-			}else if (eLayer.getEntityList().get(i).getBody().getShape() instanceof Polygon) {
-				Polygon poly = (Polygon) eLayer.getEntityList().get(i).getBody().getShape();
-				org.newdawn.slick.geom.Polygon p = new org.newdawn.slick.geom.Polygon();
-				ROVector2f[] verts = poly.getVertices();
-				for (int k=0;k<verts.length;k++) {
-					p.addPoint(verts[k].getX(), verts[k].getY());
-				}
-				g.translate(-list.get(i).getPosition().getX(), 
-						-list.get(i).getPosition().getY());
-				g.draw(p);
-				g.translate(list.get(i).getPosition().getX(), 
-						list.get(i).getPosition().getY());
 			}
 		}
+		
 	}
 	
 	/**

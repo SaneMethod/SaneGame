@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Menu System "kText.dtd">
+<!-- TitleMap Dialog -->
+<Dialog name="titleMapDialog">
+<Option name="titleOption" font="creditFont" colour="16711680" boxed="true"
+content="New Game@@Load Game@@Options@@Exit" caption="SANE" values="newGame@@loadGame@@options@@exit"
+/>
+</Dialog>

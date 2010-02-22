@@ -93,7 +93,11 @@ public class EntityLayer implements Layer{
 	@Override
 	public void update(int delta) {
 		for (int i=0;i<entityList.size();i++){
-			entityList.get(i).update(delta);
+			if (entityList.get(i).isActive()){
+				entityList.get(i).update(delta);
+			}else{
+				entityList.remove(i);
+			}
 		}
 	}
 	

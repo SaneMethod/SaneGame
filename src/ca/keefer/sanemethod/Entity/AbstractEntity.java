@@ -12,6 +12,8 @@ import net.phys2d.raw.Body;
 public abstract class AbstractEntity implements Entity {
 	/** The physical body representing the entity */
 	protected Body body;
+	/** Whether this entity is active, or should be removed from the entity layer */
+	boolean active;
 	
 	/**
 	 * Set the velocity of the entity
@@ -114,6 +116,10 @@ public abstract class AbstractEntity implements Entity {
 				this.body.removeExcludedBody(this.getWorld().getBodies().get(i));
 			}	
 		}
+	}
+	
+	public boolean isActive(){
+		return active;
 	}
 	
 	

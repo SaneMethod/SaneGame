@@ -5,7 +5,10 @@
 	<Item name="interfaceFont" type="font" location="res/UI/Chapparel_00.png" fontLocation="res/UI/Chapparel.fnt" />
 	<Item name="dataFont" type="font" location="res/UI/BrushFont_00.png" fontLocation="res/UI/BrushFont.fnt" />
 	<Item name="standardFont" type="font" location="res/UI/Standard_00.png" fontLocation="res/UI/Standard.fnt" />
+	<!-- Commenting out those currently not being used
 	<Item name="scaryFont" type="font" location="res/UI/Cenobyte_00.png" fontLocation="res/UI/Cenobyte.fnt" />
 	<Item name="kingdomFont" type="font" location="res/UI/Kingdom_00.png" fontLocation="res/UI/Kingdom.fnt" />
 	<Item name="elvenFont" type="font" location="res/UI/Elven_00.png" fontLocation="res/UI/Elven.fnt" />
+	-->
+	<Item name="creditFont" type="font" location="res/UI/Credit_00.png" fontLocation="res/UI/Credit.fnt" />
 </Menu>

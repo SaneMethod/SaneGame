@@ -84,7 +84,7 @@ public class Text {
 		this.text=text;
 		this.boxed=true;
 		try {
-			textTex = new Image("res/UI/texWin.png");
+			textTex = new Image("res/UI/texWinParch.png");
 		} catch (SlickException e) {
 			Log.error("Failure to load image in Text:"+e.getMessage());
 		}
@@ -99,7 +99,7 @@ public class Text {
 		this.boxed=boxed;
 		this.proceed=proceed;
 		try {
-			textTex = new Image("res/UI/texWin.png");
+			textTex = new Image("res/UI/texWinParch.png");
 		} catch (SlickException e) {
 			Log.error("Failure to load image in Text:"+e.getMessage());
 		}
@@ -237,7 +237,7 @@ public class Text {
 		if (cOffset < resString.length() && accumulator >= Constants.TEXT_SPEED){
 			cOffset++;
 			accumulator = 0;
-		}else{
+		}else if (cOffset >= resString.length()){
 			this.finished = true;
 		}
 	}
@@ -293,6 +293,9 @@ public class Text {
 	
 	public boolean isSkippable(){
 		return skippable;
+	}
+	public void setSkippable(boolean b){
+		skippable=b;
 	}
 	
 	public boolean isFinished(){

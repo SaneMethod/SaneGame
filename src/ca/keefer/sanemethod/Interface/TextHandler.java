@@ -23,6 +23,7 @@ public class TextHandler {
 	int queuedDialog;
 	short proceed;
 	boolean done;
+	String optionSelection;
 	
 	/**
 	 * This minimal constructor prepares all the text objects in the ArrayList with the default
@@ -31,6 +32,7 @@ public class TextHandler {
 	 */
 	public TextHandler(ArrayList<Text> thisDialog){
 		this.thisDialog = thisDialog;
+		optionSelection = null;
 		dialogToDisplay=0;
 		queuedDialog=0;
 		done=false;
@@ -79,7 +81,7 @@ public class TextHandler {
 			if (proceed == Text.OPEN){
 				if (thisDialog.get(dialogToDisplay).isOption()){
 					Option yada = (Option) thisDialog.get(dialogToDisplay);
-					yada.draw(g,"39168");
+					yada.draw(g,"9857534");
 				}else{
 					thisDialog.get(dialogToDisplay).drawTextLetterByLetter();
 				}
@@ -106,6 +108,14 @@ public class TextHandler {
 	}
 	
 	/**
+	 * Return the index of the currently displaying dialog
+	 * @return integer of the index of the currently displaying dialog
+	 */
+	public int getCurrent(){
+		return dialogToDisplay;
+	}
+	
+	/**
 	 * Lengthy function which accepts input from the state (in the form of an integer detailing
 	 * which key has been pressed, and compared against the KEY Constants), and performs the necessary
 	 * functions on the Text objects.
@@ -128,10 +138,10 @@ public class TextHandler {
 			}else if (keyPressed == Constants.KEY_ACCEPT){
 				if (thisDialog.get(dialogToDisplay).isOption()){
 					Option yada = (Option)thisDialog.get(dialogToDisplay);
-					String thisString = yada.getValue();
-					Log.info("Value:"+thisString);
+					optionSelection = yada.getValue();
+					Log.info("Value:"+optionSelection);
 					for (int i=0; i< thisDialog.size();i++){
-						if (thisDialog.get(i).getName().equals(thisString)){
+						if (thisDialog.get(i).getName().equals(optionSelection)){
 							queuedDialog = i;
 							break;
 						}
@@ -163,6 +173,13 @@ public class TextHandler {
 				considerQueue();
 			}
 		}
+	}
+	/**
+	 * If we want the selected optionfor seom purpose external to this dialog
+	 * @return a String containing the selected option value
+	 */
+	public String getOptionSelection(){
+		return optionSelection;
 	}
 	
 	/**

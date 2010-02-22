@@ -172,4 +172,10 @@ point10X="1087.0" point10Y="1545.0"
 point11X="1078.0" point11Y="1536.0" 
 point12X="327.0" point12Y="1534.0" 
 />
+<Element pointCount="4" 
+point0X="326.0" point0Y="1537.0" 
+point1X="1083.0" point1Y="1537.0" 
+point2X="1083.0" point2Y="1575.0" 
+point3X="326.0" point3Y="1575.0" 
+/>
 </MapShapes>

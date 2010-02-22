@@ -5,6 +5,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.RoundedRectangle;
 import org.newdawn.slick.util.Log;
 
 import java.util.Scanner;
@@ -36,9 +37,11 @@ public class Option extends Text{
 	float selectX, selectY;
 	String valueTemp;
 	String optionTemp;
+	float alpha;
+	boolean fadeOut;
 	
 
-	// Recommended Constructor
+	/** Recommended Constructor */
 	public Option (String name, AngelCodeFont font, Color colour, boolean boxed, String options,
 			String caption, String values){
 		super (name, font, colour, boxed, caption,Text.PROCEED_END);
@@ -46,9 +49,11 @@ public class Option extends Text{
 		this.finished = true;
 		valueTemp = values;
 		optionTemp = options;
+		alpha = 0.1f;
+		fadeOut=false;
 	}
 	
-	// Full Constructor
+	/** Full Constructor */
 	public Option(String name, AngelCodeFont font, Color colour, boolean boxed,
 			String options, Image textTex, String caption, String values) {
 		super(name, font, colour, boxed, caption, textTex, Text.PROCEED_END);
@@ -56,13 +61,15 @@ public class Option extends Text{
 		this.finished = true;
 		valueTemp = values;
 		optionTemp = options;
+		alpha = 0.1f;
+		fadeOut=false;
 	}
 	
 	public void parse(String values, String options, float xOffset, int boxWidth){
 		// Set variable to prevent word-wrapping of options
 		this.option=true;
 		this.finished=true;
-		// break up the text and values strings into new lines based on the delimiter '|'
+		// break up the text and values strings into new lines based on the delimiter '@@'
 		optionCount=0;
 		text+="\n";
 		Log.info("Parsing:"+this.name);
@@ -90,7 +97,7 @@ public class Option extends Text{
 			// and different values are specified
 			this.options[i] = this.wordWrap(boxWidth, (int)xOffset, this.options[i]);
 			this.text += this.options[i]+"\n";
-			optionHeight[i+1]=this.font.getHeight(this.options[i]);
+			optionHeight[i+1]=this.font.getLineHeight();
 		}
 		thisScan = new Scanner(values);
 		thisScan.useDelimiter("\\s*@@\\s*");
@@ -107,10 +114,23 @@ public class Option extends Text{
 			selectY+=optionHeight[i];
 		}
 		// Draw the selection rectangle around the current selected item
-		selectRect = new Rectangle(selectX-2,selectY,width+2,optionHeight[selected]);
+		selectRect = new RoundedRectangle(selectX-2,selectY,width+2,optionHeight[selected],15);
 		Color tColor = g.getColor(); // preserve current color in temp var
 		Color thisColor = Color.decode(colour); // get color to be displayed
-		thisColor.a = 0.5f; // set this colours transparency
+		if (fadeOut){
+			if (alpha < 0.1f){
+				fadeOut=false;
+			}else{
+				alpha -= 0.01f;
+			}
+		}else{
+			if (alpha >= 1.0f){
+				fadeOut = true;
+			}else{
+				alpha += 0.01f;
+			}
+		}
+		thisColor.a = alpha; // set this colours transparency
 		g.setColor(thisColor); // set color to our select bar color as defined in the XML
 		g.fill(selectRect); // draw the select rectangle
 		g.setColor(tColor); // set color back to original

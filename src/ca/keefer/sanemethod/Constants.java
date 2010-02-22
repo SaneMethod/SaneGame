@@ -96,6 +96,7 @@ public class Constants {
 	// Key Defaults
 	public static int KEY_ACCEPT = Input.KEY_A;
 	public static int KEY_JUMP = Input.KEY_C;
+	public static int KEY_HIDE_HUD = Input.KEY_H;
 	public static int KEY_PUNCH = Input.KEY_S;
 	public static int KEY_KICK = Input.KEY_D;
 	public static int KEY_PICK_UP = Input.KEY_V;
@@ -136,6 +137,18 @@ public class Constants {
 	public static int LAYER_TILE = 2;
 	public static int LAYER_PARTICLE = 3;
 	public static int LAYER_BACKGROUND = 4;
+	public static int LAYER_HUD = 5;
+	
+	// ObjectType Constants
+	public static String OBJECT_SPRING = "Spring";
+	public static String OBJECT_SWITCH = "Switch";
+	public static String OBJECT_DOOR = "Door";
+	public static String OBJECT_PLAYER = "Player";
+	public static String OBJECT_BALL = "Ball";
+	public static String OBJECT_CRATE = "Crate";
+	public static String OBJECT_COIN = "Coin";
+	public static String OBJECT_JMOOK = "jMook";
+	public static String OBJECT_CMOOK = "cMook";
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();

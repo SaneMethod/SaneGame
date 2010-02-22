@@ -41,6 +41,8 @@ public class Spring extends AbstractEntity {
 	private int bounceTimer;
 	private Body bounceBody;
 	private int springAffectDuration;
+	/** Whether this spring is inverted */
+	boolean inverted;
 	/** spriteSheet for animation of this spring */
 	SpriteSheet spriteSheet;
 	/** The animation tied to this string to draw from the animTable */
@@ -59,29 +61,21 @@ public class Spring extends AbstractEntity {
 	 * @param springAffectDuration
 	 * @param spriteSheet
 	 */
-	public Spring (float x, float y, int shapeType, Vector2f[] dimensions, float mass, float restitution, 
-			float friction, int zOrder, int springAffectDuration, SpriteSheet spriteSheet){
-		
-		this.shapeType=shapeType;
-		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
-			this.body = new Body(new Circle(dimensions[0].x/2),mass);
-			width = (int) dimensions[0].x*2;
-			height = (int) dimensions[0].x;
-		}else if (shapeType  == Constants.SHAPE_TYPE_BOX){
-			this.body = new Body(new Box(dimensions[0].x,dimensions[0].y),mass);
-		}else if (shapeType == Constants.SHAPE_TYPE_POLYGON){
-			this.body = new Body(new Polygon(dimensions),mass);
-		}
-		
+	public Spring (float x, float y, float mass, int zOrder, int springAffectDuration, boolean inverted, SpriteSheet spriteSheet){
+		this.active=true;
+		this.body = new Body(new Circle(32),mass);
+		width = 64;
+		height = 52;
 		body.setUserData(this);
-		body.setRestitution(restitution);
-		body.setFriction(friction);
+		body.setRestitution(1f);
+		body.setFriction(0f);
 		body.setMoveable(false);
 		body.setRotatable(false);
 		setPosition(x,y);
 		
 		this.springAffectDuration = springAffectDuration;
 		bounceAffect = false;
+		this.inverted=inverted;
 		bounceTimer = 0;
 		this.zOrder = zOrder;
 		this.spriteSheet=spriteSheet;
@@ -146,8 +140,13 @@ public class Spring extends AbstractEntity {
 	
 	@Override
 	public void preUpdate(int delta) {
+		stopSpringOnCollide();
 		if (bounceAffect && bounceTimer < springAffectDuration){
-			bounceBody.addForce(new Vector2f(0,-1000));
+			if (!inverted){
+				bounceBody.addForce(new Vector2f(0,-1000));
+			}else{
+				bounceBody.addForce(new Vector2f(0,1000));
+			}
 			bounceTimer += delta;
 		}else if (bounceTimer >= 500){
 			bounceBody = null;
@@ -166,7 +165,14 @@ public class Spring extends AbstractEntity {
 	
 	@Override
 	public void render(Graphics g) {
-		g.drawAnimation(animTable.get(currentAnim), body.getPosition().getX()-width/2, body.getPosition().getY()-height);
+		if (!inverted){
+			g.drawAnimation(animTable.get(currentAnim), body.getPosition().getX()-width, 
+					body.getPosition().getY()-height);
+		}else{
+			animTable.get(currentAnim).updateNoDraw();
+			g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(false, true),
+					body.getPosition().getX()-width, body.getPosition().getY()-height);
+		}
 		if (currentAnim == "Bounce"){
 			if (animTable.get(currentAnim).getFrame() == animTable.get(currentAnim).getFrameCount()-1){
 				animTable.get(currentAnim).restart();
@@ -205,8 +211,46 @@ public class Spring extends AbstractEntity {
 						}
 					}
 					
-				}
+				}else if (events[i].getBodyA() == this.body){
+					if (!(events[i].getBodyB().isStatic())){
+						//Log.debug("Detected Collision on Spring");
+						events[i].getBodyB().addForce(new Vector2f(0,-1000));
+						bounceAffect = true;
+						bounceBody = events[i].getBodyB();
+						currentAnim = "Bounce";
+						/* Swaps out the standing animation for jumping,
+						 * and prevents the user from double-jumping from
+						 * a spring - worthwhile? It can cause errors.
+						 */
+						if (bounceBody.getUserData().getClass() == Player.class){
+							Player setJump = (Player) bounceBody.getUserData();
+							setJump.setJumping(true);
+							setJump.onGround = false;
+						}
+					}
 			}
 		}
+	}
+	
+	// If the bounceBody collides with another object, stop applying the spring force
+	protected void stopSpringOnCollide(){
+		if (world == null) {
+			Log.error("no world found in Spring");
+			return;
+		}
+		if (bounceBody != null){
+			// Get all the collision events involving this object
+			CollisionEvent[] events = world.getContacts(this.bounceBody);
+			for (int i=0;i<events.length;i++){
+				if (events[i].getBodyA() != this.body && events[i].getBodyB()!= this.body && 
+						(events[i].getBodyA().isStatic() || events[i].getBodyB().isStatic())){
+					// set bounceTimer to expire
+					bounceTimer = 501 + springAffectDuration;
+					break;
+				}
+			}
+				
+		}
+	}
 
 }
