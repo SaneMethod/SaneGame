@@ -2,7 +2,8 @@
 <!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
 <map version="1.0" orientation="orthogonal" width="65" height="60" tilewidth="64" tileheight="64">
  <properties>
-  <property name="background" value="res/Background/background02.png"/>
+  <property name="HUD" value="true"/>
+  <property name="background" value="res/Background/background04.png"/>
  </properties>
  <tileset firstgid="1" source="JumpTiles.tsx"/>
  <layer name="Base" width="65" height="60">
@@ -12,7 +13,7 @@
  </layer>
  <layer name="Detail" width="65" height="60">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAAO3USQrCQBBG4crKJE7XcBb1Es7iLZxdeBL1JOoF/Xf2JhHBGGneBw+aQKCrCDEDAAAAshMGZpGKVTF4PS/pXFYVVQ2S3/dBTfPVVUM1nVlbOrdVR3U938FQ843UWE2cWac6z9RcLTzfwUrzrdVGbZ1Zdzrv1UEdPd8B4LOzuqR0ze9qP7O09B2c8rva1xVUqCIVO8/ffQc+7SAJO/h8Bz3VV4Mf3jFr/BPNbuqe0iO/qwEAAAAAAAAAAAAAAADAX3oCDiopH/A8AAA=
+   H4sIAAAAAAAAAO3USQrCQBBG4crKJE7XcBb1Es7iLZxFPIl6EvWC/juzSUAwibTvgwdNQ6CrFjEDAAAA0uN7ZoEKVdF735d0LquKqnrx37ugpvnqqqGakVlbOrdVR3Ud38FQ843UWE0is051nqm5Wji+g5XmW6uN2kZm3em8Vwd1dHwHgMsu6prQLb+nZWZpyTs45/e0rysoXwUqjNyf7H92EIcdfL6DnuqrQYZvTBv/RLO7eiT0zO9pAAAAAAAAAAAAAAAAAPCTXvMOdtbwPAAA
   </data>
  </layer>
  <layer name="Fringe" width="65" height="60">
@@ -35,5 +36,39 @@
    H4sIAAAAAAAAAO3HIREAAAgAMeLQhP6NMBjQyM38fQQAAAAAAPCtpnkeAAAAAAAAAACArQEX5mpX8DwAAA==
   </data>
  </layer>
- <objectgroup name="Objects" width="0" height="0"/>
+ <objectgroup name="Objects" width="0" height="0">
+  <object name="Spring1" type="Spring" x="1408" y="1344" width="64" height="64">
+   <properties>
+    <property name="Inverted" value="false"/>
+   </properties>
+  </object>
+  <object name="Spring2" type="Spring" x="1010" y="1469" width="64" height="64">
+   <properties>
+    <property name="Inverted" value="false"/>
+   </properties>
+  </object>
+  <object name="Switch1" type="Switch" x="0" y="1216" width="64" height="64">
+   <properties>
+    <property name="refID" value="1"/>
+    <property name="staysDown" value="true"/>
+   </properties>
+  </object>
+  <object name="Door1" type="Door" x="320" y="1216" width="1" height="6">
+   <properties>
+    <property name="switchRef" value="1"/>
+   </properties>
+  </object>
+  <object name="PlayerPosition" type="Player" x="128" y="64" width="64" height="64"/>
+  <object name="Coin1" type="Coin" x="576" y="896" width="64" height="64"/>
+  <object name="Coin2" type="Coin" x="832" y="896" width="64" height="64"/>
+  <object name="Ball1" type="Ball" x="273" y="63" width="64" height="64"/>
+  <object name="Ball2" type="Ball" x="199" y="64" width="64" height="64"/>
+  <object name="jMook1" type="jMook" x="704" y="1472" width="64" height="64">
+   <properties>
+    <property name="xLower" value="9"/>
+    <property name="xUpper" value="12"/>
+   </properties>
+  </object>
+  <object name="cMook1" type="cMook" x="384" y="1503" width="64" height="32"/>
+ </objectgroup>
 </map>

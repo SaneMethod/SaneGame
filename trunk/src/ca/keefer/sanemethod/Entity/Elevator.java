@@ -55,7 +55,7 @@ public class Elevator extends AbstractEntity{
 	public Elevator(float x, float y, int shapeType, Vector2f[] dimensions, float mass, float restitution, 
 			float friction, int zOrder, short direction, boolean auto, int speed, Line line, Vector2f maxVelocity,
 			SpriteSheet spriteSheet){
-		
+		this.active=true;
 		this.shapeType=shapeType;
 		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
 			this.body = new Body(new Circle(dimensions[0].x/2),mass);

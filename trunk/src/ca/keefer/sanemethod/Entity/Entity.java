@@ -78,4 +78,6 @@ public interface Entity {
 	 * @return
 	 */
 	public World getWorld();
+	
+	public boolean isActive();
 }

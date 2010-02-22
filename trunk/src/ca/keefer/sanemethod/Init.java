@@ -2,6 +2,9 @@ package ca.keefer.sanemethod;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.VerticalSplitTransition;
 import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.CodeExamples.TextBoxExampleState;
@@ -27,6 +30,9 @@ public class Init extends StateBasedGame {
 		
 		try {
 			// Set default width/height to 800x600 and fullscreen
+			// Note: magic numbers are used here for good reason - Constants
+			// class can't be accessed at this point, and its unreasonable
+			// to define additional constants for this one statement
 			thisGameContainer = new AppGameContainer(this,800,600,false);
 			// Make sure the game logic doesn't update less than 60 times per second
 			//thisGameContainer.setMinimumLogicUpdateInterval(1000/91);
@@ -42,11 +48,11 @@ public class Init extends StateBasedGame {
 			this.addState(new IntroState(Constants.STATE_INTRO));
 			//this.addState(new LevelShapeBuilder(Constants.STATE_SHAPE_BUILDER));
 			//this.addState(new DemoState(Constants.STATE_DEMO));
-			this.addState(new TestState(Constants.STATE_TEST));
+			//this.addState(new TestState(Constants.STATE_TEST));
 			//this.addState(new TextBoxExampleState(Constants.STATE_TEXT_DEMO));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.STATE_TEST);
+			this.enterState(Constants.STATE_INTRO);
 			
 			
 		}catch (SlickException e){

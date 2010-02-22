@@ -3,6 +3,7 @@ package ca.keefer.sanemethod.Entity;
 import java.util.Hashtable;
 
 import net.phys2d.math.Vector2f;
+import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.FixedJoint;
 
@@ -15,11 +16,11 @@ import org.newdawn.slick.util.Log;
 import ca.keefer.sanemethod.Constants;
 
 /**
- * This class extends Platformer to allow for a animated character, with specific 
+ * This class extends Platformer to allow for an animated character, with specific 
  * actions/animations mapped to user input, with Platformer dynamics and physical
  * body representation
  * @author Christopher Keefer
- *
+ * @version 1.5
  */
 public class Player extends Platformer{
 
@@ -33,12 +34,29 @@ public class Player extends Platformer{
 	int idleTimer=0;
 	/** Are we trying to grab something */
 	boolean grabbing=false;
+	/** Are we kicking at something */
+	boolean kicking;
 	/** FixedJoint for establishing a grabbed relationship */
 	FixedJoint grabJoint;
 	/** The last key pressed */
 	int lastKey;
 	/** yOffset for image display */
 	int yOffset;
+	/** how many coins the player has */
+	int coins;
+	/** whether we're currently hurting */
+	boolean hurt;
+	/** Player's life points - when 0, restart level from (beginning || waypoint) */
+	int lifePoints;
+	/** Whether we need the current environment to reset */
+	boolean requestReset=false;
+	/** Whether the player is currently invulnerable (usually due to being hit recently) */
+	boolean mercy = false;
+	/** How long mercy has lasted for */
+	int mercyTimer;
+	
+	/** How long mercy time should last for */
+	private final int MERCY_PERIOD = 5000;
 	
 	boolean sliding=false;
 	
@@ -56,7 +74,7 @@ public class Player extends Platformer{
 	 * @param zOrder
 	 * @param spriteSheet
 	 */
-	public Player(float x, float y, int shapeType, Vector2f[] dimensions,
+	public Player(float x, float y, int shapeType, Vector2f dimensions,
 			float mass, float restitution, float friction,
 			Vector2f maxVelocity, boolean rotatable, int zOrder, SpriteSheet spriteSheet) {
 		super(x, y, shapeType, dimensions, mass, restitution, friction, maxVelocity,
@@ -65,6 +83,8 @@ public class Player extends Platformer{
 		yOffset = 58;
 		animTable = new Hashtable<String,Animation>();
 		currentAnim = "Run";
+		coins=0;
+		lifePoints=3;
 		buildExpectedPlayerTable();
 	}
 	
@@ -85,7 +105,7 @@ public class Player extends Platformer{
 	 * @param spriteSheet
 	 * @param animTable
 	 */
-	public Player(float x, float y, int shapeType, Vector2f[] dimensions,
+	public Player(float x, float y, int shapeType, Vector2f dimensions,
 			float mass, float restitution, float friction,
 			Vector2f maxVelocity, boolean rotatable, int zOrder, SpriteSheet spriteSheet,
 			Hashtable<String,Animation> animTable) {
@@ -93,6 +113,8 @@ public class Player extends Platformer{
 				rotatable, zOrder);
 		this.spriteSheet = spriteSheet;
 		currentAnim = "Run";
+		coins=0;
+		lifePoints=3;
 		this.animTable = animTable;
 	}
 	
@@ -114,9 +136,10 @@ public class Player extends Platformer{
 	private void buildExpectedPlayerTable(){
 		Animation thisAnim = new Animation(spriteSheet, 0, 0, 0, 9, false, 50, true);
 		animTable.put("Run", thisAnim);
-		thisAnim = new Animation(spriteSheet, 1,0,1,3,false,200,true);
-		animTable.put("Stand", thisAnim);
-		thisAnim = new Animation(spriteSheet, 1, 4, 1, 9, false, 100, true);
+		thisAnim = new Animation(spriteSheet, 1,0,1,3,false,300,true);
+		animTable.put("Idle", thisAnim);
+		thisAnim = new Animation(spriteSheet, 1, 4, 1, 8, false, 150, true);
+		thisAnim.addFrame(spriteSheet.getSubImage(1,9),500);
 		thisAnim.setLooping(false);
 		animTable.put("Hurt",thisAnim);
 		thisAnim = new Animation(spriteSheet, 2,0,2,7,false,150,true);
@@ -143,7 +166,7 @@ public class Player extends Platformer{
 		thisAnim = new Animation(spriteSheet, 5, 5, 5, 6, false, 200, true);
 		animTable.put("Slide", thisAnim);
 		thisAnim = new Animation(spriteSheet, 5,7,5,9,false,250,true);
-		animTable.put("Idle", thisAnim);
+		animTable.put("Stand", thisAnim);
 		thisAnim = new Animation();
 		thisAnim.addFrame(spriteSheet.getSubImage(1,0),150);
 		thisAnim.addFrame(spriteSheet.getSubImage(2,7),150);
@@ -156,10 +179,18 @@ public class Player extends Platformer{
 		animTable.put("Stopping", thisAnim);
 	}
 	
+	/**
+	 * Set The animation to draw from the Hashtable
+	 * @param animToDraw
+	 */
 	public void setAnimToDraw(String animToDraw){
 		currentAnim = animToDraw;
 	}
 	
+	/**
+	 * Get the last key pressed
+	 * @return an integer representing the last key pressed by the player
+	 */
 	public int getLastKey(){
 		return lastKey;
 	}
@@ -179,31 +210,26 @@ public class Player extends Platformer{
 		if (this.getDirection() == DIR_LEFT){
 			animTable.get(currentAnim).updateNoDraw();
 			if (yInverse){
-				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, true),
+					g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, true),
 						super.getX()-50, super.getY()-yOffset+16);
 			}else{
-				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, false),
+					g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(true, false),
 						super.getX()-50, super.getY()-yOffset);
 			}
 		}else{
 			if (yInverse){
 				animTable.get(currentAnim).updateNoDraw();
-				g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(false, true),
+					g.drawImage(animTable.get(currentAnim).getCurrentFrame().getFlippedCopy(false, true),
 						super.getX()-50, super.getY()-yOffset+16);
 			}else{
-				g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-yOffset);
+					g.drawAnimation(animTable.get(currentAnim), super.getX()-50, super.getY()-yOffset);
 			}
 		}
 	}
 	
 	@Override 
 	public void preUpdate (int delta){
-		if (!sliding){
-			super.preUpdate(delta);
-		}else{
-			// different slow down as though half time has passed
-			super.preUpdate(delta);
-		}
+		super.preUpdate(delta);
 		if (grabJoint != null){
 			grabJoint.preStep(delta);
 		}
@@ -212,6 +238,12 @@ public class Player extends Platformer{
 	@Override
 	public void update (int delta){
 		super.update(delta);
+		// check for invulnerability due to collision, and whether it should be turned off
+		mercyTimer += delta;
+		if (mercyTimer > MERCY_PERIOD){
+			mercyTimer = 0;
+			mercy = false;
+		}
 		if (grabbing){
 			if (grabJoint == null){
 				pickUpOnCollide();
@@ -223,9 +255,11 @@ public class Player extends Platformer{
 		if (idleTimer < 20000){
 		idleTimer += delta;
 		}
-		if (idleTimer >= 20000){
-			setAnimToDraw("Stand");
-		} else if (isReversing() && !sliding){
+		if (idleTimer >= 20000 && !this.isMoving()){
+			setAnimToDraw("Idle");
+		}else if (isHurt()){
+			setAnimToDraw("Hurt");
+		}else if (isReversing() && !sliding){
 			setAnimToDraw("Stopping");
 		}else if (this.isMoving() && onGround){
 			setAnimToDraw("Run");
@@ -238,14 +272,19 @@ public class Player extends Platformer{
 		}
 		
 		else{
-			//yOffset = 50;
-			setAnimToDraw("Idle");
+			setAnimToDraw("Stand");
 		}
 		
 		// check to see if certain animations have reached a point where they should be swapped out
 		if (currentAnim == "Slide"){
 			if (!(isMoving() || isReversing()) && sliding){
 				sliding = false;
+			}
+		}else if (currentAnim == "Hurt"){
+			if (animTable.get(currentAnim).isStopped()){
+				hurt = false;
+				animTable.get(currentAnim).restart();
+				currentAnim = "Stand";
 			}
 		}
 	}
@@ -265,7 +304,7 @@ public class Player extends Platformer{
 		}
 		super.receiveKeyPress(keyPressed);
 	}
-	
+	@Override
 	public void receiveKeyRelease(int keyReleased){
 		if (keyReleased == Constants.KEY_PICK_UP){
 			grabbing = false;
@@ -286,6 +325,63 @@ public class Player extends Platformer{
 		sliding=b;
 	}
 	
+	// Coin getter/setters
+	public void addCoins(int amount){
+		coins += amount;
+	}
+	public void removeCoins(int amount){
+		coins -= amount;
+	}
+	public void setCoins(int amount){
+		coins = amount;
+	}
+	public int getCoins(){
+		return coins;
+	}
+	/**
+	 * Get whether we're hurting
+	 * @return
+	 */
+	public boolean isHurt(){
+		return hurt;
+	}
+	/**
+	 * Set the value of hurt, without subtracting any life
+	 * Use this to display the hurt animation without changing any other variables
+	 * @param b
+	 */
+	public void setHurt(boolean b){
+		hurt=b;
+	}
+	/**
+	 * Hurt the player (usually by collision with an enemy, or by falling too far)
+	 */
+	public void hurtPlayer(){
+		if (!mercy){
+			hurt = true;
+			mercy = true;
+			lifePoints -= 1;
+			// Check to see if the player is now 'dead' - at -1 lifepoints. If so, set reset flag
+			if (lifePoints <= -1){
+				requestReset = true;
+			}
+		}
+	}
+	/** Set the player's lifepoints to a specific value */
+	public void setLifePoints(int lp){
+		lifePoints = lp;
+	}
+	public int getLifePoints(){
+		return lifePoints;
+	}
+	/** Get whether the player is requesting reset of the scenario - usually due to dying */
+	public boolean resetRequested(){
+		return requestReset;
+	}
+	public void setReset(boolean b){
+		requestReset = b;
+	}
+	
 	public void pickUpOnCollide(){
 		if (world == null) {
 			return;
@@ -300,6 +396,14 @@ public class Player extends Platformer{
 					if (grabJoint == null){
 						grabJoint = new FixedJoint(events[i].getBodyB(),body);
 						//events[i].getBodyB().setPosition(body.getPosition().getX(), body.getPosition().getY());
+						grabJoint.setRelaxation(0.3f);
+						world.add(grabJoint);
+					}
+				}
+			}else if (events[i].getBodyB()==body){
+				if (events[i].getBodyA().getMass() < body.getMass()*4 && events[i].getBodyA().isMoveable()){
+					if (grabJoint == null){
+						grabJoint = new FixedJoint(events[i].getBodyA(),body);
 						grabJoint.setRelaxation(0.3f);
 						world.add(grabJoint);
 					}

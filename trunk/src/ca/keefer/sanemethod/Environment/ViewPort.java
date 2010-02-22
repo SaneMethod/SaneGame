@@ -146,8 +146,8 @@ public class ViewPort {
 	public void setTiledDimensions(int width, int height){
 		tileMapWidth=width;
 		tileMapHeight=height;
-		maxX=width;
-		maxY=height;
+		maxX=width-Constants.SCREENWIDTH;
+		maxY=height-Constants.SCREENHEIGHT;
 	}
 	/**
 	 * Get the dimensions of the tiled map

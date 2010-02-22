@@ -81,16 +81,14 @@ public class Platformer extends AbstractEntity{
 	 * @param zOrder Controls the sorting of entities - not necessary if each entity is added to a seperate layer
 	 * @param image Static image for this Platformer
 	 */
-	public Platformer(float x, float y,int shapeType, Vector2f[] dimensions, float mass, float restitution, 
+	public Platformer(float x, float y,int shapeType, Vector2f dimensions, float mass, float restitution, 
 			float friction, Vector2f maxVelocity, boolean rotatable, int zOrder, Image image){
-		
+		this.active=true;
 		this.shapeType=shapeType;
 		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
-			this.body = new Body(new Circle(dimensions[0].x/2),mass);
+			this.body = new Body(new Circle(dimensions.x/2),mass);
 		}else if (shapeType  == Constants.SHAPE_TYPE_BOX){
-			this.body = new Body(new Box(dimensions[0].x,dimensions[0].y),mass);
-		}else if (shapeType == Constants.SHAPE_TYPE_POLYGON){
-			this.body = new Body(new Polygon(dimensions),mass);
+			this.body = new Body(new Box(dimensions.x,dimensions.y),mass);
 		}
 		body.setUserData(this);
 		body.setRestitution(restitution);
@@ -127,16 +125,14 @@ public class Platformer extends AbstractEntity{
 	 * @param rotatable Whether this body is rotatable - default false
 	 * @param zOrder Controls the sorting of entities - not necessary if each entity is added to a seperate layer
 	 */
-	public Platformer(float x, float y,int shapeType, Vector2f[] dimensions, float mass, float restitution, 
+	public Platformer(float x, float y,int shapeType, Vector2f dimensions, float mass, float restitution, 
 			float friction, Vector2f maxVelocity, boolean rotatable, int zOrder){
-		
+		this.active=true;
 		this.shapeType=shapeType;
 		if (shapeType == Constants.SHAPE_TYPE_CIRCLE){
-			this.body = new Body(new Circle(dimensions[0].x/2),mass);
+			this.body = new Body(new Circle(dimensions.x/2),mass);
 		}else if (shapeType  == Constants.SHAPE_TYPE_BOX){
-			this.body = new Body(new Box(dimensions[0].x,dimensions[0].y),mass);
-		}else if (shapeType == Constants.SHAPE_TYPE_POLYGON){
-			this.body = new Body(new Polygon(dimensions),mass);
+			this.body = new Body(new Box(dimensions.x,dimensions.y),mass);
 		}
 		body.setUserData(this);
 		body.setRestitution(restitution);
@@ -438,7 +434,7 @@ public class Platformer extends AbstractEntity{
 		CollisionEvent[] events = world.getContacts(body);
 		
 		for (int i=0;i<events.length;i++) {
-			Log.debug("CollisionEvent:"+events[i].getNormal());
+			//Log.debug("CollisionEvent:"+events[i].getNormal());
 			
 			// if the point of collision was below the centre of the actor
 			// i.e. near the feet
@@ -448,7 +444,7 @@ public class Platformer extends AbstractEntity{
 				// if the right body is involved and a collision has happened
 				// below it then we're on the ground
 				if ((events[i].getNormal().getY() < -0.5 && !yInverse) || 
-						(events[i].getNormal().getY() < -0.5 && yInverse)) {
+						(events[i].getNormal().getY() > 0.5 && yInverse)) {
 					if (events[i].getBodyB() == body) {
 						//Log.debug(events[i].getPoint()+","+events[i].getNormal());
 						return true;
