@@ -23,5 +23,7 @@
 			<attribute name="javadoc_location" value="http://www.cokeandcode.com/phys2d/source/javadoc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Christopher Keefer/My Documents/slickset-0.4/jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Christopher Keefer/My Documents/slickset-0.4/jogg-0.0.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

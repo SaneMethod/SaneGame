@@ -121,6 +121,17 @@ public abstract class AbstractEntity implements Entity {
 	public boolean isActive(){
 		return active;
 	}
+	/**
+	 * Override this in order to receive key presses in any entity
+	 */
+	public void receiveKeyPress(int keyPressed){
+	}
+	/**
+	 * Override this in order to receive key releases in any entity
+	 */
+	public void receiveKeyRelease(int keyReleased){
+		
+	}
 	
 	
 }

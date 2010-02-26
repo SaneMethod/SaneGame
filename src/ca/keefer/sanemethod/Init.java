@@ -2,9 +2,6 @@ package ca.keefer.sanemethod;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.state.transition.EmptyTransition;
-import org.newdawn.slick.state.transition.FadeInTransition;
-import org.newdawn.slick.state.transition.VerticalSplitTransition;
 import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.CodeExamples.TextBoxExampleState;

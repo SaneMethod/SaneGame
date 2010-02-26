@@ -3,7 +3,6 @@ package ca.keefer.sanemethod.Entity;
 import java.util.Hashtable;
 
 import net.phys2d.math.Vector2f;
-import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.FixedJoint;
 
@@ -46,14 +45,30 @@ public class Player extends Platformer{
 	int coins;
 	/** whether we're currently hurting */
 	boolean hurt;
-	/** Player's life points - when 0, restart level from (beginning || waypoint) */
-	int lifePoints;
 	/** Whether we need the current environment to reset */
 	boolean requestReset=false;
 	/** Whether the player is currently invulnerable (usually due to being hit recently) */
 	boolean mercy = false;
 	/** How long mercy has lasted for */
-	int mercyTimer;
+	int mercyTimer=0;
+	/** how long we've been dying for */
+	int dyingTimer=0;
+	/** whether we're currently dying */
+	boolean dying;
+	/** whether to lock out control of this entity or not */
+	boolean lockOut=false;
+	/** how long we've been jumping while holding something - if too long, remove fixedJoint */
+	int jumpGripTimer=0;
+	/** how long we've been falling for */
+	int fallTimer;
+	/** how long we can fall before we take damage (loss of 1 coin) when we land */
+	private final int FALL_PERIOD = 6000;
+	/** waypoint position */
+	float wayX, wayY;
+	/** whether we've hit any waypoints */
+	boolean hitWaypoint;
+	/** whether we've reached the end of the stage */
+	boolean finishedStage;
 	
 	/** How long mercy time should last for */
 	private final int MERCY_PERIOD = 5000;
@@ -84,7 +99,6 @@ public class Player extends Platformer{
 		animTable = new Hashtable<String,Animation>();
 		currentAnim = "Run";
 		coins=0;
-		lifePoints=3;
 		buildExpectedPlayerTable();
 	}
 	
@@ -114,7 +128,6 @@ public class Player extends Platformer{
 		this.spriteSheet = spriteSheet;
 		currentAnim = "Run";
 		coins=0;
-		lifePoints=3;
 		this.animTable = animTable;
 	}
 	
@@ -160,9 +173,10 @@ public class Player extends Platformer{
 		animTable.put("Crawl", thisAnim);
 		thisAnim = new Animation(spriteSheet, 5, 0, 5, 3, false, 150, true);
 		animTable.put("Climb", thisAnim);
-		thisAnim = new Animation(spriteSheet, 5, 4, 5, 4, false, 500, true);
+		thisAnim = new Animation(spriteSheet, 1, 9, 1, 9, false, 500, true);
+		thisAnim.addFrame(spriteSheet.getSubImage(5,4),500);
 		thisAnim.setLooping(false);
-		animTable.put("Fallen", thisAnim);
+		animTable.put("Dying", thisAnim);
 		thisAnim = new Animation(spriteSheet, 5, 5, 5, 6, false, 200, true);
 		animTable.put("Slide", thisAnim);
 		thisAnim = new Animation(spriteSheet, 5,7,5,9,false,250,true);
@@ -195,10 +209,24 @@ public class Player extends Platformer{
 		return lastKey;
 	}
 	
+	/** Toggle the world's gravity, at the cost of one coin */
+	public void toggleGravity(){
+		if (coins > 0){
+			coins -= 1;
+			if (Constants.GRAVITY.getY() > 0){
+				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,-15f);
+				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+			}else{
+				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,15f);
+				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+			}
+		}
+	}
+	
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	/** Draw a specific animation at this  player's current position */
+	/** Draw a specific animation at this player's current position */
 	public void render (Graphics g){
 		boolean yInverse;
 		if (Constants.GRAVITY.getY() > 0){
@@ -244,6 +272,14 @@ public class Player extends Platformer{
 			mercyTimer = 0;
 			mercy = false;
 		}
+		if (this.isFalling()){
+			fallTimer += delta;
+		}else{
+			if (fallTimer > FALL_PERIOD){
+				hurtPlayer();
+			}
+			fallTimer = 0;
+		}
 		if (grabbing){
 			if (grabJoint == null){
 				pickUpOnCollide();
@@ -259,6 +295,8 @@ public class Player extends Platformer{
 			setAnimToDraw("Idle");
 		}else if (isHurt()){
 			setAnimToDraw("Hurt");
+		}else if (isDying()){
+			setAnimToDraw("Dying");
 		}else if (isReversing() && !sliding){
 			setAnimToDraw("Stopping");
 		}else if (this.isMoving() && onGround){
@@ -276,45 +314,68 @@ public class Player extends Platformer{
 		}
 		
 		// check to see if certain animations have reached a point where they should be swapped out
-		if (currentAnim == "Slide"){
+		if (currentAnim.equalsIgnoreCase("Slide")){
 			if (!(isMoving() || isReversing()) && sliding){
 				sliding = false;
 			}
-		}else if (currentAnim == "Hurt"){
+		}
+		if (currentAnim.equals("Hurt")){
 			if (animTable.get(currentAnim).isStopped()){
 				hurt = false;
 				animTable.get(currentAnim).restart();
 				currentAnim = "Stand";
 			}
 		}
+		if (currentAnim.equals("Dying")){
+			// if we're dying, and the animation is finished, give the player a second to realize they're dead,
+			// then request a reset
+			if(animTable.get(currentAnim).isStopped()){
+				dyingTimer += delta;
+				if (dyingTimer > 1000){
+					dyingTimer = 0;
+					animTable.get(currentAnim).restart();
+					currentAnim="Stand";
+					lockOut=false;
+					this.requestReset = true;
+				}
+			}
+		}
+		
 	}
 	
 	@Override
 	public void receiveKeyPress(int keyPressed){
-		lastKey = keyPressed;
-		// reset the idle timer
-		idleTimer = 0;
-		if (keyPressed == Constants.KEY_DOWN && onGround && isMoving()){
-			sliding = true;
-			setMoving(false);
-			setReversing(true);
+		if (!lockOut){
+			lastKey = keyPressed;
+			// reset the idle timer
+			idleTimer = 0;
+			if (keyPressed == Constants.KEY_DOWN && onGround && isMoving()){
+				sliding = true;
+				setMoving(false);
+				setReversing(true);
+			}
+			if (keyPressed == Constants.KEY_PICK_UP){
+				grabbing = true;
+			}
+			if (keyPressed == Constants.KEY_TOGGLE_GRAVITY){
+				toggleGravity();
+			}
+			super.receiveKeyPress(keyPressed);
 		}
-		if (keyPressed == Constants.KEY_PICK_UP){
-			grabbing = true;
-		}
-		super.receiveKeyPress(keyPressed);
 	}
 	@Override
 	public void receiveKeyRelease(int keyReleased){
-		if (keyReleased == Constants.KEY_PICK_UP){
-			grabbing = false;
-			if (grabJoint != null){
-				world.remove(grabJoint);
-				grabJoint = null;
-				//Log.debug("Pick Up Released.");
+		if (!lockOut){
+			if (keyReleased == Constants.KEY_PICK_UP){
+				grabbing = false;
+				if (grabJoint != null){
+					world.remove(grabJoint);
+					grabJoint = null;
+					//Log.debug("Pick Up Released.");
+				}
 			}
+			super.receiveKeyRelease(keyReleased);
 		}
-		super.receiveKeyRelease(keyReleased);
 	}
 	
 	public boolean isSliding(){
@@ -357,29 +418,76 @@ public class Player extends Platformer{
 	 * Hurt the player (usually by collision with an enemy, or by falling too far)
 	 */
 	public void hurtPlayer(){
-		if (!mercy){
-			hurt = true;
-			mercy = true;
-			lifePoints -= 1;
-			// Check to see if the player is now 'dead' - at -1 lifepoints. If so, set reset flag
-			if (lifePoints <= -1){
-				requestReset = true;
+		if (!mercy && !dying){
+			coins -= 1;
+			// Check to see if the player is now 'dead' - at -1 coins. If so, set this player to dying, and lock
+			// out control of this character
+			if (coins <= -1){
+				lockOut=true;
+				setDying(true);
+			}else{
+				mercy = true;
+				hurt = true;
 			}
 		}
 	}
-	/** Set the player's lifepoints to a specific value */
-	public void setLifePoints(int lp){
-		lifePoints = lp;
+	
+	/** Toggle Lock out control of this player */
+	public void toggleLockOut(){
+		lockOut = !lockOut;
 	}
-	public int getLifePoints(){
-		return lifePoints;
+	/** set lock out control of this player */
+	public void setLockOut(boolean b){
+		lockOut=b;
 	}
+	/** get whether this player has control locked out */
+	public boolean isLockedOut(){
+		return lockOut;
+	}
+	
 	/** Get whether the player is requesting reset of the scenario - usually due to dying */
 	public boolean resetRequested(){
 		return requestReset;
 	}
 	public void setReset(boolean b){
 		requestReset = b;
+	}
+	
+	/** whether this player is currently dying */
+	public boolean isDying(){
+		return dying;
+	}
+	/** set whether this player is currently dying */
+	public void setDying(boolean b){
+		dying=b;
+	}
+	
+	/** get whether we've hit any waypoints */
+	public boolean getHitWaypoint(){
+		return hitWaypoint;
+	}
+	public float getWayX(){
+		return wayX;
+	}
+	public float getWayY(){
+		return wayY;
+	}
+	/** set a waypoint for this player */
+	public void setWaypoint(float x, float y){
+		this.hitWaypoint=true;
+		this.wayX=x;
+		this.wayY=y;
+	}
+	/** remove reference to waypoints */
+	public void clearWaypointFlag(){
+		hitWaypoint=false;
+	}
+	/** set whether we've finished the stage */
+	public void setFinishedStage(boolean b){
+		finishedStage = b;
+	}
+	public boolean isFinishedStage(){
+		return finishedStage;
 	}
 	
 	public void pickUpOnCollide(){

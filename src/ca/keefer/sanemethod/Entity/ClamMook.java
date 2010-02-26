@@ -131,6 +131,7 @@ public class ClamMook extends AbstractEntity{
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void render(Graphics g) {
 		switch(state){

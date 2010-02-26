@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
+<map version="1.0" orientation="orthogonal" width="30" height="10" tilewidth="64" tileheight="64">
+ <properties>
+  <property name="HUD" value="true"/>
+  <property name="background" value="res/Background/Background01.png"/>
+  <property name="boundariesLethal" value="false"/>
+  <property name="music" value="res/Music/Isotope.ogg"/>
+ </properties>
+ <tileset firstgid="1" source="JumpTiles.tsx"/>
+ <layer name="Base" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBSMAtKAJhBXQLEmGkYWR5fHx8dlFjINAK6obi2wBAAA
+  </data>
+ </layer>
+ <layer name="Detail" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBSMAtoAQyA2AmJjKpkHACqt/26wBAAA
+  </data>
+ </layer>
+ <layer name="Fringe" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAUjDYgBsTiVzBIBYlEi1ZoBsTmV7DUBYlMi1YYBcTiV7A0B4lAi1ZYBcTmV7C0B4lIi1U4D4ulUsncKEE8lUu02IN5OpNoZQDwTj/wWIN6KRRwA1gW5IrAEAAA=
+  </data>
+ </layer>
+ <layer name="Collision" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBSMgqEBAGlKTgywBAAA
+  </data>
+ </layer>
+ <layer name="Above" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGFmgE4iXA/EKIF4JFYPxYWLtQNwBxKvQ5FdCxTqR1KDLMyDJoYuPglEwXEEEFjFLNL4FHv3IatHNikTSDwBf0L4GsAQAAA==
+  </data>
+ </layer>
+ <layer name="Foreground" width="30" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgGAWjYBSMgqEBAGlKTgywBAAA
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="0" height="0">
+  <object name="Talkable" type="Talkable" x="64" y="512" width="64" height="64">
+   <properties>
+    <property name="dialogFile" value="res/Dialogs/tutText.xml"/>
+    <property name="position" value="2"/>
+   </properties>
+  </object>
+  <object name="Player" type="Player" x="64" y="384" width="64" height="64"/>
+  <object name="Ball1" type="Ball" x="640" y="384" width="64" height="64"/>
+  <object name="ExitOrb" type="Exit" x="1792" y="448" width="64" height="64"/>
+  <object name="Trampoline" type="Spring" x="960" y="576" width="64" height="64">
+   <properties>
+    <property name="Inverted" value="false"/>
+   </properties>
+  </object>
+  <object name="Waypoint" type="Waypoint" x="1216" y="576" width="64" height="64"/>
+  <object name="Switch1" type="Switch" x="1344" y="0" width="64" height="64">
+   <properties>
+    <property name="refID" value="1"/>
+    <property name="staysDown" value="false"/>
+   </properties>
+  </object>
+  <object name="Door1" type="Door" x="1600" y="578" width="1" height="10">
+   <properties>
+    <property name="switchRef" value="1"/>
+   </properties>
+  </object>
+  <object name="Coin1" type="Coin" x="1344" y="448" width="64" height="64"/>
+  <object name="Coin2" type="Coin" x="1408" y="384" width="64" height="64"/>
+ </objectgroup>
+</map>

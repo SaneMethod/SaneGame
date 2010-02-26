@@ -2,9 +2,8 @@ package ca.keefer.sanemethod.Entity;
 
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
+import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;
-import net.phys2d.raw.shapes.Box;
-import net.phys2d.raw.shapes.ConvexPolygon;
 import net.phys2d.raw.shapes.Polygon;
 
 import org.newdawn.slick.Graphics;
@@ -68,16 +67,14 @@ public class Door extends AbstractEntity{
 		}
 		
 		// create body based on dimensions and width, height
-		this.body = new Body(new Polygon(vecs),100);
+		this.body = new StaticBody(new Polygon(vecs));
 		body.setUserData(this);
 		body.setRestitution(1f);
 		body.setFriction(0f);
-		body.setMoveable(false);
-		body.setRotatable(false);
 		this.x=x;
 		this.y=y;
 		
-		blockImage = spriteSheet.getSubImage(3, 2);
+		blockImage = spriteSheet.getSubImage(3, 2).getScaledCopy(1f);
 	}
 	
 	/** Set this door as active in the physics world */
@@ -93,7 +90,6 @@ public class Door extends AbstractEntity{
 	public boolean getEnabled(){
 		return enabled;
 	}
-	
 	
 	@Override
 	public Body getBody() {
@@ -116,7 +112,10 @@ public class Door extends AbstractEntity{
 	@Override
 	public void setWorld(World world) {
 		this.world=world;
-		
+		// don't add this body if this door isn't enabled yet
+		if (this.enabled == false){
+			this.world.remove(this.body);
+		}
 	}
 	@Override
 	public void setZOrder(int z) {
@@ -135,17 +134,18 @@ public class Door extends AbstractEntity{
 	@Override
 	public void update(int delta) {
 		
-		if (fadeAway){
+		if (fadeAway == true){
 			if (blockImage.getAlpha() > 0){
 				blockImage.setAlpha(blockImage.getAlpha()-(0.001f*delta));
 			}else if (enabled){
+				
 				this.setEnabled(false);
 			}
 		}else{
 			if (!enabled){
 				this.setEnabled(true);
-			}
-			if (blockImage.getAlpha() < 1.0f){
+			}else if (blockImage.getAlpha() < 1.0f){
+				
 				blockImage.setAlpha(blockImage.getAlpha()+(0.001f*delta));
 			}
 		}

@@ -29,7 +29,7 @@ import ca.keefer.sanemethod.Constants;
  * handling. The file name of the output xml file will be the name of the tile map tmx with an
  * '.xml' tacked on the end.
  * @author Christopher Keefer
- * @version 1.1
+ * @version 1.2
  */
 /*
  * Format of the xml file:
@@ -211,7 +211,7 @@ public class LevelShapeBuilder extends BasicGameState{
 			if (currentShape == this.SHAPE_SQUARE){
 				tempRect = new Rectangle (startPointX-viewOffsetX, startPointY-viewOffsetY, mouseX-startPointX, mouseY-startPointY);
 			}else if (currentShape == SHAPE_CIRCLE){
-				tempCircle = new Circle(startPointX, startPointY, mouseX-startPointX);
+				tempCircle = new Circle(startPointX-viewOffsetX, startPointY-viewOffsetY, mouseX-startPointX);
 			}
 		}
 		

@@ -6,19 +6,17 @@ import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Box;
 import net.phys2d.raw.shapes.Circle;
-import net.phys2d.raw.shapes.Polygon;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
 /**
  * A special type of entity that implements platformer-style physical dynamics
  * @author Christopher Keefer
- * @version 1.1
+ * @version 1.4
  *
  */
 public class Platformer extends AbstractEntity{
@@ -54,6 +52,10 @@ public class Platformer extends AbstractEntity{
 	private boolean activeJump;
 	/** Times how long the jump button has been held down, to a max value */
 	private int jumpTimer=0;
+	/** how long its been since we checked whether we're on the ground */
+	int checkTimer;
+	final int CHECK_PERIOD = 500;
+	int keyBuffer=-1;
 	
 	public static boolean DIR_LEFT = false;
 	public static boolean DIR_RIGHT = true;
@@ -293,7 +295,22 @@ public class Platformer extends AbstractEntity{
 	@Override
 	public void update(int delta) {
 		// update whether the body is currently on the ground
-		//boolean on = onGroundImpl(body);
+		checkTimer += delta;
+		if (checkTimer > CHECK_PERIOD){
+			checkTimer=0;
+			onGround = onGroundImpl(body);
+			if (!onGround){
+				falling=true;
+			}
+		}
+		
+		// check the keyBuffer - if we've been waiting until we stop reversing, send the
+		// appropriate key press to the key receive function
+		if (keyBuffer != -1 && !isReversing()){
+			receiveKeyPress(keyBuffer);
+			keyBuffer=-1;
+		}
+		
 		// if we're standing on the ground negate gravity. This stops
 		// some instability in physics 
 		//body.setGravityEffected(!on);
@@ -391,6 +408,9 @@ public class Platformer extends AbstractEntity{
 			this.onGround = false;
 			//this.setVelocityY(-100);
 			activeJump = true;
+		}else if ((keyPressed == Constants.KEY_LEFT || keyPressed==Constants.KEY_RIGHT) && isReversing()){
+			//Log.debug("Entered value into keyBuffer");
+			keyBuffer = keyPressed;
 		}
 	}
 	

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Menu System "kText.dtd">
+<!-- error Dialog -->
+<Dialog name="errorText">
+<Text type="full" name="error" font="standardFont" colour="16711680" boxed="true"
+content="An error has occurred attempting to load the text specified for this talkable object. Sorry! At 
+least I didn't just crash on you, right? Personally, I blame whoever programmed this particular map, and 
+random fluctuations in space/time." texture="res/UI/texWin.png" proceed="@@"
+/>
+</Dialog>

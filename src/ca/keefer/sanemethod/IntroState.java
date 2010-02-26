@@ -6,20 +6,15 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.EmptyTransition;
-import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
-import org.newdawn.slick.state.transition.RotateTransition;
-import org.newdawn.slick.state.transition.Transition;
-import org.newdawn.slick.state.transition.VerticalSplitTransition;
-import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Entity.Player;
-import ca.keefer.sanemethod.Entity.TitleEntity;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
 import ca.keefer.sanemethod.Environment.ViewPort;
 import ca.keefer.sanemethod.Interface.SaneSystem;
@@ -50,10 +45,12 @@ public class IntroState extends BasicGameState {
 	TextHandler textHandler;
 	
 	Player thePlayer;
+	Music theMusic;
 	
 	float timer;
 	boolean atMenu;
 	String optionSelection;
+	String errorString;
 	
 	// Constructor receives stateID
 	public IntroState(int stateID){
@@ -77,6 +74,8 @@ public class IntroState extends BasicGameState {
 		ArrayList<MapShape> tileList = x.processXML();
 		environment = new TiledEnvironment("res/Tiles/titleMap.tmx",tileList,viewPort);
 		thePlayer = environment.getPlayer();
+		theMusic = new Music(environment.getMusic(),true);
+		theMusic.play();
 		viewPort.trackEntity(thePlayer,ViewPort.TRACK_MODE_CENTER);
 		
 		craftIntroText();
@@ -96,6 +95,11 @@ public class IntroState extends BasicGameState {
 		
 		viewPort.render(g);
 		textHandler.display(g);
+		if (errorString != null){
+			Constants.saneSystem.getFonts().get("standardFont").drawString(
+					(Constants.SCREENWIDTH/2)-(Constants.saneSystem.getFonts().get("standardFont").getWidth(errorString)/2), 
+					600, errorString);
+		}
 	}
 
 	@Override
@@ -106,6 +110,7 @@ public class IntroState extends BasicGameState {
 		viewPort.update(delta);
 		
 		textHandler.update(delta);
+		
 		if (!atMenu){
 			
 			titleSequence(delta);
@@ -115,9 +120,9 @@ public class IntroState extends BasicGameState {
 				if (optionSelection.equals("newGame")){
 					this.leave(container, game);
 				}else if (optionSelection.equals("loadGame")){
-					
+					errorString = "Loading/Saving is not available in this alpha build.";
 				}else if (optionSelection.equals("options")){
-					
+					errorString= "Control Configuration is not available in this alpha build.";
 				}else if (optionSelection.equals("exit")){
 					thisContainer.exit();
 				}
@@ -213,6 +218,12 @@ public class IntroState extends BasicGameState {
 						" Big thanks to Kevin Glass and the LWJGL team.",
 				"++");
 		thisDialog.add(thisText);
+		// builtWith - TilEd
+		thisText = new Text("builtWith",Constants.saneSystem.getFonts().get("creditFont"),
+				Color.white,true,"Also, big thanks to Thorbjorn Lindeijer, without whose map editor, Tiled " +
+						"making this game would have been even more difficult.",
+				"++");
+		thisDialog.add(thisText);
 		// Music: AreYouSleepyYet - BlueSpiderEyes
 		thisText = new Text("musicSleepyYetBy",Constants.saneSystem.getFonts().get("creditFont"),
 				Color.white,true,"Music: 'Are You Sleepy Yet' By BlueSpiderEyes.","++");
@@ -238,8 +249,9 @@ public class IntroState extends BasicGameState {
 		thisDialog.add(thisText);
 		//thanksForWaiting
 		thisText = new Text("thanksForWaiting",Constants.saneSystem.getFonts().get("creditFont"),
-				Color.red,true,"Hey, thanks for sitting through the credits. Here's a hint: Press F10 on any map" +
-						" to enable infinite jumping. Enjoy!","gameName");
+				Color.red,true,"Hey, thanks for sitting through the credits. Here's a hint: In order to jump in mid-air" +
+						" try standing on a ball, while grabbing it. You'll be able to land on coins and jump off of them," +
+						" as well as cross spikes without dying. Enjoy!","gameName");
 		thisDialog.add(thisText);
 		
 		textHandler = new TextHandler(thisDialog, viewPort.getPosition().getX(), viewPort.getPosition().getY(), Text.MIDDLE, 740);
@@ -248,6 +260,8 @@ public class IntroState extends BasicGameState {
 	@Override
 	public void leave(GameContainer container, StateBasedGame game){
 		game.addState(new TestState(Constants.STATE_TEST));
+		theMusic.fade(1000, 0, true);
+		//theMusic.stop();
 		//game.getState(Constants.STATE_TEST).init(container, game);
 		game.enterState(Constants.STATE_TEST, new EmptyTransition(), new HorizontalSplitTransition());
 	}

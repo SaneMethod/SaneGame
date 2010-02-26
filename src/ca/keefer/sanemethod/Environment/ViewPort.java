@@ -18,9 +18,7 @@ import ca.keefer.sanemethod.Entity.Entity;
  * Controls whats viewable on-screen at any one time - the 'camera' through which the user sees
  * the virtual world. It also controls what is actually drawn to the screen, as all layers must
  * relay their render requests to their assigned viewport. Only one viewport object should be
- * instantiated at a time - however, multiple 'camera' objects can be attached to any one
- * viewport, allowing for multiple scenes. Only one 'camera' can be active at a time.
- * @author Christopher Keefer
+ * instantiated at a time.
  * @version 1.1
  *
  */

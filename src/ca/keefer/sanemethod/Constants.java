@@ -5,6 +5,7 @@ import net.phys2d.math.Vector2f;
 import org.newdawn.slick.Input;
 
 import ca.keefer.sanemethod.Interface.SaneSystem;
+import ca.keefer.sanemethod.Interface.TextHandler;
 
 /**
  * This class contains configurable constants for a number of internal functions,
@@ -97,6 +98,7 @@ public class Constants {
 	public static int KEY_ACCEPT = Input.KEY_A;
 	public static int KEY_JUMP = Input.KEY_C;
 	public static int KEY_HIDE_HUD = Input.KEY_H;
+	public static int KEY_TOGGLE_GRAVITY = Input.KEY_G;
 	public static int KEY_PUNCH = Input.KEY_S;
 	public static int KEY_KICK = Input.KEY_D;
 	public static int KEY_PICK_UP = Input.KEY_V;
@@ -138,6 +140,7 @@ public class Constants {
 	public static int LAYER_PARTICLE = 3;
 	public static int LAYER_BACKGROUND = 4;
 	public static int LAYER_HUD = 5;
+	public static int LAYER_EVENT = 6;
 	
 	// ObjectType Constants
 	public static String OBJECT_SPRING = "Spring";
@@ -149,7 +152,17 @@ public class Constants {
 	public static String OBJECT_COIN = "Coin";
 	public static String OBJECT_JMOOK = "jMook";
 	public static String OBJECT_CMOOK = "cMook";
+	public static String OBJECT_FALLING_BLOCK = "FallingBlock";
+	public static String OBJECT_SPIKE = "Spike";
+	
+	// EventType Constants
+	public static String EVENT_WAYPOINT = "Waypoint";
+	public static String EVENT_EXIT = "Exit";
+	public static String EVENT_TALKABLE = "Talkable";
 	
 	// SaneSystem for system-wide access
 	public static SaneSystem saneSystem = new SaneSystem();
+	
+	// TextHandler for common access
+	public static TextHandler textHandler;
 }

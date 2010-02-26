@@ -1,6 +1,5 @@
 package ca.keefer.sanemethod.Entity;
 
-import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.World;
@@ -8,10 +7,8 @@ import net.phys2d.raw.shapes.Circle;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
