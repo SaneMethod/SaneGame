@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Menu System "kText.dtd">
+<!-- Tutorial Dialog -->
+<Dialog name="tutorialDialog">
+<Text type="rec" name="intro" font="standardFont" colour="16711680" boxed="true"
+content="Welcome to Sane. Over the course of this game, you will collect coins so you can invert gravity, create 
+objects out of thin air and duplicate yourself. Like I said, totally Sane. Press A to advance this dialog."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="dialogs" font="standardFont" colour="16711680" boxed="true"
+content="These dialogs exist to help you understand how to play. Also, to taunt you. NAH NAH nana NAH! Okay, I'm done. Like
+all dialogs, you can advance past this by pressing A."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="jumping1" font="standardFont" colour="16711680" boxed="true"
+content="This is a type of game known as a PLATFORMER, so it involves shooting everything that... no, just kidding. It mostly involves 
+non-violent activites like jumping from platform to platform, with the occasional critter to squash by jumping on its head."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="jumping2" font="standardFont" colour="16711680" boxed="true"
+content="In order to jump, press the c button. Depending on how long you hold the c button down, you'll jump higher, up to a maximum height. Normally,
+you can't jump once you're in the air - what would you jump off of? But we're not always entirely sane here in Sane - sometimes, a
+particular item might let you jump in the air... Once you've got the hang of jumping, press A to continue."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="grabBall1" font="standardFont" colour="16711680" boxed="true"
+content="You'll notice the nearby ball. It has certainly noticed you. ITS WATCHING YOU... *ahem*. In order to grab the ball (and teach 
+it a lesson in manners) hold down the v key and run into it. You'll automatically grab it, and hold on to it for as long as you hold
+down the v key."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="grabBall2" font="standardFont" colour="16711680" boxed="true"
+content="As soon as you release the v key, you'll let go. You can run and jump while holding something, but depending on how
+heavy what you're holding is, you might run or jump more slowly than usual, so keep that in mind."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="trampoline" font="standardFont" colour="16711680" boxed="true"
+content="Further to your right is a trampoline. If you jump on it, it'll propel you upwards. If you drop something on it, that object 
+will also be propeled upwards. You can even hold on to something and jump on the trampoline, but again, you'll not go as high, depending 
+on the weight of what you're holding."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="doors1" font="standardFont" colour="16711680" boxed="true"
+content="If you continue to your right, you'll notice a series of block preventing you from proceeding. 'Now what?' You cry in
+despair. 'I simply must proceed to have any meaning in my otherwise empty and purposeless life!'" 
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="doors2" font="standardFont" colour="16711680" boxed="true"
+content="Well... wow, thats pretty sad. Also, you should notice a red block on the ceiling nearby. You'll also notice a coin or two within reach. Here's your first little trick...
+If you grab the coins, you'll be able to spend one on inverting the gravity by pressing g."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="doors2" font="standardFont" colour="16711680" boxed="true"
+content=" BE CAREFUL! Each inversion costs one coin, and if you spend them all and haven't reached the exit yet, you'll have to start again. If you do mess up, pressing r on any map will
+reset you back to the beginning, or to the last waypoint you have reached."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="waypoint" font="standardFont" colour="16711680" boxed="true"
+content="You can see a Waypoint near you - you may have already stumbled over it, in fact. It looks like a furled flag post when 
+inactive, and the flag is unfurled when you've triggered the waypoint. The most recent waypoint you've triggered is the one you'll
+return to, so be careful if you backtrack on a map not to trigger an earlier waypoint!"
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="coins" font="standardFont" colour="16711680" boxed="true"
+content="As for the coins, you can spend them on your tricks, but they also serve as your 'lifepoints'. Whenever you get hit by an 
+enemy, or fall from a great height, you'll lose one coin. If you lose a coin when you don't have any, you'll die, and have to restart
+the level from the beginning, or the last waypoint you reached."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="ninth" font="standardFont" colour="16711680" boxed="true"
+content="By now, you should be standing on the ceiling. The switch is now within reach! If you step on it, 
+you'll soon be free to proceed. OR SO IT WOULD SEEM! When you step off, the wall returns! Maybe if you put something on the switch, 
+it'll keep the wall from returning..."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="tenth" font="standardFont" colour="16711680" boxed="true"
+content="Now if you're past the wall, you'll be noticing the blue orb floating in the air. That's the EXIT ORB! Yes, I've got this
+whole naming thing down. When you touch that orb, you'll be quickly transported to the next map. Congratulations, you've 
+completed the tutorial! Enjoy the game. You ought to, it took me long enough to make - not that I'm bitter. Oh no. NOT BITTER!
+Yours truly, Christopher Keefer."
+texture="res/UI/texWin.png" proceed="@@"
+/>
+</Dialog>

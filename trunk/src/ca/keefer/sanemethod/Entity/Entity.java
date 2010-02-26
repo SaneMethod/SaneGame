@@ -80,4 +80,7 @@ public interface Entity {
 	public World getWorld();
 	
 	public boolean isActive();
+	
+	public void receiveKeyPress(int keyPressed);
+	public void receiveKeyRelease(int keyReleased);
 }

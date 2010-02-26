@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Menu System "kText.dtd">
+<!-- Tutorial Dialog -->
+<Dialog name="tutorialDialog">
+<Text type="rec" name="intro" font="standardFont" colour="16711680" boxed="true"
+content="Hey, congrats, you've reached the end of the alpha tech demo. 'WHAT!' You say. 'That's IT!?' Yep. For now. However,
+I've made this fairly open-system. Anyone can make maps for this game! I hope to have a community of dedicated map-makers. Maybe 
+you'd like to be a part of it? The tools needed will soon all be made freely available. I look forward to seeing what you make of 
+my game! Yours Truly, Christopher Keefer."
+texture="res/UI/texWin.png" proceed="++"
+/>
+<Text type="rec" name="intro" font="standardFont" colour="16711680" boxed="true"
+content="You still here? Press the Escape button any time to exit. Hope to see a map or two from you soon - and if not, hey, just 
+enjoy the game! That's what its all for..."
+texture="res/UI/texWin.png" proceed="@@"
+/>
+</Dialog>

@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import org.newdawn.slick.BigImage;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
 
@@ -24,13 +23,10 @@ public class BackgroundLayer implements Layer{
 	private ViewPort viewPort;
 	private BigImage[] backImages;
 	private int length;
-	private int mapWidth,mapHeight;
 	
 	public BackgroundLayer(int id, boolean active){
 		this.id=id;
 		this.active=active;
-		this.mapWidth=mapWidth;
-		this.mapHeight=mapHeight;
 		length=0;
 	}
 	

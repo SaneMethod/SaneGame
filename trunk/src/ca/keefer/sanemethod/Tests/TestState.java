@@ -8,6 +8,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Line;
@@ -34,8 +35,8 @@ import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
 import ca.keefer.sanemethod.Entity.Spring;
 import ca.keefer.sanemethod.Entity.Switch;
-import ca.keefer.sanemethod.Entity.TitleEntity;
 import ca.keefer.sanemethod.Environment.BackgroundLayer;
+import ca.keefer.sanemethod.Environment.MapObject;
 import ca.keefer.sanemethod.Environment.ParticleLayer;
 import ca.keefer.sanemethod.Environment.TiledEnvironment;
 import ca.keefer.sanemethod.Environment.ViewPort;
@@ -44,6 +45,7 @@ import ca.keefer.sanemethod.Interface.Text;
 import ca.keefer.sanemethod.Interface.TextHandler;
 import ca.keefer.sanemethod.LevelBuilder.MapShape;
 import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
+import ca.keefer.sanemethod.Tools.LoadingListPullParser;
 import ca.keefer.sanemethod.Tools.TSXGen;
 import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 
@@ -70,9 +72,12 @@ public class TestState extends BasicGameState {
 	Platformer testSprite2;
 	Player tSprite2;
 	ArrayList<MapShape> tileList;
+	int mapOffset;
 	
 	TiledEnvironment environment;
 	ViewPort viewPort;
+	ArrayList<MapObject> loadingList;
+	Music theMusic;
 	
 	ConfigurableEmitter conEmitter;
 	ParticleSystem particleSystem;
@@ -98,11 +103,34 @@ public class TestState extends BasicGameState {
 		this.container = container;
 		this.game = game;
 		
-		XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream("res/Tiles/SaneMap1.tmx.xml"));
-		tileList = x.processXML();
+		loadingList = new LoadingListPullParser(
+				ResourceLoader.getResourceAsStream("res/loadingList.xml")).processLoadingList();
+		mapOffset=0;
+		
+		if (loadingList.get(mapOffset).getShapeList() != null){
+			XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(
+					loadingList.get(mapOffset).getShapeList()));
+			tileList = x.processXML();
+		}else{
+			tileList = null;
+		}
 		viewPort = new ViewPort(game);
-		environment = new TiledEnvironment("res/Tiles/SaneMap1.tmx",tileList,viewPort);
-		testSprite = environment.getPlayer();
+		environment = new TiledEnvironment(loadingList.get(mapOffset).getMapFile(),tileList,viewPort);
+		// check to see if we're resetting the player's position back to a waypoint
+		if (testSprite != null){
+			if (testSprite.getHitWaypoint()){
+				float wx = testSprite.getWayX();
+				float wy = testSprite.getWayY();
+				testSprite = environment.getPlayer();
+				testSprite.setPosition(wx, wy);
+			}else{
+				testSprite = environment.getPlayer();
+			}
+		}else{
+			testSprite = environment.getPlayer();
+		}
+		theMusic = new Music(environment.getMusic(),true);
+		theMusic.loop();
 		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
 		
 		/*
@@ -132,6 +160,64 @@ public class TestState extends BasicGameState {
 		//tHandle = new TextHandler(thisDialog, viewPort.getPosition().getX(), viewPort.getPosition().getY(), Text.BOTTOM, 740);
 		
 	}
+	
+	/** Reset the state of the current game map */
+	public void reset(GameContainer container, StateBasedGame game){
+		if (loadingList.get(mapOffset).getShapeList() != null){
+			XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(
+					loadingList.get(mapOffset).getShapeList()));
+			tileList = x.processXML();
+		}else{
+			tileList = null;
+		}
+		Constants.GRAVITY = new net.phys2d.math.Vector2f(0f,15f);
+		viewPort = new ViewPort(game);
+		environment = new TiledEnvironment(loadingList.get(mapOffset).getMapFile(),tileList,viewPort);
+		// check to see if we're resetting the player's position back to a waypoint
+		if (testSprite != null){
+			if (testSprite.getHitWaypoint()){
+				float wx = testSprite.getWayX();
+				float wy = testSprite.getWayY();
+				testSprite = environment.getPlayer();
+				testSprite.setPosition(wx, wy);
+			}else{
+				testSprite = environment.getPlayer();
+			}
+		}else{
+			testSprite = environment.getPlayer();
+		}
+		if (theMusic.playing()){
+			theMusic.stop();
+		}
+		try {
+			theMusic = new Music(environment.getMusic(),true);
+		} catch (SlickException e) {
+			Log.debug("Error Loading Music in reset:"+e.getMessage());
+		}
+		theMusic.loop();
+		viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
+	}
+	
+	/** Select the next map via the mapOffset */
+	public void setMapOffset(int offset){
+		mapOffset = offset;
+	}
+	
+	/** increment the map offset to go to the next map */
+	public void nextMap(){
+		if (mapOffset+1 < loadingList.size()){
+			mapOffset++;
+		}
+	}
+	
+	/** decrement the map offset to go to the previous map */
+	public void previousMap(){
+		if (mapOffset-1 >= 0){
+			mapOffset--;
+		}else{
+			mapOffset = 0;
+		}
+	}
 
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
@@ -139,20 +225,24 @@ public class TestState extends BasicGameState {
 		g.setBackground(Color.black);
 		
 		if (viewPort != null){
+			//g.setColor(Color.white);
 			viewPort.render(g);
+			//environment.render(g);
+			//environment.renderBounds(g);
+			if (Constants.textHandler != null){
+				g.translate(viewPort.getPosition().getX(), viewPort.getPosition().getY());
+				Constants.textHandler.display(g);
+				g.translate(-viewPort.getPosition().getX(), -viewPort.getPosition().getY());
+			}
 		}else{
+			Color rg = Color.red;
 			Color.red.a=0.5f;
 			g.setColor(Color.red);
 			g.fill(new Rectangle(-10,250,(Constants.SCREENWIDTH+10),100));
-			Color.red.a=1f;
+			Color.red.a = rg.a;
 			Constants.saneSystem.getFonts().get("creditFont").drawString(
 					(Constants.SCREENWIDTH/2)-Constants.saneSystem.getFonts().get("creditFont").getWidth("Loading Level")/2, 300, "Loading Level", Color.white);
 		}
-		
-		//environment.render(g);
-		//environment.renderBounds(g);
-		
-		//tHandle.display(g);
 
 	}
 
@@ -190,9 +280,18 @@ public class TestState extends BasicGameState {
 		if (viewPort != null){
 		environment.update(delta);
 		viewPort.update(delta);
-		if (testSprite.resetRequested()){
-			init(container,game);
+		if (Constants.textHandler != null){
+			Constants.textHandler.update(delta);
 		}
+			if (testSprite.resetRequested()){
+				reset(container,game);
+			}
+			if (testSprite.isFinishedStage()){
+				nextMap();
+				// reset waypoint flag
+				testSprite = null;
+				reset(container,game);
+			}
 		}
 	}
 	
@@ -232,6 +331,9 @@ public class TestState extends BasicGameState {
 		//tHandle.acceptInput(keyPressed);
 		
 		testSprite.receiveKeyPress(keyPressed);
+		if (Constants.textHandler != null){
+			Constants.textHandler.acceptInput(keyPressed);
+		}
 	}
 	
 	public void keyReleased(int keyReleased, char keyChar){

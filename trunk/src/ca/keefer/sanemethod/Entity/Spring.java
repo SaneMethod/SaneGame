@@ -6,17 +6,13 @@ import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.World;
-import net.phys2d.raw.shapes.Box;
 import net.phys2d.raw.shapes.Circle;
-import net.phys2d.raw.shapes.Polygon;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.Log;
-
-import ca.keefer.sanemethod.Constants;
 
 /**
  * This class contains a physical object (the spring) and a springJoint, which applies the spring forces to
@@ -163,6 +159,7 @@ public class Spring extends AbstractEntity {
 
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void render(Graphics g) {
 		if (!inverted){

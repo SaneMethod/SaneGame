@@ -1,7 +1,5 @@
 package ca.keefer.sanemethod.Environment;
 
-import javax.media.j3d.LOD;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -17,7 +15,6 @@ public class HudLayer implements Layer{
 	private boolean active;
 	private Player thePlayer;
 	private ViewPort viewPort;
-	int lifePoints;
 	int coins;
 	SpriteSheet hudSheet;
 	
@@ -29,7 +26,6 @@ public class HudLayer implements Layer{
 		}catch(SlickException e){
 			Log.debug("Error loading Hud Sheet:"+e.getMessage());
 		}
-		lifePoints = thePlayer.getLifePoints();
 		coins = thePlayer.getCoins();
 	}
 
@@ -76,18 +72,19 @@ public class HudLayer implements Layer{
 	@Override
 	public void update(int delta) {
 		coins = thePlayer.getCoins();
-		lifePoints = thePlayer.getLifePoints();
 	}
 	
 	@Override
 	public void render(Graphics g) {
 		g.translate(viewPort.getPosition().getX(),viewPort.getPosition().getY());
+		/*
 		hudSheet.getSubImage(0, 0, 98, 52).draw(10, 10);
 		for (int i=0;i<=lifePoints;i++){
 			hudSheet.getSubImage(98, 0, 30, 52).draw(108+(30*i), 10);
 		}
-		hudSheet.getSubImage(0, 64, 156, 44).draw(10, 74);
-		Constants.saneSystem.getFonts().get("interfaceFont").drawString(50, 78, ""+coins, Color.white);
+		*/
+		hudSheet.getSubImage(0, 64, 40, 44).draw(10, 20);
+		Constants.saneSystem.getFonts().get("interfaceFont").drawString(50, 24, ""+coins, Color.white);
 		g.translate(-viewPort.getPosition().getX(),-viewPort.getPosition().getY());
 	}
 

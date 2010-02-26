@@ -53,6 +53,7 @@ public class TextHandler {
 	 * the individual Text objects.
 	 * @param thisDialog The text object ArrayList
 	 * @param x float for position of text along the left margin
+	 * @param y float for position of text along y axis
 	 * @param position short for position of text vertically on screen (Text.BOTTOM, MIDDLE or TOP)
 	 * @param boxWidth width of the text box versus the right margin
 	 */
@@ -212,6 +213,12 @@ public class TextHandler {
 	 */
 	public boolean getDone(){
 		return done;
+	}
+	
+	/** Reset this textHandler so its ready to display its contents again */
+	public void reset(){
+		dialogToDisplay=0;
+		done=false;
 	}
 	
 	/**

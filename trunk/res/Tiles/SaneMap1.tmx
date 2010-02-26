@@ -4,21 +4,24 @@
  <properties>
   <property name="HUD" value="true"/>
   <property name="background" value="res/Background/background04.png"/>
+  <property name="boundariesLethal" value="true"/>
+  <property name="music" value="res/Music/AreYouSleepyYet.ogg"/>
  </properties>
  <tileset firstgid="1" source="JumpTiles.tsx"/>
+ <tileset firstgid="1025" source="Castle.tsx"/>
  <layer name="Base" width="65" height="60">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAAO3SRw6DMBRFUVsC0laR3laRXlhFetv/PI8pA0KkIINzj3Rl6Y/sLxsDAAAA4NcCa0yoIlWzn+c+6ul9fTVQQ5s9r+tsqKZqebSXpd6yUmu1sdnzkc6xmqipRzs46y0XdVU3mz3f6typvYo92sE37nr3Qz3V6093AKD8AhWmipzeCFWW/k/8peprq07Ouo7uWLSZmuds4eiORWMH7CDBDthBgh0Yc1DHnJ0c3REAAAAAAAAAAAAAyuANJlGSPfA8AAA=
+   H4sIAAAAAAAAAO2aaW7CMBSEsZSy9VeP0ELpdoruLT1FC13J/X93UINqGS9JSEjyPJ80Mhgl9hv7OSGOSno9FbkIIYTIZ5XJ/G7WS8cVKz1opwfr25SDTP0Sxx9DJ5kmWr2ZC7bPUniF3jIttHrXGlClB4nC2EF9aKDC9TpTaOY5d+j3tjBFfKfQDDpT/vohyhE0hg4dvnSRO8RyDz1Aj8pff47yArqErgR5sEQs79AH9Kn89U8on6E59CLIgyJ8Ie5v6AdaReoBIWQ3BtAQGmXluIY29PvUXe5X68LsX5v6RrbheMlD/y8a0sRxjir7YlJ3m2uuoZucum2gL6E2bet80Tztugd1tduUB/rzEdtzkrpokwdNIdGDzRqR95ot0YOi2HLQpX3kJilH0blPSCwwN+KE405ccG6QLpFWeK6uzv3UolihF9tU4UVXc8OE8+If+vBHDB7Y1sXU87s0XHG5YpXmgW9cpXuQZ167ckOCB2Vz2jxG8vrgIqZYXYQ88L03IAXf9TP0HsU+3mNomtCeodR9Qp3QnuFmn/AooX4B8zuDl/A8AAA=
   </data>
  </layer>
  <layer name="Detail" width="65" height="60">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAAO3USQrCQBBG4crKJE7XcBb1Es7iLZxFPIl6EvWC/juzSUAwibTvgwdNQ6CrFjEDAAAA0uN7ZoEKVdF735d0LquKqnrx37ugpvnqqqGakVlbOrdVR3Ud38FQ843UWE0is051nqm5Wji+g5XmW6uN2kZm3em8Vwd1dHwHgMsu6prQLb+nZWZpyTs45/e0rysoXwUqjNyf7H92EIcdfL6DnuqrQYZvTBv/RLO7eiT0zO9pAAAAAAAAAAAAAAAAAPCTXvMOdtbwPAAA
+   H4sIAAAAAAAAAO3WV04CURSH8Ys+OAzNZQgIWDYBKqi7UAFL3IS9bsJeN2HXXQj2Jfi9OQ8y0UQdM/f/Jb/khoTknPNAMEYppZRSKnzdo4EmHgKexfaciDFRuIhFPj6P804giVSk9ffDUBf7pZFB1rNrN+8c8iiE/AZF9ithAIOeXYd4l1HBcMhvMMZ+45hA1bNrjXcdk5gK+Q2UCnPr2PCxGdxof9ao8b/BbHCj/XgdcBCF6/l8xthzg1bpBt+/QS/60P+HM/52+k005hgnPk6DG019obQPpZRSSimllFJKKaWUUkp9ntNmTBQuYogjgSRS6GwLesLfr4sd08ggi27kkEcBPRbcoMiOJQxgEEMoo4JhjFhwgzF2HMcEqqihjklMYdqCG8yx4zwWsIglLGMFq1iz4AZb7LiNHexiD/s4wCGOLLjBGTue4wKXuMI1bnCLOwtu0GDHJh7wiCc84wWveLPgBk47/w/gIoY4Ekgihc72oCdUSv233gGTWCKE8DwAAA==
   </data>
  </layer>
  <layer name="Fringe" width="65" height="60">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAAO3TWwqDMBAF0AitbsTHRoRuROv+d2CEFEQqiFD6MefAJb+TO0xKAAAAwF2PKqVnTv3l3dJU/57w99r8x+4kfc4QpIP5pIN3kA4+2t3uo+z/aDx08ArYwVRuYi43sATsAAAAAAAAAAAAALhuBbwKMOfwPAAA
+   H4sIAAAAAAAAAO3TyQkCQRQE0BFcEtAMXPCuGQgmoBm4JKCZaCaan18YQQaXk3yh34Oir9XVdFUB/6QfGWSXSDaLzLNLJFtF1tklkh0ix+wSyU6Rc3aJZJfINbsEAHzRblVVJ9J9cd7Ta2U3/L1h3HH0JuPIpJANtm822BWywcPw6e1Lef+mRWODZYEbbOo/sa3/wL7ADQAAAAAAAAAAoHTTDwFougFkP/b88DwAAA==
   </data>
  </layer>
  <layer name="Collision" width="65" height="60">
@@ -28,7 +31,7 @@
  </layer>
  <layer name="Above" width="65" height="60">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAAO3UTQrCMBAG0OwULyJ6Em+mOYnaUzZCA3FIqKBQF+/BLL5k8tdFUwIAAABYdy11K5VDfrmXepR6LvNtjr2jdXGunhP72p62r45PS546+8czermuGa3r7dvmqekd9bVj+cM7xPfFc3s57tvryWF87XuR0ikUfGNXal/qsPVF+Kljev9PXEI+b3c1AAAAAAAAAACAvzQDs5+iCPA8AAA=
+   H4sIAAAAAAAAAO3ZTQrCMBCG4ewULyJ6Ar1Bj6A38Qaak6g5pRNIcBwm2EUhUd4HvsWkk592UQoNAQAA4D/tSgAAwDKukpskmjq7Sx6SZ7mua9vbmmev1X1sn+7RfXU8lTo569s9vLrOac3z1tV1Ur2tPj0WZ57B3p/d16vtul5PNOPfnhfe35mjfm9OKhjfSrKWbHofBIvahs/3xGTqfb+jYaaDqY9dTgEAAAAAAAAAAAAAwG/L/99PkotK/gd/7nkoAMN6AcZ8d5/wPAAA
   </data>
  </layer>
  <layer name="Foreground" width="65" height="60">
@@ -50,7 +53,7 @@
   <object name="Switch1" type="Switch" x="0" y="1216" width="64" height="64">
    <properties>
     <property name="refID" value="1"/>
-    <property name="staysDown" value="true"/>
+    <property name="staysDown" value="false"/>
    </properties>
   </object>
   <object name="Door1" type="Door" x="320" y="1216" width="1" height="6">
@@ -58,11 +61,11 @@
     <property name="switchRef" value="1"/>
    </properties>
   </object>
-  <object name="PlayerPosition" type="Player" x="128" y="64" width="64" height="64"/>
+  <object name="PlayerPosition" type="Player" x="128" y="190" width="64" height="64"/>
   <object name="Coin1" type="Coin" x="576" y="896" width="64" height="64"/>
-  <object name="Coin2" type="Coin" x="832" y="896" width="64" height="64"/>
-  <object name="Ball1" type="Ball" x="273" y="63" width="64" height="64"/>
-  <object name="Ball2" type="Ball" x="199" y="64" width="64" height="64"/>
+  <object name="Coin2" type="Coin" x="1087" y="1092" width="64" height="64"/>
+  <object name="Ball1" type="Ball" x="268" y="103" width="64" height="64"/>
+  <object name="Ball2" type="Ball" x="193" y="121" width="64" height="64"/>
   <object name="jMook1" type="jMook" x="704" y="1472" width="64" height="64">
    <properties>
     <property name="xLower" value="9"/>
@@ -70,5 +73,104 @@
    </properties>
   </object>
   <object name="cMook1" type="cMook" x="384" y="1503" width="64" height="32"/>
+  <object name="Coin3" type="Coin" x="1408" y="960" width="64" height="64"/>
+  <object name="Coin4" type="Coin" x="1408" y="576" width="64" height="64"/>
+  <object name="FallingBlock1" type="FallingBlock" x="1600" y="1408" width="64" height="64"/>
+  <object name="FallBlock2" type="FallingBlock" x="1792" y="1408" width="64" height="64">
+   <properties>
+    <property name="dissolvePeriod" value="500"/>
+   </properties>
+  </object>
+  <object name="FallBlock3" type="FallingBlock" x="2048" y="1408" width="64" height="64">
+   <properties>
+    <property name="dissolvePeriod" value="300"/>
+   </properties>
+  </object>
+  <object name="FallBlock4" type="FallingBlock" x="2368" y="1408" width="64" height="64"/>
+  <object name="Switch2" type="Switch" x="2467" y="637" width="64" height="64">
+   <properties>
+    <property name="refID" value="2"/>
+    <property name="staysDown" value="true"/>
+    <property name="switchState" value="false"/>
+   </properties>
+  </object>
+  <object name="Door2" type="Door" x="2624" y="704" width="7" height="2">
+   <properties>
+    <property name="switchRef" value="2"/>
+   </properties>
+  </object>
+  <object name="Coin5" type="Coin" x="2816" y="576" width="64" height="64"/>
+  <object name="Coin6" type="Coin" x="2752" y="832" width="64" height="64"/>
+  <object name="Coin7" type="Coin" x="3712" y="512" width="64" height="64"/>
+  <object name="Coin8" type="Coin" x="2688" y="1344" width="64" height="64"/>
+  <object name="Spike1" type="Spike" x="2625" y="1535" width="64" height="64">
+   <properties>
+    <property name="Inverted" value="false"/>
+   </properties>
+  </object>
+  <object name="Spike2" type="Spike" x="2688" y="1535" width="64" height="64"/>
+  <object name="Spike3" type="Spike" x="2752" y="1535" width="64" height="64"/>
+  <object name="Spike4" type="Spike" x="2816" y="1535" width="64" height="64"/>
+  <object name="WayPoint1" type="Waypoint" x="1952" y="620" width="64" height="64"/>
+  <object name="Exit" type="Exit" x="3780" y="3512" width="64" height="64"/>
+  <object name="Switch3" type="Switch" x="2752" y="1888" width="64" height="64">
+   <properties>
+    <property name="refID" value="3"/>
+    <property name="staysDown" value="false"/>
+   </properties>
+  </object>
+  <object name="Door3" type="Door" x="3328" y="1536" width="1" height="6">
+   <properties>
+    <property name="switchRef" value="3"/>
+   </properties>
+  </object>
+  <object name="Spike4" type="Spike" x="2880" y="3264" width="64" height="64"/>
+  <object name="Spike5" type="Spike" x="3136" y="3520" width="64" height="64"/>
+  <object name="Spring3" type="Spring" x="3648" y="1664" width="64" height="64">
+   <properties>
+    <property name="Inverted" value="true"/>
+   </properties>
+  </object>
+  <object name="Spike" type="Spike" x="3712" y="1792" width="64" height="64"/>
+  <object name="Spike" type="Spike" x="3776" y="1792" width="64" height="64"/>
+  <object name="Spike" type="Spike" x="3840" y="1792" width="64" height="64"/>
+  <object name="Spike" type="Spike" x="3648" y="2624" width="64" height="64"/>
+  <object name="Spike" type="Spike" x="3712" y="2176" width="64" height="64"/>
+  <object name="jMook" type="jMook" x="3648" y="1472" width="64" height="64">
+   <properties>
+    <property name="xLower" value="55"/>
+    <property name="xUpper" value="59"/>
+   </properties>
+  </object>
+  <object name="Switch4" type="Switch" x="3392" y="3328" width="64" height="64">
+   <properties>
+    <property name="refID" value="4"/>
+    <property name="staysDown" value="true"/>
+    <property name="switchState" value="true"/>
+   </properties>
+  </object>
+  <object name="Door4" type="Door" x="3520" y="3520" width="1" height="7">
+   <properties>
+    <property name="switchRef" value="4"/>
+   </properties>
+  </object>
+  <object name="Door5" type="Door" x="3520" y="3072" width="8" height="1">
+   <properties>
+    <property name="switchRef" value="4"/>
+   </properties>
+  </object>
+  <object name="Door6" type="Door" x="4032" y="3520" width="1" height="8">
+   <properties>
+    <property name="switchRef" value="4"/>
+   </properties>
+  </object>
+  <object name="jMook" type="jMook" x="2624" y="3072" width="64" height="64">
+   <properties>
+    <property name="xLower" value="40"/>
+    <property name="xUpper" value="43"/>
+   </properties>
+  </object>
+  <object name="Waypoint2" type="Waypoint" x="3840" y="1536" width="64" height="64"/>
+  <object name="Talkable" type="Talkable" x="832" y="896" width="64" height="64"/>
  </objectgroup>
 </map>

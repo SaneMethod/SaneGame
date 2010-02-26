@@ -12,6 +12,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.tiled.TiledMap;
 import org.newdawn.slick.util.Log;
+import org.newdawn.slick.util.ResourceLoader;
 
 import net.phys2d.math.ROVector2f;
 import net.phys2d.math.Vector2f;
@@ -26,14 +27,19 @@ import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.ClamMook;
 import ca.keefer.sanemethod.Entity.Coin;
 import ca.keefer.sanemethod.Entity.Door;
+import ca.keefer.sanemethod.Entity.ExitBubble;
+import ca.keefer.sanemethod.Entity.FallingBlock;
 import ca.keefer.sanemethod.Entity.JumpingMook;
 import ca.keefer.sanemethod.Entity.Platformer;
 import ca.keefer.sanemethod.Entity.Player;
+import ca.keefer.sanemethod.Entity.Spike;
 import ca.keefer.sanemethod.Entity.Spring;
 import ca.keefer.sanemethod.Entity.Switch;
-import ca.keefer.sanemethod.Entity.TitleEntity;
+import ca.keefer.sanemethod.Entity.Talkable;
+import ca.keefer.sanemethod.Entity.Waypoint;
 import ca.keefer.sanemethod.LevelBuilder.MapShape;
 import ca.keefer.sanemethod.LevelBuilder.XMLShapePullParser;
+import ca.keefer.sanemethod.Tools.TextXMLPullParser;
 
 /**
  * This class helps bridge the gap between the Phys2D static bodies and the TilEd tmx maps. 
@@ -74,23 +80,39 @@ public class TiledEnvironment extends AbstractEnvironment{
 	SpriteSheet doorSheet;
 	SpriteSheet playerSheet;
 	Image ballImage;
+	Image blockImage;
+	Image spikeImage;
+	SpriteSheet talkableSheet;
 	SpriteSheet jMookSheet;
 	SpriteSheet cMookSheet;
+	SpriteSheet waySheet;
+	SpriteSheet exitSheet;
 	/** Player entity created set by this map */
 	Player thePlayer;
 	/** HudLayer created for this map if map property HUD == true */
 	HudLayer hudLayer;
+	/** ids for identifying the upper and lower boundaries of the map */
+	int lowerID, upperID;
+	/** whether the upper and lower boundaries should be considered lethal */
+	boolean boundariesLethal;
+	/** the music for this map */
+	String theMusic;
 	
 	
 	public TiledEnvironment(String mapFile, ArrayList<MapShape> tileList, ViewPort viewPort) {
 		this.viewPort=viewPort;
+		world.clear();
 		try {
 			springSheet = new SpriteSheet("res/Sprites/Jellyfish.png",128,128);
 			doorSheet = switchSheet = new SpriteSheet("res/Tiles/Blocks.png",64,64);
 			playerSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
 			ballImage = new Image("/res/ball.png");
+			spikeImage = new Image("/res/Tiles/Spike.png");
+			talkableSheet = new SpriteSheet("res/Sprites/WilloWisp.png",64,64);
+			exitSheet = new SpriteSheet("res/Sprites/ExitBubble.png",128,128);
 			jMookSheet = new SpriteSheet("res/Sprites/MobA.png",96,112);
 			cMookSheet = new SpriteSheet("res/Sprites/Reserve_MobC.png",128,128);
+			waySheet = new SpriteSheet("res/Sprites/waypoint.png",96,89);
 		} catch (SlickException e1) {
 			Log.error("Failed to load sprite sheet:"+e1.getMessage());
 		}
@@ -216,11 +238,12 @@ public class TiledEnvironment extends AbstractEnvironment{
 			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
 		}
 		body = new StaticBody("upperBorder",new Polygon(vecs));
+		upperID = body.getID();
 		body.setFriction(0f);
 		body.setRestitution(1f);
 		world.add(body);
 		
-		// Right Border
+		// Lower Border
 		border = new Path(0,(this.height*Constants.TILE_HEIGHT)+2);
 		border.lineTo((this.width*Constants.TILE_WIDTH), (this.height*Constants.TILE_HEIGHT)+2);
 		border.lineTo((this.width*Constants.TILE_WIDTH), (this.height*Constants.TILE_HEIGHT));
@@ -234,6 +257,7 @@ public class TiledEnvironment extends AbstractEnvironment{
 			vecs[j] = new Vector2f(pts[j*2],pts[(j*2)+1]);
 		}
 		body = new StaticBody("lowerBorder",new Polygon(vecs));
+		lowerID = body.getID();
 		body.setFriction(0f);
 		body.setRestitution(1f);
 		world.add(body);
@@ -265,6 +289,10 @@ public class TiledEnvironment extends AbstractEnvironment{
 		return thePlayer;
 	}
 	
+	public String getMusic(){
+		return theMusic;
+	}
+	
 	public void buildLayers(){
 		// layerOffset controls how much to offset the layer ids, so they line up
 		// with their render priorities
@@ -294,6 +322,7 @@ public class TiledEnvironment extends AbstractEnvironment{
 				layerOffset+=1;
 			}
 		}
+		
 		// Build Entity Layer 3
 		eLayer = new EntityLayer(3+layerOffset,true);
 		viewPort.attachLayer(eLayer);
@@ -322,7 +351,8 @@ public class TiledEnvironment extends AbstractEnvironment{
 				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_SWITCH)){
 					// FIXME: The way this is setup, the switch MUST appear first in the tmx file - it works, but is rough
 					Switch thisSwitch = new Switch(Integer.parseInt(tiledMap.getObjectProperty(i, j, "refID", "-1")),
-							tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),10,1,Switch.UP,
+							tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1,
+							Boolean.parseBoolean(tiledMap.getObjectProperty(i, j, "switchState", "true")),
 							Boolean.parseBoolean(tiledMap.getObjectProperty(i, j, "staysDown", "true")),switchSheet);
 					this.addEntity(thisSwitch);
 				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_DOOR)){
@@ -342,13 +372,14 @@ public class TiledEnvironment extends AbstractEnvironment{
 					
 					Door thisDoor = new Door(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j)-
 							((tiledMap.getObjectHeight(i, j)-1)*64),
-							tiledMap.getObjectWidth(i, j),tiledMap.getObjectHeight(i, j),1,true,switchRef,doorSheet);
+							tiledMap.getObjectWidth(i, j),tiledMap.getObjectHeight(i, j),1,switchRef.getSwitchState(),
+							switchRef,doorSheet);
 					this.addEntity(thisDoor);
 				}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_COIN)){
 					Coin thisCoin = new Coin(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1);
 					this.addEntity(thisCoin);
 				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_JMOOK)){
-					Log.debug("Making jMook");
+					//Log.debug("Making jMook");
 					JumpingMook jMook= new JumpingMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),40,
 							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xLower", "-1")),
 							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xUpper", "-1")),1,true,jMookSheet);
@@ -356,6 +387,27 @@ public class TiledEnvironment extends AbstractEnvironment{
 				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_CMOOK)){
 					ClamMook clamMook = new ClamMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1,true,cMookSheet);
 					this.addEntity(clamMook);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_FALLING_BLOCK)){
+					FallingBlock fallingBlock = new FallingBlock(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),
+							Integer.parseInt(tiledMap.getObjectProperty(i, j, "dissolvePeriod", "1000")),1,doorSheet.getSubImage(3, 3));
+					this.addEntity(fallingBlock);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_SPIKE)){
+					Spike spike = new Spike(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),
+							1, Boolean.parseBoolean(tiledMap.getObjectProperty(i, j, "Inverted", "false")),spikeImage);
+					this.addEntity(spike);				
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.EVENT_WAYPOINT)){
+					Waypoint waypoint = new Waypoint(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),1,waySheet);
+					this.addEntity(waypoint);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.EVENT_EXIT)){
+					ExitBubble exit = new ExitBubble(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),1,exitSheet);
+					this.addEntity(exit);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.EVENT_TALKABLE)){
+					Talkable talkable = new Talkable(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),1,
+							new TextXMLPullParser(ResourceLoader.getResourceAsStream(
+									tiledMap.getObjectProperty(i,j,"dialogFile","res/Dialogs/errorText.xml"))).processDialog(),
+							Short.parseShort(tiledMap.getObjectProperty(i,j,"position","0")),
+									talkableSheet);
+					this.addEntity(talkable);
 				}
 			}
 		}
@@ -369,11 +421,14 @@ public class TiledEnvironment extends AbstractEnvironment{
 			}
 		}
 		
+		
 		//create any foreground effect/image/whatever layers
 		if (Boolean.parseBoolean(tiledMap.getMapProperty("HUD", "false"))){
 			hudLayer = new HudLayer(thePlayer);
 			viewPort.attachLayer(hudLayer);
 		}
+		boundariesLethal = Boolean.parseBoolean(tiledMap.getMapProperty("boundariesLethal","false"));
+		theMusic = tiledMap.getMapProperty("music","res/Music/Isotope.mp3");
 	}
 	
 	public void toggleHudLayer(){
@@ -474,6 +529,22 @@ public class TiledEnvironment extends AbstractEnvironment{
 		public void collisionOccured(CollisionEvent event) {
 			// TODO: Do Something when we encounter a collision?
 			//Log.debug("Collision Occured:"+event.getTime());
+			// base collision with upper and lower boundaries on their ids
+			if ((event.getBodyA().getID() == lowerID || event.getBodyA().getID() == upperID)
+					&& boundariesLethal){
+				if (event.getBodyB().getUserData().getClass() == Player.class){
+					Player p = (Player) event.getBodyB().getUserData();
+					p.setLockOut(true);
+					p.setDying(true);
+				}
+			}else if ((event.getBodyB().getID() == lowerID || event.getBodyB().getID() == upperID)
+					&& boundariesLethal){
+				if (event.getBodyA().getUserData().getClass() == Player.class){
+					Player p = (Player) event.getBodyA().getUserData();
+					p.setLockOut(true);
+					p.setDying(true);
+				}
+			}
 		}
 		
 	}

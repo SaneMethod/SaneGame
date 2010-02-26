@@ -1,13 +1,10 @@
 package ca.keefer.sanemethod.Environment;
 
-import org.newdawn.slick.util.Log;
-
 import ca.keefer.sanemethod.Constants;
 import ca.keefer.sanemethod.Entity.Entity;
 
 import net.phys2d.raw.World;
 import net.phys2d.raw.strategies.BruteCollisionStrategy;
-import net.phys2d.raw.strategies.QuadSpaceStrategy;
 
 /**
  * The common bits of all environments. Holds a physics world, allows addition

@@ -3,9 +3,8 @@ package ca.keefer.sanemethod.Entity;
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.CollisionEvent;
+import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;
-import net.phys2d.raw.shapes.Box;
-import net.phys2d.raw.shapes.Circle;
 import net.phys2d.raw.shapes.Polygon;
 
 import org.newdawn.slick.Graphics;
@@ -14,8 +13,6 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Path;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.Log;
-
-import ca.keefer.sanemethod.Constants;
 
 public class Switch extends AbstractEntity{
 	
@@ -34,6 +31,8 @@ public class Switch extends AbstractEntity{
 	private boolean state;
 	/** boolean controlling whether this switch stays down after being pressed, or needs to be kept down */
 	private boolean staysDown;
+	/** collision states of this switch on last cycle */
+	boolean collided=false;
 	/** spriteSheet for animation of this spring */
 	SpriteSheet spriteSheet;
 	/** The id that any door objects defined on the map will use to reference this switch - must be unique */
@@ -42,7 +41,7 @@ public class Switch extends AbstractEntity{
 	public static boolean UP = true;
 	public static boolean DOWN = false;
 	
-	public Switch(int refID, float x, float y, float mass, int zOrder, boolean state, boolean staysDown, SpriteSheet spriteSheet){
+	public Switch(int refID, float x, float y, int zOrder, boolean state, boolean staysDown, SpriteSheet spriteSheet){
 		this.active=true;
 		// Dimensions of this switch
 		Path switchPath = new Path(x,y);
@@ -60,7 +59,7 @@ public class Switch extends AbstractEntity{
 		this.x=x;
 		this.y=y;
 		
-		this.body = new Body(new Polygon(vecs),100);
+		this.body = new StaticBody(new Polygon(vecs));
 		body.setUserData(this);
 		body.setRestitution(1f);
 		body.setFriction(0f);
@@ -132,13 +131,17 @@ public class Switch extends AbstractEntity{
 	@Override
 	public void preUpdate(int delta) {
 		// If this button doesn't stay down, check if there's anything on it keeping it down
-		if (state == DOWN && staysDown == false){
-			if (!checkForCollision()){
-				state = UP;
+		boolean cc = checkForCollision();
+		if (cc != collided){
+			collided=cc;
+			if (staysDown == false){
+				if (!cc){
+					state = !state;
+				}
 			}
-		}
-		if (checkForCollision()){
-			state = DOWN;
+			if (cc){
+				state = !state;
+			}
 		}
 		
 	}

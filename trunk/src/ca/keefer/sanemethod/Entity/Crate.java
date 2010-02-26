@@ -3,8 +3,6 @@ package ca.keefer.sanemethod.Entity;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Box;
-import net.phys2d.raw.shapes.Circle;
-
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;

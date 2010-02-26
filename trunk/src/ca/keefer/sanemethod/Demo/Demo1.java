@@ -1,6 +1,5 @@
 package ca.keefer.sanemethod.Demo;
 
-import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.World;

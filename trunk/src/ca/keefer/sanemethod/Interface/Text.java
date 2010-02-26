@@ -124,7 +124,7 @@ public class Text {
 	
 	// This method ensures the horizontal centering of the text box
 	public float centerWidth(float width){
-		float x = (Constants.SCREENWIDTH - width) / 2;
+		x = (Constants.SCREENWIDTH - width)/2;
 		return x;
 	}
 	
@@ -174,7 +174,7 @@ public class Text {
 	
 	
 	// This method draws the full text immediately to the screen with an immediate box
-	public void drawWithBox(){
+	public void drawWithBox(float x){
 		// if boxed==true, then draw a text box around the text
 		if (boxed){
 			x = centerWidth(width);
