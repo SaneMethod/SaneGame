@@ -218,6 +218,8 @@ public class TextHandler {
 	/** Reset this textHandler so its ready to display its contents again */
 	public void reset(){
 		dialogToDisplay=0;
+		queuedDialog=0;
+		optionSelection=null;
 		done=false;
 	}
 	

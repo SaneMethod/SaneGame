@@ -24,8 +24,10 @@ import net.phys2d.raw.StaticBody;
 import net.phys2d.raw.shapes.Polygon;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Entity.Ball;
 import ca.keefer.sanemethod.Entity.ClamMook;
 import ca.keefer.sanemethod.Entity.Coin;
+import ca.keefer.sanemethod.Entity.Crate;
 import ca.keefer.sanemethod.Entity.Door;
 import ca.keefer.sanemethod.Entity.ExitBubble;
 import ca.keefer.sanemethod.Entity.FallingBlock;
@@ -106,8 +108,8 @@ public class TiledEnvironment extends AbstractEnvironment{
 			springSheet = new SpriteSheet("res/Sprites/Jellyfish.png",128,128);
 			doorSheet = switchSheet = new SpriteSheet("res/Tiles/Blocks.png",64,64);
 			playerSheet = new SpriteSheet("res/Sprites/Player.png",96,96);
-			ballImage = new Image("/res/ball.png");
-			spikeImage = new Image("/res/Tiles/Spike.png");
+			ballImage = new Image("res/ball.png");
+			spikeImage = new Image("res/Tiles/Spike.png");
 			talkableSheet = new SpriteSheet("res/Sprites/WilloWisp.png",64,64);
 			exitSheet = new SpriteSheet("res/Sprites/ExitBubble.png",128,128);
 			jMookSheet = new SpriteSheet("res/Sprites/MobA.png",96,112);
@@ -339,9 +341,12 @@ public class TiledEnvironment extends AbstractEnvironment{
 						new Vector2f(50,50),5,0,0,new net.phys2d.math.Vector2f(30,50),true,4,playerSheet);
 				this.addEntity(thePlayer);
 			}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_BALL)){
+				/*
 				Platformer ball = new Platformer(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),
 						Constants.SHAPE_TYPE_CIRCLE,new Vector2f(48,48),1,0,0,new net.phys2d.math.Vector2f(100,50),
 						false,2,ballImage);
+				*/		
+				Ball ball = new Ball(tiledMap.getObjectX(i, j),tiledMap.getObjectY(i, j),1,false,ballImage);
 				this.addEntity(ball);
 			}else if (tiledMap.getObjectType(i, j).equals(Constants.OBJECT_SPRING)){
 					Spring thisSpring = new Spring(tiledMap.getObjectX(i, j),
@@ -382,11 +387,18 @@ public class TiledEnvironment extends AbstractEnvironment{
 					//Log.debug("Making jMook");
 					JumpingMook jMook= new JumpingMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),40,
 							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xLower", "-1")),
-							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xUpper", "-1")),1,true,jMookSheet);
+							Integer.parseInt(tiledMap.getObjectProperty(i, j, "xUpper", "-1")),1,true,
+							Integer.parseInt(tiledMap.getObjectProperty(i, j, "jumpInterval","1000")),
+							jMookSheet);
 					this.addEntity(jMook);
 				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_CMOOK)){
 					ClamMook clamMook = new ClamMook(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),1,true,cMookSheet);
 					this.addEntity(clamMook);
+				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_CRATE)){
+					Crate crate = new Crate(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),
+							tiledMap.getObjectWidth(i, j),tiledMap.getObjectHeight(i, j),1,
+							Integer.parseInt(tiledMap.getObjectProperty(i,j,"mass","10")),doorSheet);
+					this.addEntity(crate);
 				}else if (tiledMap.getObjectType(i,j).equals(Constants.OBJECT_FALLING_BLOCK)){
 					FallingBlock fallingBlock = new FallingBlock(tiledMap.getObjectX(i, j), tiledMap.getObjectY(i, j),
 							Integer.parseInt(tiledMap.getObjectProperty(i, j, "dissolvePeriod", "1000")),1,doorSheet.getSubImage(3, 3));

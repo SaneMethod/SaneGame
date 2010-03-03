@@ -235,10 +235,6 @@ public class Platformer extends AbstractEntity{
 			accel = Constants.ACCELERATION;
 			if (velocity.getX() > 0.001){
 				velocity.x -= Constants.FRICTION * velocity.getX() * 2;
-				if (isReversing()){
-					// add additional slow down from dug in heels effect
-					//velocity.x -= (Constants.FRICTION * velocity.getX());
-				}
 				if (((velocity.getX() < 4 && getDirection() == DIR_LEFT)
 						|| (velocity.getX() < 4 && getDirection() == DIR_RIGHT))
 						&& isReversing()){
@@ -310,10 +306,6 @@ public class Platformer extends AbstractEntity{
 			receiveKeyPress(keyBuffer);
 			keyBuffer=-1;
 		}
-		
-		// if we're standing on the ground negate gravity. This stops
-		// some instability in physics 
-		//body.setGravityEffected(!on);
 		
 		// Update speed throughout physics/frame updates
 		
@@ -403,7 +395,7 @@ public class Platformer extends AbstractEntity{
 		}else if (keyPressed == Constants.KEY_RIGHT && !isReversing()){
 				this.setDirection(DIR_RIGHT);
 				this.setMoving(true);
-		}else if (keyPressed == Constants.KEY_JUMP){
+		}else if (keyPressed == Constants.KEY_JUMP && onGround){
 			this.setJumping(true);
 			this.onGround = false;
 			//this.setVelocityY(-100);
@@ -434,8 +426,6 @@ public class Platformer extends AbstractEntity{
 	
 	/**
 	 * Implementation on ground check. This can be expensive so best to try and limit its use by caching
-	 * FIXED[more or less]: We check this only when we might suspect the body is not on the ground
-	 * (ie. when falling) - this helps make the expense of this function less onerous
 	 * @return True if the body is resting on the ground
 	 */
 	protected boolean onGroundImpl(Body body) {

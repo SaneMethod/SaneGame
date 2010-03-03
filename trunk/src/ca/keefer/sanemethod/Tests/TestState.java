@@ -21,6 +21,8 @@ import org.newdawn.slick.particles.ParticleIO;
 import org.newdawn.slick.particles.ParticleSystem;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.VerticalSplitTransition;
 import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -107,6 +109,10 @@ public class TestState extends BasicGameState {
 				ResourceLoader.getResourceAsStream("res/loadingList.xml")).processLoadingList();
 		mapOffset=0;
 		
+		// Set the Constant textHandler to null so message not cleared from a previous map don't
+		// follow us around forever
+		Constants.textHandler=null;
+		
 		if (loadingList.get(mapOffset).getShapeList() != null){
 			XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(
 					loadingList.get(mapOffset).getShapeList()));
@@ -161,7 +167,7 @@ public class TestState extends BasicGameState {
 		
 	}
 	
-	/** Reset the state of the current game map */
+	/** Reset the state of the current game map, possibly loading a new map */
 	public void reset(GameContainer container, StateBasedGame game){
 		if (loadingList.get(mapOffset).getShapeList() != null){
 			XMLShapePullParser x = new XMLShapePullParser(ResourceLoader.getResourceAsStream(
@@ -170,7 +176,14 @@ public class TestState extends BasicGameState {
 		}else{
 			tileList = null;
 		}
+		
+		// Set the Constant textHandler to null so message not cleared from a previous map don't
+		// follow us around forever
+		Constants.textHandler=null;
+		
+		// Reset the gravity to pull us down, as default
 		Constants.GRAVITY = new net.phys2d.math.Vector2f(0f,15f);
+		
 		viewPort = new ViewPort(game);
 		environment = new TiledEnvironment(loadingList.get(mapOffset).getMapFile(),tileList,viewPort);
 		// check to see if we're resetting the player's position back to a waypoint
@@ -243,6 +256,17 @@ public class TestState extends BasicGameState {
 			Constants.saneSystem.getFonts().get("creditFont").drawString(
 					(Constants.SCREENWIDTH/2)-Constants.saneSystem.getFonts().get("creditFont").getWidth("Loading Level")/2, 300, "Loading Level", Color.white);
 		}
+		// If the container is paused, grey it out and draw PAUSED in the middle
+		if (container.isPaused()){
+			g.translate(viewPort.getPosition().getX(),viewPort.getPosition().getY());
+			Color tColor = g.getColor();
+			g.setColor(new Color(0.7f,0.7f,0.7f,0.5f));
+			g.draw(new Rectangle(0,0,Constants.SCREENWIDTH,Constants.SCREENHEIGHT));
+			g.setColor(tColor);
+			Constants.saneSystem.getFonts().get("creditFont").drawString(
+					(Constants.SCREENWIDTH/2)-Constants.saneSystem.getFonts().get("creditFont").getWidth("PAUSED")/2, 
+					300, "PAUSED", Color.white);
+		}
 
 	}
 
@@ -309,11 +333,7 @@ public class TestState extends BasicGameState {
 	 */
 	public void keyPressed(int keyPressed, char keyChar){
 		if (keyPressed == Input.KEY_ESCAPE){
-			this.container.exit();
-		}else if (keyPressed == Input.KEY_1){
-			viewPort.trackEntity(testSprite,ViewPort.TRACK_MODE_CENTER);
-		}else if (keyPressed == Input.KEY_2){
-			viewPort.trackEntity(testSprite2,ViewPort.TRACK_MODE_CENTER);
+			this.game.enterState(Constants.STATE_INTRO, new EmptyTransition(), new VerticalSplitTransition());
 		}else if (keyPressed == Input.KEY_3){
 			Constants.GRAVITY = new net.phys2d.math.Vector2f(0,15f);
 			environment.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
@@ -326,9 +346,17 @@ public class TestState extends BasicGameState {
 			environment.toggleHudLayer();
 		}else if (keyPressed == Input.KEY_M){
 			testSprite.setCoins(5000);
+		}else if (keyPressed == Input.KEY_PAUSE){
+			if (container.isPaused()){
+				container.resume();
+				theMusic.resume();
+				testSprite.setLockOut(false);
+			}else{
+				container.pause();
+				theMusic.pause();
+				testSprite.setLockOut(true);
+			}
 		}
-		
-		//tHandle.acceptInput(keyPressed);
 		
 		testSprite.receiveKeyPress(keyPressed);
 		if (Constants.textHandler != null){
@@ -347,6 +375,11 @@ public class TestState extends BasicGameState {
 		} catch (SlickException e) {
 			Log.debug("Error initiating on entrance to state.");
 		}
+	}
+	
+	@Override
+	public void leave(GameContainer container, StateBasedGame game){
+		//theMusic.stop();
 	}
 
 }

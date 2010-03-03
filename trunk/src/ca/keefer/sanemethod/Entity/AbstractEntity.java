@@ -1,5 +1,6 @@
 package ca.keefer.sanemethod.Entity;
 
+import ca.keefer.sanemethod.Environment.Environment;
 import net.phys2d.math.Vector2f;
 import net.phys2d.raw.Body;
 
@@ -12,6 +13,8 @@ import net.phys2d.raw.Body;
 public abstract class AbstractEntity implements Entity {
 	/** The physical body representing the entity */
 	protected Body body;
+	/** The environment this entity is found in */
+	protected Environment environment;
 	/** Whether this entity is active, or should be removed from the entity layer */
 	boolean active;
 	
@@ -121,6 +124,15 @@ public abstract class AbstractEntity implements Entity {
 	public boolean isActive(){
 		return active;
 	}
+	
+	public void setEnvironment(Environment environment){
+		this.environment=environment;
+	}
+	
+	public Environment getEnvironment(){
+		return environment;
+	}
+	
 	/**
 	 * Override this in order to receive key presses in any entity
 	 */

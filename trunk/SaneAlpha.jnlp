@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  spec="1.0+"
+  codebase="http://cs.redeemer.ca/~ckeefer/webstart/"
+  href="SaneAlpha.jnlp">
+  <information>
+    <title>Sane</title>
+    <vendor>Christopher Keefer - Sane Method</vendor>
+    <homepage href="http://www.sanemethod.com"/>
+    <description>Sane - A 2D Physics-based Platformer running on OpenGL</description>
+    <description kind="short">2D Physics-based Platformer</description>
+    <icon href="icon.png"/>
+    <offline-allowed/>
+  </information>
+  <security>
+    <all-permissions/>
+  </security>
+  <resources>
+    <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+" />
+    <jar href="SaneAlpha.jar"/>  
+    <extension href="http://slick.cokeandcode.com/demos/slick.jnlp" />
+  </resources>  
+  <application-desc main-class="ca.keefer.sanemethod.Main"/>
+</jnlp>

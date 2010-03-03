@@ -31,10 +31,15 @@ public class Init extends StateBasedGame {
 			// class can't be accessed at this point, and its unreasonable
 			// to define additional constants for this one statement
 			thisGameContainer = new AppGameContainer(this,800,600,false);
+			String[] icons = new String[2];
+			icons[0] = "res/smallIcon.png";
+			icons[1] = "res/icon.png";
+			thisGameContainer.setIcons(icons);
 			// Make sure the game logic doesn't update less than 60 times per second
 			//thisGameContainer.setMinimumLogicUpdateInterval(1000/91);
 			thisGameContainer.setMaximumLogicUpdateInterval(1000/120);
 			thisGameContainer.setTargetFrameRate(60);
+			thisGameContainer.setUpdateOnlyWhenVisible(true);
 			//Set console output to verbose to help diagnose problems
 			thisGameContainer.setVerbose(true);
 			thisGameContainer.setVSync(true);
@@ -42,14 +47,14 @@ public class Init extends StateBasedGame {
 			
 			// Add states to this game container and initialize them
 			this.addState(new MainMenuState(Constants.STATE_MAIN_MENU));
-			this.addState(new IntroState(Constants.STATE_INTRO));
-			//this.addState(new LevelShapeBuilder(Constants.STATE_SHAPE_BUILDER));
+			//this.addState(new IntroState(Constants.STATE_INTRO));
+			this.addState(new LevelShapeBuilder(Constants.STATE_SHAPE_BUILDER));
 			//this.addState(new DemoState(Constants.STATE_DEMO));
 			//this.addState(new TestState(Constants.STATE_TEST));
 			//this.addState(new TextBoxExampleState(Constants.STATE_TEXT_DEMO));
 			
 			// Enter first game state and begin render/update loop
-			this.enterState(Constants.STATE_INTRO);
+			this.enterState(Constants.STATE_SHAPE_BUILDER);
 			
 			
 		}catch (SlickException e){

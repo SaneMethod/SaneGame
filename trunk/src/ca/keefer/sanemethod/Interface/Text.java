@@ -134,6 +134,34 @@ public class Text {
 		return y;
 	}
 	
+	// This is a nice utility method, based on the below internal method, for wrapping a string
+	public static String wordWrap(int width, int xOffset, String text, AngelCodeFont font){
+		int textWidth=xOffset;
+		String token="";
+		String temp="";
+		String product="";
+		// tokenize and split the text
+		Scanner thisScan = new Scanner(text);
+		while(thisScan.hasNext()){
+			token = thisScan.next()+" ";
+			// Add the width of this token to the currently tested width
+			textWidth += font.getWidth(token);
+			// if this width is greater than the boxWidth, add a \n to the current temp string
+			// and append it to the product string, clear the temp string and add this text to
+			// it - if it isn't greater, than add this token to the temp string and move on
+			if (textWidth > width){
+				temp+="\n";
+				product += temp;
+				temp=token;
+				textWidth=xOffset+font.getWidth(token);
+			}else{
+				temp+=token;
+			}
+		}
+		product+=temp;
+		return product;
+	}
+	
 	// This method parses the text, wrapping it according to my implementation of the
 	// Greedy Algorithm - not optimal, perhaps, but efficient
 	// This requires that the text to print be split into words (searching for blank space

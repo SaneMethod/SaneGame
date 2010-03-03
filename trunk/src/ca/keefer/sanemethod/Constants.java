@@ -99,8 +99,9 @@ public class Constants {
 	public static int KEY_JUMP = Input.KEY_C;
 	public static int KEY_HIDE_HUD = Input.KEY_H;
 	public static int KEY_TOGGLE_GRAVITY = Input.KEY_G;
-	public static int KEY_PUNCH = Input.KEY_S;
-	public static int KEY_KICK = Input.KEY_D;
+	public static int KEY_SUMMON_BALL = Input.KEY_S;
+	public static int KEY_PUNCH = Input.KEY_Z;
+	public static int KEY_KICK = Input.KEY_X;
 	public static int KEY_PICK_UP = Input.KEY_V;
 	public static int KEY_INFO = Input.KEY_I;
 	public static int KEY_UP = Input.KEY_UP;

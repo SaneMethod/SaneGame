@@ -43,7 +43,7 @@ public class JumpingMook extends AbstractEntity{
 	int xLower; int xUpper;
 
 	/** How long we should be idle */
-	private final int IDLE_PERIOD = 1000;
+	private int IDLE_PERIOD = 1000;
 	/** How long between updating whether or not this mook has collided with the player or been stomped on */
 	private final int CHECK_PERIOD = 200;
 	// Entity States
@@ -74,12 +74,14 @@ public class JumpingMook extends AbstractEntity{
 	 * @param spriteSheet
 	 */
 	public JumpingMook(float x, float y, int diameter, int xLower, int xUpper, int zOrder, boolean active,
+			int jumpInterval,
 			SpriteSheet spriteSheet){
 		this.active=true;
 		this.xUpper=xUpper*Constants.TILE_WIDTH;
 		this.xLower=xLower*Constants.TILE_WIDTH;
 		this.body = new Body(new Circle(diameter/2),10);
 		this.diameter = diameter;
+		this.IDLE_PERIOD = jumpInterval;
 		this.body.setFriction(0.9f);
 		this.body.setMaxVelocity(10, 50);
 		this.zOrder=zOrder;
@@ -361,9 +363,7 @@ public class JumpingMook extends AbstractEntity{
 		CollisionEvent[] events = world.getContacts(body);
 		
 		for (int i=0;i<events.length;i++) {
-			if ((!events[i].getBodyA().isStatic() && !events[i].getBodyB().isStatic()) && 
-					(events[i].getBodyA().getUserData().getClass() == Player.class || 
-					events[i].getBodyB().getUserData().getClass() == Player.class)){
+			if ((!events[i].getBodyA().isStatic() && !events[i].getBodyB().isStatic())){
 				boolean yInverse;
 				if (Constants.GRAVITY.getY() > 0){
 					yInverse = false;
@@ -400,7 +400,7 @@ public class JumpingMook extends AbstractEntity{
 						if (events[i].getBodyA().getUserData().getClass() == Player.class){
 							Player hPlayer = (Player) events[i].getBodyA().getUserData();
 							hPlayer.hurtPlayer();
-						}else{
+						}else if (events[i].getBodyB().getUserData().getClass() == Player.class){
 							Player hPlayer = (Player) events[i].getBodyB().getUserData();
 							hPlayer.hurtPlayer();
 						}
@@ -410,7 +410,7 @@ public class JumpingMook extends AbstractEntity{
 					if (events[i].getBodyA().getUserData().getClass() == Player.class){
 						Player hPlayer = (Player) events[i].getBodyA().getUserData();
 						hPlayer.hurtPlayer();
-					}else{
+					}else if (events[i].getBodyB().getUserData().getClass() == Player.class){
 						Player hPlayer = (Player) events[i].getBodyB().getUserData();
 						hPlayer.hurtPlayer();
 					}

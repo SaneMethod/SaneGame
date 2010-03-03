@@ -8,11 +8,13 @@ import net.phys2d.raw.FixedJoint;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.util.Log;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Environment.TiledEnvironment;
 
 /**
  * This class extends Platformer to allow for an animated character, with specific 
@@ -23,57 +25,57 @@ import ca.keefer.sanemethod.Constants;
  */
 public class Player extends Platformer{
 
-	/** Contains the sprites for this Player */
-	SpriteSheet spriteSheet;
 	/** Hashtable containing this Player's animations, keyed to strings which name the animation */
 	Hashtable<String,Animation> animTable;
-	/** The animation currently selected for drawing */
-	String currentAnim;
-	/** Idle timer - times how long its been since last input */
-	int idleTimer=0;
-	/** Are we trying to grab something */
-	boolean grabbing=false;
-	/** Are we kicking at something */
-	boolean kicking;
-	/** FixedJoint for establishing a grabbed relationship */
-	FixedJoint grabJoint;
-	/** The last key pressed */
-	int lastKey;
-	/** yOffset for image display */
-	int yOffset;
+	/** The ball we can summon */
+	Ball ball;
+	/** the image for summoned balls */
+	Image ballImage;
 	/** how many coins the player has */
 	int coins;
-	/** whether we're currently hurting */
-	boolean hurt;
-	/** Whether we need the current environment to reset */
-	boolean requestReset=false;
-	/** Whether the player is currently invulnerable (usually due to being hit recently) */
-	boolean mercy = false;
-	/** How long mercy has lasted for */
-	int mercyTimer=0;
-	/** how long we've been dying for */
-	int dyingTimer=0;
+	/** The animation currently selected for drawing */
+	String currentAnim;
 	/** whether we're currently dying */
 	boolean dying;
-	/** whether to lock out control of this entity or not */
-	boolean lockOut=false;
-	/** how long we've been jumping while holding something - if too long, remove fixedJoint */
-	int jumpGripTimer=0;
-	/** how long we've been falling for */
-	int fallTimer;
-	/** how long we can fall before we take damage (loss of 1 coin) when we land */
-	private final int FALL_PERIOD = 6000;
-	/** waypoint position */
-	float wayX, wayY;
-	/** whether we've hit any waypoints */
-	boolean hitWaypoint;
+	/** how long we've been dying for */
+	int dyingTimer=0;
 	/** whether we've reached the end of the stage */
 	boolean finishedStage;
-	
+	/** Are we trying to grab something */
+	boolean grabbing=false;
+	/** FixedJoint for establishing a grabbed relationship */
+	FixedJoint grabJoint;
+	/** whether we've hit any waypoints */
+	boolean hitWaypoint;
+	/** whether we're currently hurting */
+	boolean hurt;
+	/** Idle timer - times how long its been since last input */
+	int idleTimer=0;
+	/** Are we kicking at something */
+	boolean kicking;
+	/** The last key pressed */
+	int lastKey;
+	/** whether to lock out control of this entity or not */
+	boolean lockOut=false;
+	/** Whether the player is currently invulnerable (usually due to being hit recently) */
+	boolean mercy = false;
 	/** How long mercy time should last for */
 	private final int MERCY_PERIOD = 5000;
-	
+	/** How long mercy has lasted for */
+	int mercyTimer=0;
+	/** Whether we need the current environment to reset */
+	boolean requestReset=false;
 	boolean sliding=false;
+	/** Contains the sprites for this Player */
+	SpriteSheet spriteSheet;
+	/** whether we've currently got a ball summoned */
+	boolean summonedBall;
+	
+	/** waypoint position */
+	float wayX, wayY;
+	
+	/** yOffset for image display */
+	int yOffset;
 	
 	/** Constructs a Platformer based on the passed spriteSheet and pre-set expectations about
 	 * where specific frames of animation will be found, and what they should be named
@@ -131,18 +133,9 @@ public class Player extends Platformer{
 		this.animTable = animTable;
 	}
 	
-	/**
-	 * Set the spriteSheet of this Player to another image
-	 * @param spriteSheet String Location of the image file
-	 * @param tw Width of the sprites on the sheet
-	 * @param th Height of the sprites on the sheet
-	 */
-	public void setSpriteSheet(String spriteSheet, int tw, int th){
-		try{
-			this.spriteSheet = new SpriteSheet(spriteSheet, tw, th);
-		}catch (SlickException e){
-			Log.error("Error Loading SpriteSheet:"+e.getMessage());
-		}
+	// Coin getter/setters
+	public void addCoins(int amount){
+		coins += amount;
 	}
 	
 	/** Build the animTable based on the standard sprite sheet, Player.png */
@@ -193,13 +186,20 @@ public class Player extends Platformer{
 		animTable.put("Stopping", thisAnim);
 	}
 	
-	/**
-	 * Set The animation to draw from the Hashtable
-	 * @param animToDraw
-	 */
-	public void setAnimToDraw(String animToDraw){
-		currentAnim = animToDraw;
+	/** remove reference to waypoints */
+	public void clearWaypointFlag(){
+		hitWaypoint=false;
 	}
+	
+	public int getCoins(){
+		return coins;
+	}
+	
+	/** get whether we've hit any waypoints */
+	public boolean getHitWaypoint(){
+		return hitWaypoint;
+	}
+	
 	
 	/**
 	 * Get the last key pressed
@@ -209,20 +209,137 @@ public class Player extends Platformer{
 		return lastKey;
 	}
 	
-	/** Toggle the world's gravity, at the cost of one coin */
-	public void toggleGravity(){
-		if (coins > 0){
+	public float getWayX(){
+		return wayX;
+	}
+	
+	public float getWayY(){
+		return wayY;
+	}
+	
+	/**
+	 * Hurt the player (usually by collision with an enemy, or by falling too far)
+	 */
+	public void hurtPlayer(){
+		if (!mercy && !dying){
 			coins -= 1;
-			if (Constants.GRAVITY.getY() > 0){
-				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,-15f);
-				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+			// Check to see if the player is now 'dead' - at -1 coins. If so, set this player to dying, and lock
+			// out control of this character
+			if (coins <= -1){
+				lockOut=true;
+				setDying(true);
 			}else{
-				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,15f);
-				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+				mercy = true;
+				hurt = true;
 			}
 		}
 	}
+	/** whether this player is currently dying */
+	public boolean isDying(){
+		return dying;
+	}
 	
+	public boolean isFinishedStage(){
+		return finishedStage;
+	}
+	
+	/**
+	 * Get whether we're hurting
+	 * @return
+	 */
+	public boolean isHurt(){
+		return hurt;
+	}
+	
+	/** get whether this player has control locked out */
+	public boolean isLockedOut(){
+		return lockOut;
+	}
+	public boolean isSliding(){
+		return sliding;
+	}
+	public void pickUpOnCollide(){
+		if (world == null) {
+			return;
+		}
+		// Get all the collision events involving this player
+		CollisionEvent[] events = world.getContacts(body);
+		for (int i=0;i<events.length;i++){
+			// make sure this collision occurred by running into this object
+			// and that its mass is not too great for our player to lift
+			if (events[i].getBodyA()==body){
+				if (events[i].getBodyB().getMass() < body.getMass()*4 && events[i].getBodyB().isMoveable()){
+					if (grabJoint == null){
+						grabJoint = new FixedJoint(events[i].getBodyB(),body);
+						//events[i].getBodyB().setPosition(body.getPosition().getX(), body.getPosition().getY());
+						grabJoint.setRelaxation(0.3f);
+						world.add(grabJoint);
+					}
+				}
+			}else if (events[i].getBodyB()==body){
+				if (events[i].getBodyA().getMass() < body.getMass()*4 && events[i].getBodyA().isMoveable()){
+					if (grabJoint == null){
+						grabJoint = new FixedJoint(events[i].getBodyB(),body);
+						grabJoint.setRelaxation(0.3f);
+						world.add(grabJoint);
+					}
+				}
+			}
+		}
+		
+	}
+	@Override 
+	public void preUpdate (int delta){
+		super.preUpdate(delta);
+		if (grabJoint != null){
+			if (grabJoint.getBody1().added() && grabJoint.getBody2().added()){
+				grabJoint.preStep(delta);
+			}else{
+				world.remove(grabJoint);
+				grabJoint = null;
+			}
+		}
+	}
+	@Override
+	public void receiveKeyPress(int keyPressed){
+		if (!lockOut){
+			lastKey = keyPressed;
+			// reset the idle timer
+			idleTimer = 0;
+			if (keyPressed == Constants.KEY_DOWN && onGround && isMoving()){
+				sliding = true;
+				setMoving(false);
+				setReversing(true);
+			}
+			if (keyPressed == Constants.KEY_PICK_UP){
+				grabbing = true;
+			}
+			if (keyPressed == Constants.KEY_TOGGLE_GRAVITY){
+				toggleGravity();
+			}
+			if (keyPressed == Constants.KEY_SUMMON_BALL){
+				summonBall();
+			}
+			super.receiveKeyPress(keyPressed);
+		}
+	}
+	@Override
+	public void receiveKeyRelease(int keyReleased){
+		if (!lockOut){
+			if (keyReleased == Constants.KEY_PICK_UP){
+				grabbing = false;
+				if (grabJoint != null){
+					world.remove(grabJoint);
+					grabJoint = null;
+					//Log.debug("Pick Up Released.");
+				}
+			}
+			super.receiveKeyRelease(keyReleased);
+		}
+	}
+	public void removeCoins(int amount){
+		coins -= amount;
+	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -254,13 +371,113 @@ public class Player extends Platformer{
 			}
 		}
 	}
+	/** Get whether the player is requesting reset of the scenario - usually due to dying */
+	public boolean resetRequested(){
+		return requestReset;
+	}
+	/**
+	 * Set The animation to draw from the Hashtable
+	 * @param animToDraw
+	 */
+	public void setAnimToDraw(String animToDraw){
+		currentAnim = animToDraw;
+	}
 	
-	@Override 
-	public void preUpdate (int delta){
-		super.preUpdate(delta);
-		if (grabJoint != null){
-			grabJoint.preStep(delta);
+	public void setCoins(int amount){
+		coins = amount;
+	}
+	/** set whether this player is currently dying */
+	public void setDying(boolean b){
+		dying=b;
+	}
+	
+	/** set whether we've finished the stage */
+	public void setFinishedStage(boolean b){
+		finishedStage = b;
+	}
+	/**
+	 * Set the value of hurt, without subtracting any life
+	 * Use this to display the hurt animation without changing any other variables
+	 * @param b
+	 */
+	public void setHurt(boolean b){
+		hurt=b;
+	}
+	
+	/** set lock out control of this player */
+	public void setLockOut(boolean b){
+		lockOut=b;
+	}
+	public void setReset(boolean b){
+		requestReset = b;
+	}
+	public void setSliding(boolean b){
+		sliding=b;
+	}
+	/**
+	 * Set the spriteSheet of this Player to another image
+	 * @param spriteSheet String Location of the image file
+	 * @param tw Width of the sprites on the sheet
+	 * @param th Height of the sprites on the sheet
+	 */
+	public void setSpriteSheet(String spriteSheet, int tw, int th){
+		try{
+			this.spriteSheet = new SpriteSheet(spriteSheet, tw, th);
+		}catch (SlickException e){
+			Log.error("Error Loading SpriteSheet:"+e.getMessage());
 		}
+	}
+	/** set a waypoint for this player */
+	public void setWaypoint(float x, float y){
+		this.hitWaypoint=true;
+		this.wayX=x;
+		this.wayY=y;
+	}
+	
+	public void summonBall(){
+		if (summonedBall){
+			ball.getWorld().remove(ball.getBody());
+			ball.active=false;
+			summonedBall = false;
+		}else{
+			if (this.coins >= 1){
+				int xOffset = 0;
+				if (this.getDirection() == Platformer.DIR_LEFT){
+					xOffset -= this.getBody().getShape().getBounds().getWidth()+5;
+				}else{
+					xOffset += this.getBody().getShape().getBounds().getWidth()+5;
+				}
+				try {
+					ballImage = new Image("res/Sprites/summonBall.png");
+				} catch (SlickException e) {
+					Log.debug("Failed to load Ball Image in Player:"+e.getMessage());
+				}
+				ball = new Ball(this.getBody().getPosition().getX()+xOffset,this.getBody().getPosition().getY(),
+						1,true,ballImage);
+				this.summonedBall=true;
+				TiledEnvironment tE = (TiledEnvironment)this.getEnvironment();
+				tE.addEntity(ball);
+			}
+		}
+	}
+	
+	/** Toggle the world's gravity, at the cost of one coin */
+	public void toggleGravity(){
+		if (coins >= 10){
+			removeCoins(10);
+			if (Constants.GRAVITY.getY() > 0){
+				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,-15f);
+				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+			}else{
+				Constants.GRAVITY = new net.phys2d.math.Vector2f(0,15f);
+				this.getWorld().setGravity(Constants.GRAVITY.getX(), Constants.GRAVITY.getY());
+			}
+		}
+	}
+	
+	/** Toggle Lock out control of this player */
+	public void toggleLockOut(){
+		lockOut = !lockOut;
 	}
 	
 	@Override
@@ -271,14 +488,6 @@ public class Player extends Platformer{
 		if (mercyTimer > MERCY_PERIOD){
 			mercyTimer = 0;
 			mercy = false;
-		}
-		if (this.isFalling()){
-			fallTimer += delta;
-		}else{
-			if (fallTimer > FALL_PERIOD){
-				hurtPlayer();
-			}
-			fallTimer = 0;
 		}
 		if (grabbing){
 			if (grabJoint == null){
@@ -337,184 +546,6 @@ public class Player extends Platformer{
 					currentAnim="Stand";
 					lockOut=false;
 					this.requestReset = true;
-				}
-			}
-		}
-		
-	}
-	
-	@Override
-	public void receiveKeyPress(int keyPressed){
-		if (!lockOut){
-			lastKey = keyPressed;
-			// reset the idle timer
-			idleTimer = 0;
-			if (keyPressed == Constants.KEY_DOWN && onGround && isMoving()){
-				sliding = true;
-				setMoving(false);
-				setReversing(true);
-			}
-			if (keyPressed == Constants.KEY_PICK_UP){
-				grabbing = true;
-			}
-			if (keyPressed == Constants.KEY_TOGGLE_GRAVITY){
-				toggleGravity();
-			}
-			super.receiveKeyPress(keyPressed);
-		}
-	}
-	@Override
-	public void receiveKeyRelease(int keyReleased){
-		if (!lockOut){
-			if (keyReleased == Constants.KEY_PICK_UP){
-				grabbing = false;
-				if (grabJoint != null){
-					world.remove(grabJoint);
-					grabJoint = null;
-					//Log.debug("Pick Up Released.");
-				}
-			}
-			super.receiveKeyRelease(keyReleased);
-		}
-	}
-	
-	public boolean isSliding(){
-		return sliding;
-	}
-	
-	public void setSliding(boolean b){
-		sliding=b;
-	}
-	
-	// Coin getter/setters
-	public void addCoins(int amount){
-		coins += amount;
-	}
-	public void removeCoins(int amount){
-		coins -= amount;
-	}
-	public void setCoins(int amount){
-		coins = amount;
-	}
-	public int getCoins(){
-		return coins;
-	}
-	/**
-	 * Get whether we're hurting
-	 * @return
-	 */
-	public boolean isHurt(){
-		return hurt;
-	}
-	/**
-	 * Set the value of hurt, without subtracting any life
-	 * Use this to display the hurt animation without changing any other variables
-	 * @param b
-	 */
-	public void setHurt(boolean b){
-		hurt=b;
-	}
-	/**
-	 * Hurt the player (usually by collision with an enemy, or by falling too far)
-	 */
-	public void hurtPlayer(){
-		if (!mercy && !dying){
-			coins -= 1;
-			// Check to see if the player is now 'dead' - at -1 coins. If so, set this player to dying, and lock
-			// out control of this character
-			if (coins <= -1){
-				lockOut=true;
-				setDying(true);
-			}else{
-				mercy = true;
-				hurt = true;
-			}
-		}
-	}
-	
-	/** Toggle Lock out control of this player */
-	public void toggleLockOut(){
-		lockOut = !lockOut;
-	}
-	/** set lock out control of this player */
-	public void setLockOut(boolean b){
-		lockOut=b;
-	}
-	/** get whether this player has control locked out */
-	public boolean isLockedOut(){
-		return lockOut;
-	}
-	
-	/** Get whether the player is requesting reset of the scenario - usually due to dying */
-	public boolean resetRequested(){
-		return requestReset;
-	}
-	public void setReset(boolean b){
-		requestReset = b;
-	}
-	
-	/** whether this player is currently dying */
-	public boolean isDying(){
-		return dying;
-	}
-	/** set whether this player is currently dying */
-	public void setDying(boolean b){
-		dying=b;
-	}
-	
-	/** get whether we've hit any waypoints */
-	public boolean getHitWaypoint(){
-		return hitWaypoint;
-	}
-	public float getWayX(){
-		return wayX;
-	}
-	public float getWayY(){
-		return wayY;
-	}
-	/** set a waypoint for this player */
-	public void setWaypoint(float x, float y){
-		this.hitWaypoint=true;
-		this.wayX=x;
-		this.wayY=y;
-	}
-	/** remove reference to waypoints */
-	public void clearWaypointFlag(){
-		hitWaypoint=false;
-	}
-	/** set whether we've finished the stage */
-	public void setFinishedStage(boolean b){
-		finishedStage = b;
-	}
-	public boolean isFinishedStage(){
-		return finishedStage;
-	}
-	
-	public void pickUpOnCollide(){
-		if (world == null) {
-			return;
-		}
-		// Get all the collision events involving this player
-		CollisionEvent[] events = world.getContacts(body);
-		for (int i=0;i<events.length;i++){
-			// make sure this collision occurred by running into this object
-			// and that its mass is not too great for our player to lift
-			if (events[i].getBodyA()==body){
-				if (events[i].getBodyB().getMass() < body.getMass()*4 && events[i].getBodyB().isMoveable()){
-					if (grabJoint == null){
-						grabJoint = new FixedJoint(events[i].getBodyB(),body);
-						//events[i].getBodyB().setPosition(body.getPosition().getX(), body.getPosition().getY());
-						grabJoint.setRelaxation(0.3f);
-						world.add(grabJoint);
-					}
-				}
-			}else if (events[i].getBodyB()==body){
-				if (events[i].getBodyA().getMass() < body.getMass()*4 && events[i].getBodyA().isMoveable()){
-					if (grabJoint == null){
-						grabJoint = new FixedJoint(events[i].getBodyA(),body);
-						grabJoint.setRelaxation(0.3f);
-						world.add(grabJoint);
-					}
 				}
 			}
 		}

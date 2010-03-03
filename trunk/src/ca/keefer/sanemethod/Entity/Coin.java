@@ -5,6 +5,8 @@ import net.phys2d.raw.CollisionEvent;
 import net.phys2d.raw.World;
 import net.phys2d.raw.shapes.Circle;
 
+import ca.keefer.sanemethod.Environment.TiledEnvironment;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -118,21 +120,17 @@ public class Coin extends AbstractEntity{
 		for (int i=0;i<events.length;i++){
 			if (events[i].getBodyB() == this.body){
 				if (!(events[i].getBodyA().isStatic())){
-					if (events[i].getBodyA().getUserData().getClass() == Player.class){
-						Player thePlayer = (Player) events[i].getBodyA().getUserData();
-						thePlayer.addCoins(1);
-						this.world.remove(this.body);
-						this.active = false;
-					}
+					TiledEnvironment tE = (TiledEnvironment)this.getEnvironment();
+					tE.getPlayer().addCoins(10);
+					this.world.remove(this.body);
+					this.active = false;
 				}
 			}else if (events[i].getBodyA() == this.body){
 				if (!(events[i].getBodyB().isStatic())){
-					if (events[i].getBodyB().getUserData().getClass() == Player.class){
-						Player thePlayer = (Player) events[i].getBodyB().getUserData();
-						thePlayer.addCoins(1);
-						this.world.remove(this.body);
-						this.active = false;
-					}
+					TiledEnvironment tE = (TiledEnvironment)this.getEnvironment();
+					tE.getPlayer().addCoins(10);
+					this.world.remove(this.body);
+					this.active = false;
 				}
 			}
 		}
