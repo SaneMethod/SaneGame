@@ -21,7 +21,7 @@ public class XMLShapeOutput {
 		name = fileName;
 	}
 	
-	public void createOutputFile(){
+	public File createOutputFile(){
 		FileWriter fw=null;
 		try {
 			fw = new FileWriter(toSaveTo);
@@ -35,7 +35,7 @@ public class XMLShapeOutput {
 					"See www.sanemethod.com for more -->\n");
 			fw.write("<MapShapes name=\""+name+"\" map=\""+fileName+"\">\n");
 			
-			// Now we enter the for loops where we write Tile information
+			// Now we enter the for loops where we write map shape information
 			for (int i=0; i< shapeList.length;i++){
 				fw.write("<Element pointCount=\""+
 						shapeList[i].getShape().getPointCount()+"\" \n");
@@ -50,16 +50,16 @@ public class XMLShapeOutput {
 				// close this tile tag
 				fw.write("/>\n");
 			}
-			// write close TileShapes tag
+			// write close MapShapes tag
 			fw.write("</MapShapes>");
 			
 			//Done.
 			fw.close();
-			toSaveTo = null;
+			return toSaveTo;
 			
 		} catch (IOException e) {
 			Log.error(e.getMessage());
 		}
-		
+		return null;
 	}
 }

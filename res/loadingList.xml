@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Menu System "kLoadingList.dtd">
 <!-- Default Loading List as of Feb 2010 -->
-<LoadingList name="default" listSize="2">
+<LoadingList name="default" listSize="3">
 <Map name="tutorialMap" mapTMX="res/Tiles/tutorialMap.tmx" />
 <Map name="SaneMap1" shapeXML="res/Tiles/SaneMap1.tmx.xml" mapTMX="res/Tiles/SaneMap1.tmx" />
 <Map name="endDemoMap" mapTMX="res/Tiles/endDemoMap.tmx" />

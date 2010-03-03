@@ -7,6 +7,8 @@ import net.phys2d.raw.World;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Rectangle;
 
+import ca.keefer.sanemethod.Environment.Environment;
+
 /**
  * This interface defines the methods all classes implementing the Entity interface must possess.
  * @author Christopher Keefer, Kevin Glass
@@ -79,7 +81,13 @@ public interface Entity {
 	 */
 	public World getWorld();
 	
+	/** Get whether this entity is currently active, or should be removed from the entityLayer */
 	public boolean isActive();
+	
+	/** assign an TiledEnvironment to this entity */
+	public void setEnvironment(Environment environment);
+	
+	public Environment getEnvironment();
 	
 	public void receiveKeyPress(int keyPressed);
 	public void receiveKeyRelease(int keyReleased);

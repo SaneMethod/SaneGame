@@ -75,7 +75,7 @@ public class IntroState extends BasicGameState {
 		environment = new TiledEnvironment("res/Tiles/titleMap.tmx",tileList,viewPort);
 		thePlayer = environment.getPlayer();
 		theMusic = new Music(environment.getMusic(),true);
-		theMusic.play();
+		theMusic.loop();
 		viewPort.trackEntity(thePlayer,ViewPort.TRACK_MODE_CENTER);
 		
 		craftIntroText();
@@ -94,6 +94,7 @@ public class IntroState extends BasicGameState {
 		g.setBackground(Color.black);
 		
 		viewPort.render(g);
+		//environment.renderBounds(g);
 		textHandler.display(g);
 		if (errorString != null){
 			Constants.saneSystem.getFonts().get("standardFont").drawString(
@@ -259,10 +260,10 @@ public class IntroState extends BasicGameState {
 	
 	@Override
 	public void leave(GameContainer container, StateBasedGame game){
+		optionSelection=null;
+		this.textHandler.reset();
 		game.addState(new TestState(Constants.STATE_TEST));
-		theMusic.fade(1000, 0, true);
-		//theMusic.stop();
-		//game.getState(Constants.STATE_TEST).init(container, game);
+		theMusic.fade(500, 0, true);
 		game.enterState(Constants.STATE_TEST, new EmptyTransition(), new HorizontalSplitTransition());
 	}
 	

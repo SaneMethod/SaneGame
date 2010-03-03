@@ -59,7 +59,7 @@ public class LoadingListPullParser {
 		if (xpp.getName().equalsIgnoreCase("LoadingList")){
 			// the name and size of the list are available here - do something with them?
 			Log.info("LoadingList: "+xpp.getAttributeValue(null, "name")+" with a size of:"
-					+xpp.getAttributeValue(null, "size"));
+					+xpp.getAttributeValue(null, "listSize"));
 		}else if (xpp.getName().equalsIgnoreCase("Map")){
 			MapObject temp = new MapObject(xpp.getAttributeValue(null, "shapeXML"),
 					xpp.getAttributeValue(null, "mapTMX"));

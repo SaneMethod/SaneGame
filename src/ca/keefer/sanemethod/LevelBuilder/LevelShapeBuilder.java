@@ -1,5 +1,6 @@
 package ca.keefer.sanemethod.LevelBuilder;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
@@ -19,6 +20,9 @@ import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
 
 import ca.keefer.sanemethod.Constants;
+import ca.keefer.sanemethod.Interface.Text;
+import ca.keefer.sanemethod.Tools.LoadingListPullParser;
+import ca.keefer.sanemethod.Tools.LoadingListXmlOutput;
 
 /**
  * This class allows me to draw paths/polygons overlaying individual elements of a tile map,
@@ -53,7 +57,6 @@ import ca.keefer.sanemethod.Constants;
 public class LevelShapeBuilder extends BasicGameState{
 
 	int stateID;
-	
 	// Global variables for editor environment
 	
 	// TMX Map
@@ -73,6 +76,19 @@ public class LevelShapeBuilder extends BasicGameState{
 	TextField fileNameField;
 	
 	String ref;
+	
+	// The File created by saving, to be added to the loadingList
+	File savedFile;
+	
+	// whether to show the hotkeys or not
+	boolean showHotKeys;
+	// string to display hot keys
+	String hotKeyText;
+	
+	// The errorText
+	String errorText=null;
+	// how long the errorText has been displaying
+	int errorTextTimer=0;
 	
 	// File type constants
 	final int FILE_TYPE_TMX = 0;
@@ -98,7 +114,6 @@ public class LevelShapeBuilder extends BasicGameState{
 	
 	final int DRAW_STATE_NONE = 0;
 	final int DRAW_STATE_DRAWING = 1;
-	final int DRAW_STATE_DRAWN = 2;
 	
 	// The array list holding all completed shapes
 	ArrayList<MapShape> shapeList;
@@ -136,6 +151,15 @@ public class LevelShapeBuilder extends BasicGameState{
 		showFileNameField = false;
 		fileNameRectangle = new Rectangle(0+viewOffsetX,230+viewOffsetY,800,100);
 		fileNameField = new TextField(container,container.getDefaultFont(),200+viewOffsetX,260+viewOffsetY,200,30);
+		fileNameField.setConsumeEvents(false);
+		
+		showHotKeys=true;
+		hotKeyText = "Hot keys: s = save the xml file; l = load tmx or xml file; h = toggle this hot key display on or off " +
+				"1 = square; 2 = circle; 3 = Path/polygon; " +
+				"right key = scroll map right; left key = scroll map left; up key = scroll map up; down key = scroll map down; " +
+				"enter = commit current shape to list; , = increase map scroll speed; . = decrease map scroll speed; " +
+				"F1->F10 = toggle layers 0-9 on/off";
+		hotKeyText = Text.wordWrap(700, 10, hotKeyText, Constants.saneSystem.getFonts().get("interfaceFont"));
 		
 		ref = null;
 		
@@ -166,9 +190,11 @@ public class LevelShapeBuilder extends BasicGameState{
 		
 		if (showFileNameField){
 			g.setColor(Color.white);
+			fileNameRectangle.setLocation(0-viewOffsetX,230-viewOffsetY);
 			g.fill(fileNameRectangle);
 			g.setColor(Color.red);
-			g.drawString("File Name:", 200+viewOffsetX, 240+viewOffsetY);
+			g.drawString("File Name:", 200-viewOffsetX, 240-viewOffsetY);
+			fileNameField.setLocation(200-viewOffsetX, 260-viewOffsetY);
 			fileNameField.render(container, g);
 			g.setColor(Color.white);
 		}
@@ -199,6 +225,17 @@ public class LevelShapeBuilder extends BasicGameState{
 			}
 		}
 		
+		if (showHotKeys){
+			Constants.saneSystem.getFonts().get("interfaceFont").drawString(10-viewOffsetX, 20-viewOffsetY, hotKeyText);
+		}
+		
+		if (errorText != null){
+			errorText = Text.wordWrap(700, 10, errorText, Constants.saneSystem.getFonts().get("interfaceFont"));
+			Constants.saneSystem.getFonts().get("interfaceFont").drawString(10-viewOffsetX, 
+					(Constants.SCREENHEIGHT-Constants.saneSystem.getFonts().get("interfaceFont").getHeight(errorText)-50)
+					-viewOffsetY, 
+					errorText);
+		}
 		
 	}
 
@@ -215,6 +252,14 @@ public class LevelShapeBuilder extends BasicGameState{
 			}
 		}
 		
+		if (errorText != null){
+			errorTextTimer += delta;
+			if (errorTextTimer > 5000){
+				errorTextTimer =0;
+				errorText = null;
+			}
+		}
+		
 	}
 	
 	@Override
@@ -227,6 +272,12 @@ public class LevelShapeBuilder extends BasicGameState{
 	// Controls key press response
 	public void keyPressed(int keyPressed, char keyChar){
 		int fileType;
+		if (showFileNameField){
+			if (keyPressed != Input.KEY_ENTER){
+				//fileNameField.k
+				keyPressed = -1;
+			}
+		}
 		switch(keyPressed){
 		case Input.KEY_L:
 			showFileNameField=true;
@@ -259,12 +310,14 @@ public class LevelShapeBuilder extends BasicGameState{
 				fileType = checkFileType(ref);
 				if (fileType == FILE_TYPE_TMX){
 					XMLShapeOutput xso = new XMLShapeOutput(ref,shapeList.toArray(new MapShape[0]));
-					xso.createOutputFile();
+					savedFile = xso.createOutputFile();
+					errorText="File:"+ref+".xml has been created successfully.";
 					Log.info("File:"+ref+".xml has been created successfully.");
 				}else{
 					String thisRef = ref.substring(0, ref.length()-4);
 					XMLShapeOutput xso = new XMLShapeOutput(thisRef,shapeList.toArray(new MapShape[0]));
-					xso.createOutputFile();
+					savedFile = xso.createOutputFile();
+					errorText="File:"+thisRef+".xml has been created successfully.";
 					Log.info("File:"+thisRef+".xml has been created successfully.");
 				}
 			}
@@ -357,6 +410,9 @@ public class LevelShapeBuilder extends BasicGameState{
 				}
 			}
 			break;
+		case Input.KEY_H:
+			showHotKeys = !showHotKeys;
+			break;
 		case Input.KEY_ESCAPE:
 			this.container.exit();
 			break;
@@ -364,7 +420,14 @@ public class LevelShapeBuilder extends BasicGameState{
 	}
 	
 	public int checkFileType(String fileName){
-		String ext = fileName.substring(fileName.length()-3,fileName.length());
+		String ext = null;
+		try{
+			ext = fileName.substring(fileName.length()-3,fileName.length());
+		}catch(StringIndexOutOfBoundsException e){
+			errorText = "Failed to find file extension: must be .xml or .tmx";
+			Log.error("String not long enough:"+e.getMessage());
+			return -1;
+		}
 		Log.debug("Extension:"+ext);
 		if (ext.equalsIgnoreCase("TMX")){
 			return FILE_TYPE_TMX;
@@ -382,9 +445,13 @@ public class LevelShapeBuilder extends BasicGameState{
 				displayLayer[i]=true;
 			}
 		} catch (SlickException e) {
+			errorText = e.getMessage();
 			Log.error(e.getMessage());
+			return;
 		} catch (RuntimeException ex){
+			errorText = "TiledMap failed to load:"+ex.getMessage();
 			Log.error("TiledMap failed to load:"+ex.getMessage());
+			return;
 		}
 	}
 	
@@ -400,7 +467,13 @@ public class LevelShapeBuilder extends BasicGameState{
 				displayLayer[i]=true;
 			}
 		} catch (SlickException e) {
+			errorText = e.getMessage();
 			Log.error(e.getMessage());
+			return;
+		} catch (RuntimeException ex){
+			errorText = ex.getMessage();
+			Log.error(ex.getMessage());
+			return;
 		}
 		shapeList = x.processXML();
 	}
@@ -448,7 +521,7 @@ public class LevelShapeBuilder extends BasicGameState{
 			drawState = DRAW_STATE_NONE;
 		}else if (currentShape == SHAPE_CIRCLE && drawState == DRAW_STATE_DRAWING){
 			shapeList.add(new MapShape(tempCircle));
-			drawState = DRAW_STATE_DRAWN;
+			drawState = DRAW_STATE_NONE;
 		}else if (currentShape == SHAPE_PATH && drawState == DRAW_STATE_DRAWING){
 			tempPath.close();
 			Polygon thisPoly = new Polygon();
@@ -457,8 +530,8 @@ public class LevelShapeBuilder extends BasicGameState{
 				thisPoly.addPoint(thisFloat[i],thisFloat[i+1]);
 			}
 			shapeList.add(new MapShape(thisPoly));
-			Log.debug("Xoffset:"+viewOffsetX+" Yoffset:"+viewOffsetY);
-			Log.debug("PolyX:"+thisPoly.getX()+" PolyY:"+thisPoly.getY());
+			//Log.debug("Xoffset:"+viewOffsetX+" Yoffset:"+viewOffsetY);
+			//Log.debug("PolyX:"+thisPoly.getX()+" PolyY:"+thisPoly.getY());
 			drawState = DRAW_STATE_NONE;
 		}
 	}

@@ -35,6 +35,7 @@ public abstract class AbstractEnvironment implements Environment {
 		}
 		
 		entity.setWorld(world);
+		entity.setEnvironment(this);
 		
 		eLayer.addEntity(entity);
 	}
